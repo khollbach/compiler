@@ -1,6 +1,6 @@
 % CSC488 Assignment 1 - Part (d)
 
-
+{
 var global1, global2 : Integer
 global1 := 100
 global2 := 50
@@ -42,3 +42,4 @@ procedure proc2 ( p : Integer , q : Integer, r : Boolean )
       else
         return proc1       
     }
+}
