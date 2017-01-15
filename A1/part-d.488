@@ -42,4 +42,9 @@ procedure proc2 ( p : Integer , q : Integer, r : Boolean )
       else
         return proc1       
     }
+
+if func1 = 150 then write "func1 correct"
+if proc1 = true then write "proc1 correct"
+if func2 ( true, 20, 10) =  20 then write "func2 correct"
+if proc2 ( 75, 25, false ) = 25 then write "proc2 correct"
 }
