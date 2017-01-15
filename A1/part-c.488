@@ -1,0 +1,105 @@
+% Test case (c).
+% 'A program using all forms of loop building and loop exit constructs.'
+
+% There are two types of loops: while-loops and repeat-loops.
+% In addition to loops terminating because the condition is made false/true,
+% loops can be exited using 'exit' and 'exit-when', and each can also have an
+% integer specifying how many loops to exit (the default is 1).
+
+{
+    while true do {
+        write "test", newline
+        exit
+    }
+
+    while true do {
+        exit
+        write "SHOULD NOT PRINT!!!", newline
+    }
+
+    while false do write "SHOULD NOT PRINT!!!", newline
+
+    var i : Integer
+
+    i := 1
+    while i = 1 do {
+        i = 2
+        write "test", newline
+    }
+
+    while true do {
+        write "test", newline
+        exit when i = 2
+    }
+
+    while true do {
+        exit when i = 2
+        write "SHOULD NOT PRINT!!!", newline
+    }
+
+    i := 1
+    while i < 10 do i := i + 1
+    write "Should be 10: ", i, newline
+
+    while true do
+        while true do
+            while true do
+                exit 3
+
+    var j, k : Integer
+
+    i := 1
+    j := 1
+    k := 1
+    while true do {
+        while true do {
+            while true do {
+                exit 3 when i = 2 and j = 3 and k = 4
+                k := k + 1
+            }
+            j := j + 1
+        }
+        i := i + 1
+    }
+    write "Should be 2 3 4: ", i, " ", j, " ", k, newline
+
+    repeat until true
+
+    i := 1
+    repeat
+        if i = 2 then
+            exit
+        else {
+            write "test", newline
+            i := 2
+        }
+    until false
+
+    var count : Integer
+    count := 0
+    i := 0
+    while i < 10 do {
+        j := 0
+        repeat {
+            j := j + 1
+        } until j = 5
+        i := i + 1
+    }
+    write "Should be 50: ", count, newline
+
+    count := 0
+    while true {
+        i := 0
+        repeat {
+            j := 0
+            while true do {
+                if i = 2 and j = 3 then
+                    exit 2
+                j := j + 1
+            }
+            i := i + 1
+        } until false
+        write "test", newline
+        exit 1
+    }
+}
