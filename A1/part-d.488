@@ -1,0 +1,16 @@
+% CSC488 Assignment 1 - Part (d)
+
+% non-recursive function without parameters
+var global : Integer
+
+function func1 : Integer { global : = 100}
+
+% non-recursive procedure without parameters
+procedure proc1 {}
+
+% non-recursive function with parameters
+
+function func2 ( arg1 , arg2 , arg3 ) : Integer {}
+
+% non-recursive procedure with parameters
+procedure proc2 ( arg1 , arg2 , arg3 ) : {}
