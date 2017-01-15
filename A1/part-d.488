@@ -1,16 +1,31 @@
 % CSC488 Assignment 1 - Part (d)
 
-% non-recursive function without parameters
-var global : Integer
 
-function func1 : Integer { global : = 100}
+var global1, global2 : Integer
+global1 := 100
+global2 := 50
+
+var global3 : Boolean
+global3 := false
+
+% non-recursive function without parameters
+% returns the sum of the two global variables
+function func1 : Integer 
+    { return with global1 + global2 }
 
 % non-recursive procedure without parameters
-procedure proc1 {}
+procedure proc1 
+    { if global3 then return global1 + global2
+      else return global1 - global2
+    }
 
 % non-recursive function with parameters
-
-function func2 ( arg1 , arg2 , arg3 ) : Integer {}
+% func2 takes a boolean a and two integers.
+% returns the first integer if a is true, second integer if false
+function func2 ( a : Boolean, b : Integer, c : Integer  ) : Integer 
+    { if arg1 then return with b
+      else return with c
+    }
 
 % non-recursive procedure with parameters
-procedure proc2 ( arg1 , arg2 , arg3 ) : {}
+procedure proc2 ( arg1 , arg2 , arg3 ) : {return}
