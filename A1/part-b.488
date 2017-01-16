@@ -2,7 +2,7 @@
 
 {
     % Declaring a one dimensional array with a single integer upper bound.
-    simple_upper_bound_array[3]
+    var simple_upper_bound_array[3] : Integer
     simple_upper_bound_array[1] := 1
     simple_upper_bound_array[2] := 2
     simple_upper_bound_array[3] := 3
@@ -15,7 +15,7 @@
 
     % Declare a one dimensional array with two bounds.
     % This should be equivalent to the array declared above. 
-    two_bounds_array_positive_indices[1..3]
+    var two_bounds_array_positive_indices[1..3] : Integer
     two_bounds_array_positive_indices[1] := 1
     two_bounds_array_positive_indices[2] := 2
     two_bounds_array_positive_indices[3] := 3
@@ -26,7 +26,7 @@
     write two_bounds_array_positive_indices[3]=3, newline
 
     % Declare a one dimensional array with two negative bounds.
-    two_bounds_array_negative_indices[-3..-1]
+    var two_bounds_array_negative_indices[-3..-1] : Integer
     two_bounds_array_negative_indices[-3] := 1
     two_bounds_array_negative_indices[-2] := 2
     two_bounds_array_negative_indices[-1] := 3
@@ -37,7 +37,7 @@
     write two_bounds_array_negative_indices[-1]=3, newline
 
     % Declare a one dimensional array with a negative lower bound and a positive upper bound.
-    two_bounds_array_negative_and_positive_indices[-1..1]
+    var two_bounds_array_negative_and_positive_indices[-1..1] : Integer
     two_bounds_array_negative_and_positive_indices[-1] := 1
     two_bounds_array_negative_and_positive_indices[0] := 2
     two_bounds_array_negative_and_positive_indices[1] := 3
@@ -46,6 +46,4 @@
     write two_bounds_array_negative_and_positive_indices[-1]=1, newline
     write two_bounds_array_negative_and_positive_indices[0]=2, newline
     write two_bounds_array_negative_and_positive_indices[1]=3, newline
-
 }
-
