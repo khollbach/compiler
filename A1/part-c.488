@@ -48,12 +48,12 @@
 
     var j, k : Integer
 
-    i := 1
-    j := 1
-    k := 1
-    while true do {
-        while true do {
-            while true do {
+    i := 0
+    while i < 10 do {
+        j := 0
+        while j < 10 do {
+            k := 0
+            while k < 10 do {
                 exit 3 when i = 2 and j = 3 and k = 4
                 k := k + 1
             }
@@ -94,14 +94,15 @@
         i := 0
         repeat {
             j := 0
-            while true do {
+            while j < 10 do {
                 if i = 2 and j = 3 then
                     exit 2
                 j := j + 1
             }
             i := i + 1
-        } until false
+        } until i = 10
         write "test", newline
         exit 1
     }
+    write "Should be 2 3: ", i, " ", j, newline
 }
