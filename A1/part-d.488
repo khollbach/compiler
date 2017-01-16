@@ -4,6 +4,7 @@
 var global1, global2 : Integer
 global1 := 100
 global2 := 50
+global4 := 10
 
 var global3, global4 : Boolean
 global3 := false
@@ -13,17 +14,6 @@ global4 := true
 % returns the sum of the two global variables
 function func1 : Integer 
     { return with global1 + global2 }
-
-% non-recursive procedure without parameters
-% if the boolean global3 is true, it returns the sum of the global ints
-% else, it returns global4 (a boolean)
-% as this is a procedure (instead of a function) it does not require uniform return types
-procedure proc1 
-    { if global3 then 
-        return global1 + global2
-      else 
-        return global4
-    }
 
 % non-recursive function with parameters
 % func2 takes a boolean a and two integers.
@@ -35,16 +25,33 @@ function func2 ( a : Boolean, b : Integer, c : Integer  ) : Integer
         return with c
     }
 
+% non-recursive procedure without parameters
+% if the boolean global3 is true, it increases the value of global1 by 1
+% else, it increases the value of global2 by 1
+% as this is a procedure (instead of a function) it does not return anything
+procedure proc1 
+    { if global3 then
+        global1 :=  global1 + 1
+        return 
+      else 
+        global1 := global2 + 1
+        return
+    }
+
 % non-recursive procedure with parameters
 procedure proc2 ( p : Integer , q : Integer, r : Boolean )
-    { if p < global1 then
-        return func2 ( r, p, q )
+    { if r then
+        global4 := global4 + p
+        return
       else
-        return proc1       
+        global4 := global4 + q
+        return       
     }
 
 if func1 = 150 then write "func1 correct"
-if proc1 = true then write "proc1 correct"
 if func2 ( true, 20, 10) =  20 then write "func2 correct"
-if proc2 ( 75, 25, false ) = 25 then write "proc2 correct"
+proc1
+if global1 = 101 then write "proc1 correct"
+proc2 ( 5, 7, true ) 
+if global4 = 15 then write "proc2 correct"
 }
