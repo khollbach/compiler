@@ -81,6 +81,8 @@
     while i < 10 do {
         j := 0
         repeat {
+            count := count + 1
+
             j := j + 1
         } until j = 5
         i := i + 1
