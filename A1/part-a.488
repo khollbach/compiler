@@ -33,7 +33,7 @@
     test(not (false and true))
 
     write "or: "
-    test(false or ture)
+    test(false or true)
 
     write "or: "
     test(not (false or false))
