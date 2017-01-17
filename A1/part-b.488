@@ -2,46 +2,45 @@
 
 {
     % Declaring a one dimensional array with a single integer upper bound.
-    var simple_upper_bound_array[3] : Integer
+    var simple_upper_bound_array[3] : integer
+    % Declare a one dimensional array with two bounds.
+    var two_bounds_array_positive_indices[1..3] : Integer
+    % Declare a one dimensional array with two negative bounds.
+    var two_bounds_array_negative_indices[-3..-1] : Integer
+    % Declare a one dimensional array with a negative lower bound and a positive upper bound.
+    var two_bounds_array_negative_and_positive_indices[-1..1] : Integer
+
     simple_upper_bound_array[1] := 1
     simple_upper_bound_array[2] := 2
     simple_upper_bound_array[3] := 3
-
     % Test that indices were assigned the proper values.
     write simple_upper_bound_array[1]=1, newline
     write simple_upper_bound_array[2]=2, newline
     write simple_upper_bound_array[3]=3, newline
 
 
-    % Declare a one dimensional array with two bounds.
+    
     % This should be equivalent to the array declared above. 
-    var two_bounds_array_positive_indices[1..3] : Integer
     two_bounds_array_positive_indices[1] := 1
     two_bounds_array_positive_indices[2] := 2
     two_bounds_array_positive_indices[3] := 3
-
     % Test that the indices were assigned the proper values
     write two_bounds_array_positive_indices[1]=1, newline
     write two_bounds_array_positive_indices[2]=2, newline
     write two_bounds_array_positive_indices[3]=3, newline
 
-    % Declare a one dimensional array with two negative bounds.
-    var two_bounds_array_negative_indices[-3..-1] : Integer
+    
     two_bounds_array_negative_indices[-3] := 1
     two_bounds_array_negative_indices[-2] := 2
     two_bounds_array_negative_indices[-1] := 3
-
     % Test that the indices were assigned the proper values
     write two_bounds_array_negative_indices[-3]=1, newline
     write two_bounds_array_negative_indices[-2]=2, newline
     write two_bounds_array_negative_indices[-1]=3, newline
-
-    % Declare a one dimensional array with a negative lower bound and a positive upper bound.
-    var two_bounds_array_negative_and_positive_indices[-1..1] : Integer
+    
     two_bounds_array_negative_and_positive_indices[-1] := 1
     two_bounds_array_negative_and_positive_indices[0] := 2
     two_bounds_array_negative_and_positive_indices[1] := 3
-
     % Test that the indices were assigned the proper values
     write two_bounds_array_negative_and_positive_indices[-1]=1, newline
     write two_bounds_array_negative_and_positive_indices[0]=2, newline
