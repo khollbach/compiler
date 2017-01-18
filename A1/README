@@ -4,5 +4,5 @@ Each group member did the following part:
 George: (a)
 Arturo: (b) The program declares 4 Integer arrays and assigns values to the indices that are valid for each array. Finally, the program tests that all arrays have the right values assigned to their indices.
 Kevan:  (c)
-Tarang: (d)
+Tarang: (d) The two function perform arithmetic and logical operations on the global variables and return the result. The two procedures modify the global variables, and do nor return anything.
 Andrew: (e)
