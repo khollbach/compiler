@@ -18,7 +18,7 @@ function func1 : Integer
 % func2 takes a boolean a and two integers.
 % returns the first integer if a is true, second integer if false
 function func2 ( a : Boolean, b : Integer, c : Integer  ) : Integer 
-    { if arg1 then 
+    { if a then
         return with b
       else 
         return with c
@@ -30,21 +30,21 @@ function func2 ( a : Boolean, b : Integer, c : Integer  ) : Integer
 % as this is a procedure (instead of a function) it does not return anything
 procedure proc1 
     { if global3 then
-        global1 :=  global1 + 1
-        return 
+      { global1 :=  global1 + 1
+        return }
       else 
-        global1 := global2 + 1
-        return
+      { global1 := global2 + 1
+        return }
     }
 
 % non-recursive procedure with parameters
 procedure proc2 ( p : Integer , q : Integer, r : Boolean )
     { if r then
-        global4 := global4 + p
-        return
+      { global4 := global4 + p
+        return }
       else
-        global4 := global4 + q
-        return       
+      { global4 := global4 + q
+        return }
     }
 
 if func1 = 150 then write "func1 correct"
