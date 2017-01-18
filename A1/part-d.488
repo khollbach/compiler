@@ -7,7 +7,7 @@ var global3 : Boolean
 global1 := 100
 global2 := 50
 global4 := 10
-global3 := false
+global3 := true
 
 % non-recursive function without parameters
 % returns the sum of the two global variables
@@ -33,7 +33,7 @@ procedure proc1
       { global1 :=  global1 + 1
         return }
       else 
-      { global1 := global2 + 1
+      { global2 := global2 + 1
         return }
     }
 
