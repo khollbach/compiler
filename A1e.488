@@ -1,6 +1,6 @@
 {
 	%Recursive functions, with and without parameters
-	var count : = 10
+	var count : Integer
 	function countdown : Integer
 	{
 		if count = 0 then return with count
@@ -15,7 +15,7 @@
 		return with fib ( n - 1 ) + fib ( n - 2 )
 	}
 	%Recursive procedures, with and without parameters
-	var tally : = 0
+	var tally : = Integer
 	procedure tallyup
 	{
 		if tally = 10 then return
@@ -23,7 +23,6 @@
 		tallyup
 		return
 	}
-	var count : = 0
 	procedure helper
 	{
 		if count = 3 return
@@ -48,9 +47,12 @@
 		return with factorial ( n - 1 ) * sillyfactorial ( n - 2 )		
 	}
 	%Procedure and function calls
+	tally : = 0
+	count : = 10
 	countdown
 	fib ( 6 )
 	tallyup
+	count : = 0
 	helper
 	sillyfactorial(12)
 }
