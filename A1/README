@@ -2,7 +2,7 @@ CSC488 Assignment 1
 
 Each group member did the following part:
 George: (a)
-Arturo: (b)
+Arturo: (b) The program declares 4 Integer arrays and assigns values to the indices that are valid for each array. Finally, the program tests that all arrays have the right values assigned to their indices.
 Kevan:  (c)
 Tarang: (d)
 Andrew: (e)
