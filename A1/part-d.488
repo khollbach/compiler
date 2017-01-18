@@ -1,14 +1,13 @@
 % CSC488 Assignment 1 - Part (d)
 
 {
-var global1, global2 : Integer
+var global1, global2, global4 : Integer
+var global3 : Boolean
+
 global1 := 100
 global2 := 50
 global4 := 10
-
-var global3, global4 : Boolean
 global3 := false
-global4 := true
 
 % non-recursive function without parameters
 % returns the sum of the two global variables
