@@ -19,7 +19,7 @@
 		return with fib ( n - 1 ) + fib ( n - 2 )
 	}
 	%Recursive procedures, with and without parameters
-	var tally : = Integer
+	var tally : Integer
 	procedure tallyup
 	{
 		if tally = 10 then return
