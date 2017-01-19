@@ -1,8 +1,7 @@
 CSC488 Assignment 1
 
 Each group member did the following part:
-George: (a)
+George: (a) Using a 'test' procedure, the program ensures that Boolean expressions crafted using each of the 488 language's operators all evaulate to 'true', and reports whether each test passes or fails. Tests are categorized by the type of operator being tested (i.e. Boolean, Comparison, Arithmetic).
 Arturo: (b) The program declares 4 Integer arrays and assigns values to the indices that are valid for each array. Finally, the program tests that all arrays have the right values assigned to their indices.
 Kevan:  (c)
-Tarang: (d) The two function perform arithmetic and logical operations on the global variables and return the result. The two procedures modify the global variables, and do nor return anything.
-Andrew: (e)
+Tarang: (d) The two function perform arithmetic and logical operations on the global variables and return the result. The two procedures modify the global variables, and do nor return anything.Andrew: (e)
