@@ -107,10 +107,25 @@ terminal String  TEXTCONST	;
 // Non-terminals that have no value.
 // nonterminal xxx
 
-nonterminal	program 	;
+nonterminal program;
+nonterminal statement;
+nonterminal declaration;
+nonterminal variablenames;
+nonterminal bound;
+nonterminal scope;
+nonterminal output;
+nonterminal input;
+nonterminal type;
+nonterminal arguments;
+nonterminal parameters;
+nonterminal variable;
+nonterminal expression;
+nonterminal variablename, arrayname, functionname, parametername, procedurename;
 
 // Non-terminals that have a value.
 // nonterminal type  nameList ;
+
+// TODO: Should any of the above non-terminals have values?
 
 // PLEASE NOTE: your grammar can not use the 'precedence'
 // feature of java-cup. The lines below should remain
@@ -136,4 +151,78 @@ start with program;
  *  GOES HERE
  */
 
-program		::=	;
+program ::= scope;
+statement ::= variable COLON EQUAL expression
+    | IF expression THEN statement
+    | IF expression THEN statement ELSE statement
+    | WHILE expression DO statement
+    | REPEAT statement UNTIL expression
+    | EXIT
+    | EXIT INTCONST
+    | EXIT WHEN expression
+    | EXIT INTCONST WHEN expression
+    | RETURN WITHX expression
+    | RETURN
+    | WRITE output
+    | READ input
+    | procedurename
+    | procedurename L_PAREN arguments R_PAREN
+    | scope
+    | statement statement;
+declaration ::= VAR variablenames COLON type
+    | FUNCTION functionname COLON type scope
+    | FUNCTION functionname L_PAREN parameters R_PAREN COLON type scope
+    | PROCEDURE procedurename scope
+    | PROCEDURE procedurename L_PAREN parameters R_PAREN scope
+    | declaration declaration;
+variablenames ::= variablename
+    | variablename L_SQUARE INTCONST R_SQUARE
+    | variablename L_SQUARE bound DOT DOT bound R_SQUARE
+    | variablenames COMMA variablenames;
+bound ::= INTCONST
+    | MINUS INTCONST;
+scope ::= L_CURLEY declaration statement R_CURLEY
+    | L_CURLEY statement R_CURLEY
+    | L_CURLEY R_CURLEY;
+output ::= expression
+    | TEXTCONST
+    | NEWLINE
+    | output COMMA output;
+input ::= variable
+    | input COMMA input;
+type ::= INTEGER
+    | BOOLEAN;
+arguments ::= expression
+    | arguments COMMA expression;
+parameters ::= parametername COLON type
+    | parameters COMMA parameters;
+variable ::= variablename
+    | arrayname L_SQUARE expression R_SQUARE;
+expression ::= INTCONST
+    | MINUS expression
+    | expression PLUS expression
+    | expression MINUS expression
+    | expression TIMES expression
+    | expression DIVIDE expression
+    | TRUE
+    | FALSE
+    | NOT expression
+    | expression AND expression
+    | expression OR expression
+    | expression EQUAL expression
+    | expression NOT EQUAL expression
+    | expression LESS expression
+    | expression LESS EQUAL expression
+    | expression GREATER expression
+    | expression GREATER EQUAL expression
+    | L_PAREN expression R_PAREN
+    | L_PAREN expression QUESTION expression COLON expression R_PAREN
+    | variable
+    | functionname
+    | functionname L_PAREN arguments R_PAREN
+    | parametername;
+variablename ::= IDENT;
+arrayname ::= IDENT;
+functionname ::= IDENT;
+parametername ::= IDENT;
+procedurename ::= IDENT;
