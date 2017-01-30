@@ -193,7 +193,7 @@ input ::= variable
 type ::= INTEGER
     | BOOLEAN;
 arguments ::= expression
-    | arguments COMMA expression;
+    | arguments COMMA arguments;
 parameters ::= parametername COLON type
     | parameters COMMA parameters;
 variable ::= variablename
