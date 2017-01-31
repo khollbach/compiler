@@ -123,7 +123,7 @@ nonterminal expression;
 nonterminal variablename, arrayname, functionname, parametername, procedurename;
 
 nonterminal declaration_basecase, variablenames_basecase, parameters_basecase;
-nonterminal or_exp, and_exp, not_exp, comparison_exp, add_sub_exp, mult_div_exp, neg_exp, general_exp;
+nonterminal or_exp, and_exp, not_exp, compare_exp, plus_minus_exp, times_divide_exp, unary_minus_exp, general_exp;
 
 // Non-terminals that have a value.
 // nonterminal type  nameList ;
@@ -206,52 +206,43 @@ variable ::= variablename
     | arrayname L_SQUARE expression R_SQUARE;
 
 expression ::= or_exp
-	| and_exp
-	| not_exp
-	| comparison_exp
-	| add_sub_exp
-	| mult_div_exp
-	| neg_exp
-	| general_exp
-	| L_PAREN expression R_PAREN
+    | and_exp
+    | not_exp
+    | compare_exp
+    | plus_minus_exp
+    | times_divide_exp
+    | unary_minus_exp
+    | general_exp
+    | L_PAREN expression R_PAREN
     | L_PAREN expression QUESTION expression COLON expression R_PAREN;
- 
 or_exp ::= or_exp OR and_exp
-	| and_exp;
-
+    | and_exp;
 and_exp ::= and_exp AND not_exp
-	| not_exp;
-
+    | not_exp;
 not_exp ::= NOT not_exp
-	| comparison_exp;
-
-comparison_exp ::= add_sub_exp EQUAL add_sub_exp
-	| add_sub_exp NOT EQUAL add_sub_exp
-	| add_sub_exp LESS add_sub_exp
-	| add_sub_exp LESS EQUAL add_sub_exp
-	| add_sub_exp GREATER add_sub_exp
-	| add_sub_exp GREATER EQUAL add_sub_exp
-	| add_sub_exp;
-
-add_sub_exp ::= add_sub_exp PLUS mult_div_exp
-	| add_sub_exp MINUS mult_div_exp
-	| mult_div_exp;
-
-mult_div_exp ::= mult_div_exp TIMES neg_exp
-	| mult_div_exp DIVIDE neg_exp
-	| neg_exp;
-
-neg_exp ::= MINUS neg_exp
-	| general_exp;
-
+    | compare_exp;
+compare_exp ::= compare_exp EQUAL plus_minus_exp
+    | compare_exp NOT EQUAL plus_minus_exp
+    | compare_exp LESS plus_minus_exp
+    | compare_exp LESS EQUAL plus_minus_exp
+    | compare_exp GREATER plus_minus_exp
+    | compare_exp GREATER EQUAL plus_minus_exp
+    | compare_exp;
+plus_minus_exp ::= plus_minus_exp PLUS times_divide_exp
+    | plus_minus_exp MINUS times_divide_exp
+    | times_divide_exp;
+times_divide_exp ::= times_divide_exp TIMES unary_minus_exp
+    | times_divide_exp DIVIDE unary_minus_exp
+    | unary_minus_exp;
+unary_minus_exp ::= MINUS unary_minus_exp
+    | general_exp;
 general_exp ::= INTCONST
-	| TRUE
-	| FALSE
-	| variable
-	| functionname
-	| functionname L_PAREN arguments R_PAREN
-	| parametername;
- 
+    | TRUE
+    | FALSE
+    | variable
+    | functionname
+    | functionname L_PAREN arguments R_PAREN
+    | parametername;
 
 variablename ::= IDENT;
 arrayname ::= IDENT;
