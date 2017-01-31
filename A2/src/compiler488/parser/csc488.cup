@@ -125,8 +125,6 @@ nonterminal variablename, arrayname, functionname, parametername, procedurename;
 // Non-terminals that have a value.
 // nonterminal type  nameList ;
 
-// TODO: Should any of the above non-terminals have values?
-
 // PLEASE NOTE: your grammar can not use the 'precedence'
 // feature of java-cup. The lines below should remain
 // commented out.
