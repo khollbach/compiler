@@ -26,7 +26,7 @@
 
     i := 1
     while i = 1 do {
-        i = 2
+        i := 2
         write "test", newline
     }
 
@@ -64,7 +64,7 @@
     }
     write "Should be 2 3 4: ", i, " ", j, " ", k, newline
 
-    repeat until true
+    repeat {} until true
 
     i := 1
     repeat
@@ -90,7 +90,7 @@
     write "Should be 50: ", count, newline
 
     count := 0
-    while true {
+    while true do {
         i := 0
         repeat {
             j := 0
