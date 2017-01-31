@@ -66,7 +66,7 @@
     test((4 > = 4) and (4 > = 3))
 
     write "conditional: "
-    test(true ? true : false)
+    test((true ? true : false))
 
 
     % ARITHMETIC OPERATORS %

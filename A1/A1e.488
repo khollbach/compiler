@@ -29,25 +29,25 @@
 	}
 	procedure helper
 	{
-		if count = 3 return
 		procedure nested ( n : Integer )
 		{
-			if n = 3 return
+			if n = 3 then return
 			nested ( n + 1 )
 			return
 		}
+		if count = 3 then return
 		nested(count)
 		return	
 	}
 	%Nested recursive function
-	function sillyfactorial ( n : Integer )
+	function sillyfactorial ( n : Integer ) : Integer
 	{
-		function factorial ( x : Integer )
+		function factorial ( x : Integer ) : Integer
 		{
-			if x = 1 return with 1
+			if x = 1 then return with 1
 			return with x * factorial ( x - 1 )
 		}
-		if n = 1 or n = 0 return with 1
+		if n = 1 or n = 0 then return with 1
 		return with factorial ( n - 1 ) * sillyfactorial ( n - 2 )		
 	}
 	%Procedure and function calls
