@@ -122,6 +122,8 @@ nonterminal variable;
 nonterminal expression;
 nonterminal variablename, arrayname, functionname, parametername, procedurename;
 
+nonterminal or_exp, and_exp, not_exp, comparison_exp, add_sub_exp, mult_div_exp, neg_exp, general_exp;
+
 // Non-terminals that have a value.
 // nonterminal type  nameList ;
 
@@ -152,6 +154,7 @@ start with program;
  */
 
 program ::= scope;
+
 statement ::= variable COLON EQUAL expression
     | IF expression THEN statement
     | IF expression THEN statement ELSE statement
@@ -169,6 +172,7 @@ statement ::= variable COLON EQUAL expression
     | procedurename L_PAREN arguments R_PAREN
     | scope
     | statement statement;
+    
 declaration ::= VAR variablenames COLON type
     | FUNCTION functionname COLON type scope
     | FUNCTION functionname L_PAREN parameters R_PAREN COLON type scope
@@ -198,29 +202,55 @@ parameters ::= parametername COLON type
     | parameters COMMA parameters;
 variable ::= variablename
     | arrayname L_SQUARE expression R_SQUARE;
-expression ::= INTCONST
-    | MINUS expression
-    | expression PLUS expression
-    | expression MINUS expression
-    | expression TIMES expression
-    | expression DIVIDE expression
-    | TRUE
-    | FALSE
-    | NOT expression
-    | expression AND expression
-    | expression OR expression
-    | expression EQUAL expression
-    | expression NOT EQUAL expression
-    | expression LESS expression
-    | expression LESS EQUAL expression
-    | expression GREATER expression
-    | expression GREATER EQUAL expression
-    | L_PAREN expression R_PAREN
-    | L_PAREN expression QUESTION expression COLON expression R_PAREN
-    | variable
-    | functionname
-    | functionname L_PAREN arguments R_PAREN
-    | parametername;
+    
+expression ::= or_exp
+	| and_exp
+	| not_exp
+	| comparison_exp
+	| add_sub_exp
+	| mult_div_exp
+	| neg_exp
+	| general_exp
+	| L_PAREN expression R_PAREN
+    | L_PAREN expression QUESTION expression COLON expression R_PAREN;
+ 
+or_exp ::= or_exp OR and_exp
+	| and_exp;
+
+and_exp ::= and_exp AND not_exp
+	| not_exp;
+
+not_exp ::= NOT not_exp
+	| comparison_exp;
+
+comparison_exp ::= add_sub_exp EQUAL add_sub_exp
+	| add_sub_exp NOT EQUAL add_sub_exp
+	| add_sub_exp LESS add_sub_exp
+	| add_sub_exp LESS EQUAL add_sub_exp
+	| add_sub_exp GREATER add_sub_exp
+	| add_sub_exp GREATER EQUAL add_sub_exp
+	| add_sub_exp;
+
+add_sub_exp ::= add_sub_exp PLUS mult_div_exp
+	| add_sub_exp MINUS mult_div_exp
+	| mult_div_exp;
+
+mult_div_exp ::= mult_div_exp TIMES neg_exp
+	| mult_div_exp DIVIDE neg_exp
+	| neg_exp;
+
+neg_exp ::= MINUS neg_exp
+	| general_exp;
+
+general_exp ::= INTCONST
+	| TRUE
+	| FALSE
+	| variable
+	| functionname
+	| functionname L_PAREN arguments R_PAREN
+	| parametername;
+ 
+
 variablename ::= IDENT;
 arrayname ::= IDENT;
 functionname ::= IDENT;
