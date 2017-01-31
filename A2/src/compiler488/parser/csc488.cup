@@ -122,6 +122,7 @@ nonterminal variable;
 nonterminal expression;
 nonterminal variablename, arrayname, functionname, parametername, procedurename;
 
+nonterminal declaration_basecase, variablenames_basecase, parameters_basecase;
 nonterminal or_exp, and_exp, not_exp, comparison_exp, add_sub_exp, mult_div_exp, neg_exp, general_exp;
 
 // Non-terminals that have a value.
@@ -170,17 +171,19 @@ statement ::= variable COLON EQUAL expression
     | procedurename L_PAREN arguments R_PAREN
     | scope
     | statement statement;
-    
-declaration ::= VAR variablenames COLON type
+
+declaration ::= declaration declaration_basecase
+    | declaration_basecase;
+declaration_basecase ::= VAR variablenames COLON type
     | FUNCTION functionname COLON type scope
     | FUNCTION functionname L_PAREN parameters R_PAREN COLON type scope
     | PROCEDURE procedurename scope
-    | PROCEDURE procedurename L_PAREN parameters R_PAREN scope
-    | declaration declaration;
-variablenames ::= variablename
+    | PROCEDURE procedurename L_PAREN parameters R_PAREN scope;
+variablenames ::= variablenames COMMA variablenames_basecase
+    | variablenames_basecase;
+variablenames_basecase ::= variablename
     | variablename L_SQUARE INTCONST R_SQUARE
-    | variablename L_SQUARE bound DOT DOT bound R_SQUARE
-    | variablenames COMMA variablenames;
+    | variablename L_SQUARE bound DOT DOT bound R_SQUARE;
 bound ::= INTCONST
     | MINUS INTCONST;
 scope ::= L_CURLEY declaration statement R_CURLEY
@@ -194,13 +197,14 @@ input ::= variable
     | input COMMA input;
 type ::= INTEGER
     | BOOLEAN;
-arguments ::= expression
-    | arguments COMMA arguments;
-parameters ::= parametername COLON type
-    | parameters COMMA parameters;
+arguments ::= arguments COMMA expression
+    | expression;
+parameters ::= parameters COMMA parameters_basecase
+    | parameters_basecase;
+parameters_basecase ::= parametername COLON type;
 variable ::= variablename
     | arrayname L_SQUARE expression R_SQUARE;
-    
+
 expression ::= or_exp
 	| and_exp
 	| not_exp
