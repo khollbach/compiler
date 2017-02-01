@@ -223,12 +223,12 @@ and_exp ::= and_exp AND not_exp
     | not_exp;
 not_exp ::= NOT not_exp
     | compare_exp;
-compare_exp ::= compare_exp EQUAL plus_minus_exp
-    | compare_exp NOT EQUAL plus_minus_exp
-    | compare_exp LESS plus_minus_exp
-    | compare_exp LESS EQUAL plus_minus_exp
-    | compare_exp GREATER plus_minus_exp
-    | compare_exp GREATER EQUAL plus_minus_exp
+compare_exp ::= plus_minus_exp EQUAL plus_minus_exp
+    | plus_minus_exp NOT EQUAL plus_minus_exp
+    | plus_minus_exp LESS plus_minus_exp
+    | plus_minus_exp LESS EQUAL plus_minus_exp
+    | plus_minus_exp GREATER plus_minus_exp
+    | plus_minus_exp GREATER EQUAL plus_minus_exp
     | plus_minus_exp;
 plus_minus_exp ::= plus_minus_exp PLUS times_divide_exp
     | plus_minus_exp MINUS times_divide_exp
