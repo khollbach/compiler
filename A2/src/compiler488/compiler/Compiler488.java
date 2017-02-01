@@ -27,10 +27,16 @@ public class Compiler488 {
 			System.out.println("Start parsing");
 			testParser (new File (argv[0]));
 			System.out.println("End parsing");
+
+            // exit status = 0 to imply successful parse
+            System.exit(0);
 		} catch (Exception e) {
 			/* do cleanup here -- possibly rethrow e */
 			System.out.println("Exception during Parsing");
 			e.printStackTrace();
+
+            // exit staus > 0 to allow for detection failed parse by return value
+            System.exit(1);
 		}
 	}
 	
