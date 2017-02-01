@@ -120,10 +120,10 @@ nonterminal arguments;
 nonterminal parameters;
 nonterminal variable;
 nonterminal expression;
-nonterminal variablename, arrayname, functionname, parametername, procedurename;
 
-nonterminal declaration_basecase, variablenames_basecase, parameters_basecase;
-nonterminal or_exp, and_exp, not_exp, compare_exp, plus_minus_exp, times_divide_exp, unary_minus_exp, general_exp;
+nonterminal multi_declaration, variablenames_basecase;
+nonterminal multi_statement, ident_statement, if_statement, exit_statement, return_statement, output_basecase;
+nonterminal or_exp, and_exp, not_exp, compare_exp, plus_minus_exp, times_divide_exp, unary_minus_exp, paren_exp, atomic_exp;
 
 // Non-terminals that have a value.
 // nonterminal type  nameList ;
@@ -134,6 +134,9 @@ nonterminal or_exp, and_exp, not_exp, compare_exp, plus_minus_exp, times_divide_
 //
 //precedence right PLUS, MINUS;
 //precedence right TIMES, DIVIDE;		// Higher precedence.
+
+// Solves the 'dangling else' problem.
+precedence right ELSE;
 
 // The grammar section.
 
@@ -153,68 +156,67 @@ start with program;
  */
 
 program ::= scope;
+scope ::= L_CURLEY multi_declaration multi_statement R_CURLEY
+    | L_CURLEY multi_statement R_CURLEY
+    | L_CURLEY R_CURLEY;
 
-statement ::= variable COLON EQUAL expression
-    | IF expression THEN statement
-    | IF expression THEN statement ELSE statement
-    | WHILE expression DO statement
-    | REPEAT statement UNTIL expression
-    | EXIT
-    | EXIT INTCONST
-    | EXIT WHEN expression
-    | EXIT INTCONST WHEN expression
-    | RETURN WITHX expression
-    | RETURN
-    | WRITE output
-    | READ input
-    | procedurename
-    | procedurename L_PAREN arguments R_PAREN
-    | scope
-    | statement statement;
-
-declaration ::= declaration declaration_basecase
-    | declaration_basecase;
-declaration_basecase ::= VAR variablenames COLON type
-    | FUNCTION functionname COLON type scope
-    | FUNCTION functionname L_PAREN parameters R_PAREN COLON type scope
-    | PROCEDURE procedurename scope
-    | PROCEDURE procedurename L_PAREN parameters R_PAREN scope;
+// Declarations.
+multi_declaration ::= multi_declaration declaration
+    | declaration;
+declaration ::= VAR variablenames COLON type
+    | FUNCTION IDENT COLON type scope
+    | FUNCTION IDENT L_PAREN parameters R_PAREN COLON type scope
+    | PROCEDURE IDENT scope
+    | PROCEDURE IDENT L_PAREN parameters R_PAREN scope;
 variablenames ::= variablenames COMMA variablenames_basecase
     | variablenames_basecase;
-variablenames_basecase ::= variablename
-    | variablename L_SQUARE INTCONST R_SQUARE
-    | variablename L_SQUARE bound DOT DOT bound R_SQUARE;
+variablenames_basecase ::= IDENT
+    | IDENT L_SQUARE INTCONST R_SQUARE
+    | IDENT L_SQUARE bound DOT DOT bound R_SQUARE;
 bound ::= INTCONST
     | MINUS INTCONST;
-scope ::= L_CURLEY declaration statement R_CURLEY
-    | L_CURLEY statement R_CURLEY
-    | L_CURLEY R_CURLEY;
-output ::= expression
-    | TEXTCONST
-    | NEWLINE
-    | output COMMA output;
-input ::= variable
-    | input COMMA input;
 type ::= INTEGER
     | BOOLEAN;
 arguments ::= arguments COMMA expression
     | expression;
-parameters ::= parameters COMMA parameters_basecase
-    | parameters_basecase;
-parameters_basecase ::= parametername COLON type;
-variable ::= variablename
-    | arrayname L_SQUARE expression R_SQUARE;
+parameters ::= parameters COMMA IDENT COLON type
+    | IDENT COLON type;
 
-expression ::= or_exp
-    | and_exp
-    | not_exp
-    | compare_exp
-    | plus_minus_exp
-    | times_divide_exp
-    | unary_minus_exp
-    | general_exp
-    | L_PAREN expression R_PAREN
-    | L_PAREN expression QUESTION expression COLON expression R_PAREN;
+// Statements.
+multi_statement ::= multi_statement statement
+    | statement;
+statement ::= ident_statement
+    | if_statement
+    | WHILE expression DO statement
+    | REPEAT statement UNTIL expression
+    | exit_statement
+    | return_statement
+    | WRITE output
+    | READ input
+    | scope;
+ident_statement ::= variable COLON EQUAL expression
+    | IDENT
+    | IDENT L_PAREN arguments R_PAREN;
+if_statement ::= IF expression THEN statement
+    | IF expression THEN statement ELSE statement;
+exit_statement ::= EXIT
+    | EXIT INTCONST
+    | EXIT WHEN expression
+    | EXIT INTCONST WHEN expression;
+return_statement ::= RETURN WITHX expression
+    | RETURN;
+output ::= output COMMA output_basecase
+    | output_basecase;
+output_basecase ::= expression
+    | TEXTCONST
+    | NEWLINE;
+input ::= input COMMA variable
+    | variable;
+variable ::= IDENT
+    | IDENT L_SQUARE expression R_SQUARE;
+
+// Expressions.
+expression ::= or_exp;
 or_exp ::= or_exp OR and_exp
     | and_exp;
 and_exp ::= and_exp AND not_exp
@@ -235,17 +237,12 @@ times_divide_exp ::= times_divide_exp TIMES unary_minus_exp
     | times_divide_exp DIVIDE unary_minus_exp
     | unary_minus_exp;
 unary_minus_exp ::= MINUS unary_minus_exp
-    | general_exp;
-general_exp ::= INTCONST
+    | paren_exp;
+paren_exp ::= L_PAREN expression R_PAREN
+    | L_PAREN expression QUESTION expression COLON expression R_PAREN
+    | atomic_exp;
+atomic_exp ::= INTCONST
     | TRUE
     | FALSE
     | variable
-    | functionname
-    | functionname L_PAREN arguments R_PAREN
-    | parametername;
-
-variablename ::= IDENT;
-arrayname ::= IDENT;
-functionname ::= IDENT;
-parametername ::= IDENT;
-procedurename ::= IDENT;
+    | IDENT L_PAREN arguments R_PAREN;
