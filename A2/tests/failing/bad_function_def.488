@@ -1,7 +1,7 @@
 {
 var global : Integer
 
-// scope where type is expected, and variable where type is expected
+% scope where type is expected, and variable where type is expected
 function foo ( a : {Boolean}, b : global)
     { if a then
         return with -1
