@@ -1,0 +1,4 @@
+{
+    write "Hello world"
+    var i : Int
+}
