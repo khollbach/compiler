@@ -1,1 +1,47 @@
-TODO
+Design Strategy / Issues Encountered
+------------------------------------
+
+We approached the problem of converting the given reference grammar into an
+(unambiguous) LALR(1) compiler grammar in the following way.
+
+We converted all rules in the reference grammar to CUP syntax.
+We then verified that there were shift-reduce and reduce-reduce conflicts.
+(There were *lots*).
+
+We commented out everything except the rules for generating expresions.
+There were still many conflicts, so we brainstormed ideas on a whiteboard
+about how to write rules for unambiguously generating expressions with
+the desired precedence of operators.
+
+The solution we arrived at introduced a new non-terminal symbol for each
+precedence level, each of which expands into one or more non-terminals of the
+next-lowest precedence level. This disambiguated the derivations of arithmetic
+expressions, and ensured that they were parsed according to their precedence.
+
+Operators were made to be "left-associative" by making the rules described
+above left-recursive. This ensures, for example, that the final '+' in a chain
+such as '1 + 2 + 3' to be reduced is the right-most one; i.e., '+' is parsed
+as left-recursive.
+
+An exception is expressions involving comparison operators, which are not
+allowed to expand recursively into other "comparison" expressions. This
+achieves a non-associative behavior of these operators.
+E.g., 'true == true == false' is not a syntactically valid expression.
+
+After this, we were almost done; we rewrote the other ambiguous rules in the
+grammar by introducing new nonterminal symbols when neccessary, to provide
+"base cases" for the recursive definitions.
+E.g.: instead of 'statement -> statement statement',
+we introduced a symbol "multistatement" with the production
+'multistatement -> multistatement statement | statement'.
+Similarly: 'output -> output COMMA output_basecase | output_basecase', etc.
+
+Statements were also broken down into subtypes:
+'if_statement', 'exit_statement', etc. This gave the LALR parser enough context
+to use lookahead sets for the new rules to resolve any would-be conflicts.
+
+Lastly, identifiers were unified under a single symbol.
+(There can't be mutliple rules of the forms 'A -> c', 'B -> c', because this
+is clearly ambiguous).
+
+The grammar we ended up with was LALR(1).
