@@ -159,27 +159,34 @@ start with program;
 
 // the main program
 program ::=
-    scope:scope
+    scope:scope_
     {:
-        RESULT = new Program();
-        RESULT.setDeclarations(scope.getDeclarations());
-        RESULT.setStatements(scope.getStatements());
+        Scope scope = (Scope) scope_;
+        Program prog = new Program();
+        prog.setDeclarations(scope.getDeclarations());
+        prog.setStatements(scope.getStatements());
+        RESULT = prog;
     :}
 ;
 
 scope ::=
     // scope with declarations and statements
-    L_CURLEY declarations:decls statements:stmts R_CURLEY
+    L_CURLEY declarations:decls_ statements:stmts_ R_CURLEY
     {:
-        RESULT = new Scope();
-        RESULT.setDeclarations(decls);
-        RESULT.setStatements(stmts);
+        ASTList<Declaration> decls = (ASTList<Declaration>) decls_;
+        ASTList<Stmt> stmts = (ASTList<Stmt>) stmts_;
+        Scope scope = new Scope();
+        scope.setDeclarations(decls);
+        scope.setStatements(stmts);
+        RESULT = scope;
     :}
 
-    | L_CURLEY statements:stmts R_CURLEY // scope with statments only
+    | L_CURLEY statements:stmts_ R_CURLEY // scope with statments only
     {:
-        RESULT = new Scope();
-        RESULT.setStatements(stmts);
+        ASTList<Stmt> stmts = (ASTList<Stmt>) stmts_;
+        Scope scope = new Scope();
+        scope.setStatements(stmts);
+        RESULT = scope;
     :}
 
     | L_CURLEY R_CURLEY // empty scope
@@ -188,25 +195,47 @@ scope ::=
 
 // sequence of statements
 statements ::=
-    statement:stmt
-    {: RESULT = new ASTList<Stmt>(stmt); :}
-
-    | statements:list statement:stmt
+    statement:stmt_
     {:
+        Stmt stmt = (Stmt) stmt_;
+        RESULT = new ASTList<Stmt>(stmt);
+
+        // TODO: remove once statement is implemented.
+        RESULT = new ASTList<Stmt>();
+    :}
+
+    | statements:list_ statement:stmt_
+    {:
+        ASTList<Stmt> list = (ASTList<Stmt>) list_;
+        Stmt stmt = (Stmt) stmt_;
+        list.addLast(stmt);
         RESULT = list;
-        RESULT.addLast(stmt);
+
+        // TODO: remove once statement is implemented.
+        RESULT = new ASTList<Stmt>();
     :}
 ;
 
 // sequence of declarations
 declarations ::=
-    declaration:decl
-    {: RESULT = new ASTList<Declaration>(decl); :}
-
-    | declarations:list declaration:decl
+    declaration:decl_
     {:
+        Declaration decl = (Declaration) decl_;
+        RESULT = new ASTList<Declaration>(decl);
+
+        // TODO: remove once declaration is implemented.
+        RESULT = new ASTList<Declaration>();
+    :}
+
+    | declarations:list_ declaration:decl_
+    {:
+        ASTList<Declaration> list = (ASTList<Declaration>) list_;
+        Declaration decl = (Declaration) decl_;
+        list.addLast(decl);
         RESULT = list;
-        RESULT.addLast(decl);
+
+        // TODO: remove once declaration is implemented.
+        RESULT = new ASTList<Declaration>();
     :}
 ;
 
