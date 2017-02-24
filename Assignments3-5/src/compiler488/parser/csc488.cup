@@ -152,38 +152,76 @@ start with program;
 
 // the main program
 program ::=
-    scope
-    {: RESULT = null; :}
+    scope:scope
+    {:
+        RESULT = new Program();
+        RESULT.setDeclarations(scope.getDeclarations());
+        RESULT.setStatements(scope.getStatements());
+    :}
 ;
 
 scope ::=
-    L_CURLEY declarations statements R_CURLEY // scope with declarations and statements
-    {: RESULT = null; :}
+    // scope with declarations and statements
+    L_CURLEY declarations:decls statements:stmts R_CURLEY
+    {:
+        RESULT = new Scope();
+        RESULT.setDeclarations(decls);
+        RESULT.setStatements(stmts);
+    :}
 
-    | L_CURLEY statements R_CURLEY // scope with statments only
-    {: RESULT = null; :}
+    | L_CURLEY statements:stmts R_CURLEY // scope with statments only
+    {:
+        RESULT = new Scope();
+        RESULT.setStatements(stmts);
+    :}
 
     | L_CURLEY R_CURLEY // empty scope
-    {: RESULT = null; :}
+    {:
+        RESULT = new Scope();
+    :}
 ;
+
+///////////////////////////////////////////////////////////////////////////////
+// TODO: change back the actions for 'statements' and 'declarations' once
+// 'statement' and 'declaration' are implemented. I have them returning empty
+// lists for now, since the singular cases are just returning nulls.
+///////////////////////////////////////////////////////////////////////////////
 
 // sequence of statements
 statements ::=
-    statement
-    {: RESULT = null; :}
+    statement:stmt
+    {:
+        //RESULT = new ASTList<Stmt>(stmt);
+        RESULT = new ASTList<Stmt>();
+    :}
 
-    | statements statement
-    {: RESULT = null; :}
+    | statements:list statement:stmt
+    {:
+        //RESULT = list;
+        //RESULT.addLast(stmt);
+        RESULT = new ASTList<Stmt>();
+    :}
 ;
 
 // sequence of declarations
 declarations ::=
-    declaration
-    {: RESULT = null; :}
+    declaration:decl
+    {:
+        //RESULT = new ASTList<Declaration>(decl);
+        RESULT = new ASTList<Declaration>();
+    :}
 
-    | declarations declaration
-    {: RESULT = null; :}
+    | declarations:list declaration:decl
+    {:
+        //RESULT = list;
+        //RESULT.addLast(decl);
+        RESULT = new ASTList<Declaration>();
+    :}
 ;
+
+///////////////////////////////////////////////////////////////////////////////
+// TODO: everything after this just returns null. Implement these.
+///////////////////////////////////////////////////////////////////////////////
 
 statement ::=
     matchedStatement
