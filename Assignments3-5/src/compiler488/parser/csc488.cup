@@ -4,14 +4,17 @@
 package compiler488.parser;
 
 import java_cup.runtime.*; // Must always import this.
+import compiler488.ast.stmt.*;
+import compiler488.ast.type.*;
+import compiler488.ast.expn.*
+
 
 /* User code components 1: action code components.
  * Code to be used inside the actions triggered when productions are matched.
  * If any common code is needed for more than one action , put it here.
  */
-// action code {:
-// your code goes HERE
-//:};
+action code {:	
+:};
 
 /* User code components 2: parser code components.
  * Modifications to the default generated parser
