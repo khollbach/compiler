@@ -9,6 +9,13 @@ import compiler488.ast.type.*;
 import compiler488.ast.expn.*
 
 
+import compiler488.ast.*;
+import compiler488.ast.decl.*;
+import compiler488.ast.expn.*;
+import compiler488.ast.stmt.*;
+import compiler488.ast.type.*;
+
+
 /* User code components 1: action code components.
  * Code to be used inside the actions triggered when productions are matched.
  * If any common code is needed for more than one action , put it here.
@@ -176,46 +183,30 @@ scope ::=
     :}
 
     | L_CURLEY R_CURLEY // empty scope
-    {:
-        RESULT = new Scope();
-    :}
+    {: RESULT = new Scope(); :}
 ;
-
-///////////////////////////////////////////////////////////////////////////////
-// TODO: change back the actions for 'statements' and 'declarations' once
-// 'statement' and 'declaration' are implemented. I have them returning empty
-// lists for now, since the singular cases are just returning nulls.
-///////////////////////////////////////////////////////////////////////////////
 
 // sequence of statements
 statements ::=
     statement:stmt
-    {:
-        //RESULT = new ASTList<Stmt>(stmt);
-        RESULT = new ASTList<Stmt>();
-    :}
+    {: RESULT = new ASTList<Stmt>(stmt); :}
 
     | statements:list statement:stmt
     {:
-        //RESULT = list;
-        //RESULT.addLast(stmt);
-        RESULT = new ASTList<Stmt>();
+        RESULT = list;
+        RESULT.addLast(stmt);
     :}
 ;
 
 // sequence of declarations
 declarations ::=
     declaration:decl
-    {:
-        //RESULT = new ASTList<Declaration>(decl);
-        RESULT = new ASTList<Declaration>();
-    :}
+    {: RESULT = new ASTList<Declaration>(decl); :}
 
     | declarations:list declaration:decl
     {:
-        //RESULT = list;
-        //RESULT.addLast(decl);
-        RESULT = new ASTList<Declaration>();
+        RESULT = list;
+        RESULT.addLast(decl);
     :}
 ;
 
@@ -308,8 +299,9 @@ declaration ::=
     {: RESULT = null; :}
 ;
 
+// list of variables being declared
 variablenames ::=
-    variablename // list of variables being declared
+    variablename
     {: RESULT = null; :}
 
     | variablenames COMMA variablename
@@ -343,8 +335,9 @@ type ::=
     {: RESULT = null; :}
 ;
 
+// list of output expressions
 outputs ::=
-    output // list of output expressions
+    output
     {: RESULT = null; :}
 
     | outputs COMMA output
@@ -362,61 +355,69 @@ output ::=
     {: RESULT = null; :}
 ;
 
+// list of variables being read into
 inputs ::=
-    variable // list of variables being read into
+    variable
     {: RESULT = null; :}
 
     | inputs COMMA variable
     {: RESULT = null; :}
 ;
 
+// list of function/procedure arguments
 arguments ::=
-    expression // list of function/procedure arguments
+    expression
     {: RESULT = null; :}
 
     | arguments COMMA expression
     {: RESULT = null; :}
 ;
 
+// list of function/procedure formal parameters
 parameters ::=
-    parameter // list of function/procedure formal parameters
+    parameter
     {: RESULT = null; :}
 
     | parameters COMMA parameter
     {: RESULT = null; :}
 ;
 
+// declare one parameter
 parameter ::=
-    IDENT COLON type // declare one parameter
+    IDENT COLON type
     {: RESULT = null; :}
 ;
 
+// disjunctions, associate left-to-right
 expression ::=
-    conjunction // disjunctions, associate left-to-right
+    conjunction
     {: RESULT = null; :}
 
     | expression OR conjunction
     {: RESULT = null; :}
 ;
 
+// conjunctions, associate left-to-right
 conjunction ::=
-    negation // conjunctions, associate left-to-right
+    negation
     {: RESULT = null; :}
 
     | conjunction AND negation
     {: RESULT = null; :}
 ;
 
+// negations
 negation ::=
-    compareExpn // negations
+    compareExpn
     {: RESULT = null; :}
 
     | NOT negation
     {: RESULT = null; :}
 ;
 
+// comparisons, do not associate
 compareExpn ::=
-    arithExpn // comparisons, do not associate
+    arithExpn
     {: RESULT = null; :}
 
     | arithExpn EQUAL arithExpn
@@ -438,8 +439,9 @@ compareExpn ::=
     {: RESULT = null; :}
 ;
 
+// expressions, associate + , - left-to-right
 arithExpn ::=
-    term // expressions, associate + , - left-to-right
+    term
     {: RESULT = null; :}
 
     | arithExpn PLUS term
@@ -449,8 +451,9 @@ arithExpn ::=
     {: RESULT = null; :}
 ;
 
+// terms, associate * , / left-to-right
 term ::=
-    factor // terms, associate * , / left-to-right
+    factor
     {: RESULT = null; :}
 
     | term TIMES factor
@@ -460,8 +463,9 @@ term ::=
     {: RESULT = null; :}
 ;
 
+// unary minus
 factor ::=
-    primary // unary minus
+    primary
     {: RESULT = null; :}
 
     | MINUS factor
