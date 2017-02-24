@@ -147,144 +147,318 @@ start with program;
  * reads one more token before it will act on the production.
  */
 
-program ::= scope; // the main program
+// the main program
+program ::=
+    scope
+    {: RESULT = null; :}
+;
 
-scope ::= L_CURLEY declarations statements R_CURLEY // scope with declarations and statements
+scope ::=
+    L_CURLEY declarations statements R_CURLEY // scope with declarations and statements
+    {: RESULT = null; :}
+
     | L_CURLEY statements R_CURLEY // scope with statments only
+    {: RESULT = null; :}
+
     | L_CURLEY R_CURLEY // empty scope
+    {: RESULT = null; :}
 ;
 
-statements ::= statement // sequence of statements
+// sequence of statements
+statements ::=
+    statement
+    {: RESULT = null; :}
+
     | statements statement
+    {: RESULT = null; :}
 ;
 
-declarations ::= declaration // sequence of declarations
+// sequence of declarations
+declarations ::=
+    declaration
+    {: RESULT = null; :}
+
     | declarations declaration
+    {: RESULT = null; :}
 ;
 
-statement ::= matchedStatement
+statement ::=
+    matchedStatement
+    {: RESULT = null; :}
+
     | unmatchedStatement
+    {: RESULT = null; :}
 ;
 
-matchedStatement::= variable COLON EQUAL expression // assignment statement
+matchedStatement ::=
+    variable COLON EQUAL expression // assignment statement
+    {: RESULT = null; :}
+
     | IF expression THEN matchedStatement ELSE matchedStatement // if statements
+    {: RESULT = null; :}
+
     | WHILE expression DO statement // while statement
+    {: RESULT = null; :}
+
     | REPEAT statement UNTIL expression // repeat statement
+    {: RESULT = null; :}
+
     | EXIT // exit statements
+    {: RESULT = null; :}
+
     | EXIT INTCONST
+    {: RESULT = null; :}
+
     | EXIT WHEN expression
+    {: RESULT = null; :}
+
     | EXIT INTCONST WHEN expression
+    {: RESULT = null; :}
+
     | RETURN WITHX expression
+    {: RESULT = null; :}
+
     | RETURN // return statements
+    {: RESULT = null; :}
+
     | WRITE outputs // input/output statments
+    {: RESULT = null; :}
+
     | READ inputs
+    {: RESULT = null; :}
+
     | procedureCall // procedure call
+    {: RESULT = null; :}
+
     | scope // embedded scope
+    {: RESULT = null; :}
 ;
 
-unmatchedStatement::= IF expression THEN statement
+unmatchedStatement ::=
+    IF expression THEN statement
+    {: RESULT = null; :}
+
     | IF expression THEN matchedStatement ELSE unmatchedStatement
+    {: RESULT = null; :}
 ;
 
-procedureCall ::= IDENT // call procedure with no parameters
+procedureCall ::=
+    IDENT // call procedure with no parameters
+    {: RESULT = null; :}
+
     | IDENT L_PAREN arguments R_PAREN // call procedure with parameters
+    {: RESULT = null; :}
 ;
 
-declaration ::= VAR variablenames COLON type // declare scalar/array variables
+declaration ::=
+    VAR variablenames COLON type // declare scalar/array variables
+    {: RESULT = null; :}
+
     | FUNCTION IDENT COLON type scope // declare function
+    {: RESULT = null; :}
+
     | FUNCTION IDENT L_PAREN parameters R_PAREN COLON type scope
+    {: RESULT = null; :}
+
     | PROCEDURE IDENT scope // declare procedure
+    {: RESULT = null; :}
+
     | PROCEDURE IDENT L_PAREN parameters R_PAREN scope
+    {: RESULT = null; :}
 ;
 
-variablenames ::= variablename // list of variables being declared
+variablenames ::=
+    variablename // list of variables being declared
+    {: RESULT = null; :}
+
     | variablenames COMMA variablename
+    {: RESULT = null; :}
 ;
 
-variablename ::= IDENT // scalar variable
+variablename ::=
+    IDENT // scalar variable
+    {: RESULT = null; :}
+
     | IDENT L_SQUARE INTCONST R_SQUARE // array variable with upper bound
+    {: RESULT = null; :}
+
     | IDENT L_SQUARE bound DOT DOT bound R_SQUARE // array variable with upper/lower bounds
+    {: RESULT = null; :}
 ;
 
-bound ::= INTCONST // positive array bound
+bound ::=
+    INTCONST // positive array bound
+    {: RESULT = null; :}
+
     | MINUS INTCONST// negative array bound
+    {: RESULT = null; :}
 ;
 
-type ::= INTEGER // integer type
+type ::=
+    INTEGER // integer type
+    {: RESULT = null; :}
+
     | BOOLEAN // boolean type
+    {: RESULT = null; :}
 ;
 
-outputs ::= output // list of output expressions
+outputs ::=
+    output // list of output expressions
+    {: RESULT = null; :}
+
     | outputs COMMA output
+    {: RESULT = null; :}
 ;
 
-output ::= expression // integer expression
+output ::=
+    expression // integer expression
+    {: RESULT = null; :}
+
     | TEXTCONST // text constant
+    {: RESULT = null; :}
+
     | NEWLINE // newline constant
+    {: RESULT = null; :}
 ;
 
-inputs ::= variable // list of variables being read into
+inputs ::=
+    variable // list of variables being read into
+    {: RESULT = null; :}
+
     | inputs COMMA variable
+    {: RESULT = null; :}
 ;
 
-arguments ::= expression // list of function/procedure arguments
+arguments ::=
+    expression // list of function/procedure arguments
+    {: RESULT = null; :}
+
     | arguments COMMA expression
+    {: RESULT = null; :}
 ;
 
-parameters ::= parameter // list of function/procedure formal parameters
+parameters ::=
+    parameter // list of function/procedure formal parameters
+    {: RESULT = null; :}
+
     | parameters COMMA parameter
+    {: RESULT = null; :}
 ;
 
-parameter ::= IDENT COLON type // declare one parameter
+parameter ::=
+    IDENT COLON type // declare one parameter
+    {: RESULT = null; :}
 ;
 
-expression ::= conjunction // disjunctions, associate left-to-right
+expression ::=
+    conjunction // disjunctions, associate left-to-right
+    {: RESULT = null; :}
+
     | expression OR conjunction
+    {: RESULT = null; :}
 ;
 
-conjunction ::= negation // conjunctions, associate left-to-right
+conjunction ::=
+    negation // conjunctions, associate left-to-right
+    {: RESULT = null; :}
+
     | conjunction AND negation
+    {: RESULT = null; :}
 ;
 
-negation ::= compareExpn // negations
+negation ::=
+    compareExpn // negations
+    {: RESULT = null; :}
+
     | NOT negation
+    {: RESULT = null; :}
 ;
 
-compareExpn ::= arithExpn // comparisons, do not associate
+compareExpn ::=
+    arithExpn // comparisons, do not associate
+    {: RESULT = null; :}
+
     | arithExpn EQUAL arithExpn
+    {: RESULT = null; :}
+
     | arithExpn NOT EQUAL arithExpn
+    {: RESULT = null; :}
+
     | arithExpn LESS arithExpn
+    {: RESULT = null; :}
+
     | arithExpn LESS EQUAL arithExpn
+    {: RESULT = null; :}
+
     | arithExpn GREATER arithExpn
+    {: RESULT = null; :}
+
     | arithExpn GREATER EQUAL arithExpn
+    {: RESULT = null; :}
 ;
 
-arithExpn ::= term // expressions, associate + , - left-to-right
+arithExpn ::=
+    term // expressions, associate + , - left-to-right
+    {: RESULT = null; :}
+
     | arithExpn PLUS term
+    {: RESULT = null; :}
+
     | arithExpn MINUS term
+    {: RESULT = null; :}
 ;
 
-term ::= factor // terms, associate * , / left-to-right
+term ::=
+    factor // terms, associate * , / left-to-right
+    {: RESULT = null; :}
+
     | term TIMES factor
+    {: RESULT = null; :}
+
     | term DIVIDE factor
+    {: RESULT = null; :}
 ;
 
-factor ::= primary // unary minus
+factor ::=
+    primary // unary minus
+    {: RESULT = null; :}
+
     | MINUS factor
+    {: RESULT = null; :}
 ;
 
-primary ::= constant // integer or boolean constant
+primary ::=
+    constant // integer or boolean constant
+    {: RESULT = null; :}
+
     | variable // scalar, array variable or function call
+    {: RESULT = null; :}
+
     | IDENT L_PAREN arguments R_PAREN // function call
+    {: RESULT = null; :}
+
     | L_PAREN expression R_PAREN // parenthesized expression
+    {: RESULT = null; :}
+
     | L_PAREN expression QUESTION expression COLON expression R_PAREN
+    {: RESULT = null; :}
 ;
 
-constant ::= INTCONST // integer constant
+constant ::=
+    INTCONST // integer constant
+    {: RESULT = null; :}
+
     | TRUE // constant true
+    {: RESULT = null; :}
+
     | FALSE // constant false
+    {: RESULT = null; :}
 ;
 
-variable ::= IDENT // scalar variable or function call
+variable ::=
+    IDENT // scalar variable or function call
+    {: RESULT = null; :}
+
     | IDENT L_SQUARE expression R_SQUARE // element of an array
+    {: RESULT = null; :}
 ;
