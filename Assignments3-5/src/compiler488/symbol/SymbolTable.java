@@ -1,6 +1,8 @@
 package compiler488.symbol;
 
 import java.io.*;
+import java.util.Stack;
+import java.util.HashMap;
 
 /** Symbol Table
  *  This almost empty class is a framework for implementing
@@ -19,6 +21,9 @@ public class SymbolTable {
          */
 
 	public final static String version = "Winter 2017" ;
+
+	public HashMap<String, Stack<Symbol>> symbolTable;
+	public Stack<Scope> scope;
 
 	/** Symbol Table  constructor
          *  Create and initialize a symbol table 
