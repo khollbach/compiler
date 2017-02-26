@@ -23,7 +23,7 @@ public class SymbolTable {
 	/** Symbol Table  constructor
          *  Create and initialize a symbol table 
 	 */
-	public SymbolTable  (){
+	public SymbolTable(){
 	
 	}
 
