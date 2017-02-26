@@ -6,7 +6,7 @@ import java.util.Set;
 /**
  * Created by Tarang Marathe on 2017-02-25.
  */
-public class Scope {
+class Scope {
 
     public final int depth;
     private final Set<String> idStrings;
@@ -16,7 +16,7 @@ public class Scope {
         this.idStrings = new HashSet<String>();
     }
 
-    // add id strings of vars contained in this scope
+    // add id strings of vars contained in this scopeStack
     public Boolean addIdString(String e){
         if (this.idStrings.contains(e)){
             return false;
@@ -25,7 +25,7 @@ public class Scope {
         return true;
     }
 
-    // return the set of vars contained in the scope
+    // return the set of vars contained in the scopeStack
     public Set<String> getIdStrings(){
         return this.idStrings;
     }

@@ -1,17 +1,17 @@
 package compiler488.symbol;
 
-import java.io.*;
+import java.util.Set;
 import java.util.Stack;
 import java.util.HashMap;
 
-/** Symbol Table
+/** SymbolAttributes Table
  *  This almost empty class is a framework for implementing
- *  a Symbol Table class for the CSC488S compiler
+ *  a SymbolAttributes Table class for the CSC488S compiler
  *  
  *  Each implementation can change/modify/delete this class
  *  as they see fit.
  *
- *  @author  <B> PUT YOUR NAMES HERE </B>
+ *  @author  Tarang Marathe
  */
 
 public class SymbolTable {
@@ -22,14 +22,15 @@ public class SymbolTable {
 
 	public final static String version = "Winter 2017" ;
 
-	public HashMap<String, Stack<Symbol>> symbolTable;
-	public Stack<Scope> scope;
+	public HashMap<String, Stack<SymbolAttributes>> symbolTable;
+	public Stack<Scope> scopeStack;
 
-	/** Symbol Table  constructor
+	/** SymbolAttributes Table  constructor
          *  Create and initialize a symbol table 
 	 */
 	public SymbolTable(){
-	
+		this.symbolTable = new HashMap<String, Stack<SymbolAttributes>>();
+		this.scopeStack = new Stack<Scope>();
 	}
 
 	/**  Initialize - called once by semantic analysis  
@@ -58,10 +59,40 @@ public class SymbolTable {
 	}
 	
 
-	/** The rest of Symbol Table
+	/** The rest of SymbolAttributes Table
 	 *  Data structures, public and private functions
- 	 *  to implement the Symbol Table
+ 	 *  to implement the SymbolAttributes Table
 	 *  GO HERE.				
 	 */
+
+	// create new Scope object; push to stack with depth = current stack size
+	private void openScope(){
+		this.scopeStack.push(new Scope(scopeStack.size()+1));
+	}
+
+	private void closeScope(){
+		Scope innerScope = scopeStack.pop();
+		Set<String> idStrings = innerScope.getIdStrings();
+		for (String id : idStrings){
+			Stack<SymbolAttributes> symbolStack = symbolTable.get(id);
+			symbolStack.pop();
+			if (symbolStack.isEmpty()){
+				symbolTable.remove(id);
+			}
+		}
+	}
+
+	private void enterSymbol(String id, SymbolAttributes attributes){
+
+		if (!symbolTable.containsKey(id)){
+			symbolTable.put(id, new Stack<>());
+		}
+		symbolTable.get(id).push(attributes);
+		scopeStack.peek().addIdString(id);
+	}
+
+	private SymbolAttributes retrieveSymbol(String id){
+		return symbolTable.get(id).peek();
+	}
 
 }
