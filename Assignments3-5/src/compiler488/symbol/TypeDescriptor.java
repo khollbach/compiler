@@ -8,7 +8,6 @@ import compiler488.ast.type.BooleanType;
 import compiler488.ast.type.Type;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
