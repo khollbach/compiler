@@ -65,11 +65,17 @@ public class SymbolTable {
 	 *  GO HERE.				
 	 */
 
-	// create new Scope object; push to stack with depth = current stack size
+	/**
+	 * create new Scope object; push to stack with depth = current stack size
+	 */
 	private void openScope(){
 		this.scopeStack.push(new Scope(scopeStack.size()+1));
 	}
 
+	/**
+	 * removes innermost scope from stack,
+	 * removes symbols attributes within this scope from symbolTable
+	 */
 	private void closeScope(){
 		Scope innerScope = scopeStack.pop();
 		Set<String> idStrings = innerScope.getIdStrings();
@@ -82,6 +88,11 @@ public class SymbolTable {
 		}
 	}
 
+	/**
+	 *
+	 * @param id - symbol id
+	 * @param attributes - an object containing all the attributed of the symbol
+	 */
 	private void enterSymbol(String id, SymbolAttributes attributes){
 
 		if (!symbolTable.containsKey(id)){
@@ -91,6 +102,11 @@ public class SymbolTable {
 		scopeStack.peek().addIdString(id);
 	}
 
+	/**
+	 *
+	 * @param id - id string of a symbol
+	 * @return returns attributes of the most local declaration of symbol id
+	 */
 	private SymbolAttributes retrieveSymbol(String id){
 		return symbolTable.get(id).peek();
 	}
