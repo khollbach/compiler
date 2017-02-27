@@ -1,7 +1,7 @@
 package compiler488.symbol;
 
 
-import java.util.Stack;
+import compiler488.symbol.td.TypeDescriptor;
 
 /**
  * Created by gg on 24/02/17.
