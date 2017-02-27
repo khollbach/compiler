@@ -248,8 +248,12 @@ statement ::=
 ;
 
 matchedStatement ::=
-    variable COLON EQUAL expression // assignment statement
-    {: RESULT = null; :}
+    variable:lval COLON EQUAL expression:rval // assignment statement
+    {:
+    IdentExpn lval = new IdentExpn();
+    lval.setIdent(lval)
+    
+     RESULT = null; :}
 
     | IF expression THEN matchedStatement ELSE matchedStatement // if statements
     {: RESULT = null; :}
@@ -327,7 +331,7 @@ declaration ::=
 // list of variables being declared
 variablenames ::=
     variablename
-    {: RESULT = null; :}
+    {: RESULT = (DeclarationPart) variablename; :}
 
     | variablenames COMMA variablename
     {: RESULT = null; :}
@@ -515,20 +519,26 @@ primary ::=
 ;
 
 constant ::=
-    INTCONST // integer constant
-    {: RESULT = null; :}
+    INTCONST:intcons // integer constant
+    {: RESULT = (int) intcons; :}
 
     | TRUE // constant true
-    {: RESULT = null; :}
+    {: RESULT = true; :}
 
     | FALSE // constant false
-    {: RESULT = null; :}
+    {: RESULT = false; :}
 ;
 
 variable ::=
-    IDENT // scalar variable or function call
-    {: RESULT = null; :}
+    IDENT:id // scalar variable or function call
+    {: IdentExpn identifier = new IdentExpn();
+    identifier.setIdent(id);
+    RESULT = identifier; :}
 
-    | IDENT L_SQUARE expression R_SQUARE // element of an array
-    {: RESULT = null; :}
+    | IDENT:id L_SQUARE expression:exp1 R_SQUARE // element of an array
+    {: SubsExpn subexpn = new SubsExpn();
+    subexpn.setVariable(id);
+    subexpn.setOperand((Expn) exp1);
+    subexpn.setOpSymbol("Subscript");
+     RESULT = subexpn; :}
 ;
