@@ -1,8 +1,6 @@
 package compiler488.symbol;
 
-import java.util.Set;
-import java.util.Stack;
-import java.util.HashMap;
+import java.util.*;
 
 /** SymbolAttributes Table
  *  This almost empty class is a framework for implementing
@@ -11,7 +9,7 @@ import java.util.HashMap;
  *  Each implementation can change/modify/delete this class
  *  as they see fit.
  *
- *  @author  Tarang Marathe
+ *  @author  Tarang Marathe, George Gianacopoulos
  */
 
 public class SymbolTable {
@@ -23,14 +21,14 @@ public class SymbolTable {
 	public final static String version = "Winter 2017" ;
 
 	public HashMap<String, Stack<SymbolAttributes>> symbolTable;
-	public Stack<Scope> scopeStack;
+	public Stack<List<String>> scopeStack;
 
 	/** SymbolAttributes Table  constructor
          *  Create and initialize a symbol table 
 	 */
 	public SymbolTable(){
 		this.symbolTable = new HashMap<String, Stack<SymbolAttributes>>();
-		this.scopeStack = new Stack<Scope>();
+		this.scopeStack = new Stack<>();
 	}
 
 	/**  Initialize - called once by semantic analysis  
@@ -69,7 +67,7 @@ public class SymbolTable {
 	 * create new Scope object; push to stack with depth = current stack size
 	 */
 	private void openScope(){
-		this.scopeStack.push(new Scope(scopeStack.size()+1));
+		this.scopeStack.push(new ArrayList<>());
 	}
 
 	/**
@@ -77,9 +75,8 @@ public class SymbolTable {
 	 * removes symbols attributes within this scope from symbolTable
 	 */
 	private void closeScope(){
-		Scope innerScope = scopeStack.pop();
-		Set<String> idStrings = innerScope.getIdStrings();
-		for (String id : idStrings){
+		List<String> innerScope = scopeStack.pop();
+		for (String id : innerScope){
 			Stack<SymbolAttributes> symbolStack = symbolTable.get(id);
 			symbolStack.pop();
 			if (symbolStack.isEmpty()){
@@ -87,6 +84,11 @@ public class SymbolTable {
 			}
 		}
 	}
+
+	private boolean declaredLocally(String id){
+	    List innerScope = scopeStack.peek();
+	    return innerScope.contains(id);
+    }
 
 	/**
 	 *
@@ -99,7 +101,7 @@ public class SymbolTable {
 			symbolTable.put(id, new Stack<>());
 		}
 		symbolTable.get(id).push(attributes);
-		scopeStack.peek().addIdString(id);
+		scopeStack.peek().add(id);
 	}
 
 	/**
