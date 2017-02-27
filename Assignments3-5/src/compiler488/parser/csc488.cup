@@ -346,11 +346,26 @@ declaration ::=
 
     :}
 
-    | PROCEDURE IDENT scope // declare procedure
-    {: RESULT = null; :}
+    | PROCEDURE IDENT:ident scope:scope_ // declare procedure
+    {: 
+     	Scope scope = (Scope) scope_;
+    	RoutineBody routineBody = new RoutineBody();
+    	routineBody.setBody(scope);
+    	RoutineDecl routineDeclaration = new RoutineDecl();
+    	routineDeclaration.setName(ident);
+    	RESULT = routineDeclaration;
+     :}
 
-    | PROCEDURE IDENT L_PAREN parameters R_PAREN scope
-    {: RESULT = null; :}
+    | PROCEDURE IDENT:ident L_PAREN parameters:params R_PAREN scope:scope_
+    {:
+    	Scope scope = (Scope) scope_;
+    	RoutineBody routineBody = new RoutineBody();
+    	routineBody.setBody(scope);
+    	routineBody.setParams((ASTList<ScalarDecl>) params);
+    	RoutineDecl routineDeclaration = new RoutineDecl();
+    	routineDeclaration.setName(ident);
+    	RESULT = routineDeclaration;
+	:}
 ;
 
 // list of variables being declared
