@@ -312,8 +312,15 @@ procedureCall ::=
 ;
 
 declaration ::=
-    VAR variablenames COLON type // declare scalar/array variables
-    {: RESULT = null; :}
+    VAR variablenames:varnames COLON type:type_ // declare scalar/array variables
+    {: 
+	    MultiDeclarations multiDecl = new MultiDeclarations();
+	    ASTList<DeclarationPart> vars = (ASTList<DeclarationPart>) varnames;
+	    multiDecl.setElements(vars);
+	    Type type = (Type) type_;
+	    multiDecl.setType(type);
+    	RESULT = multiDecl; 
+    :}
 
     | FUNCTION IDENT COLON type scope // declare function
     {: RESULT = null; :}
@@ -330,11 +337,19 @@ declaration ::=
 
 // list of variables being declared
 variablenames ::=
-    variablename
-    {: RESULT = (DeclarationPart) variablename; :}
+    variablename:variablename
+    {: 
+    	ASTList<DeclarationPart> vars = new AstList();
+	    vars.addLast((DeclarationPart) variablename); 
+    	RESULT = vars; 
+    :}
 
-    | variablenames COMMA variablename
-    {: RESULT = null; :}
+    | variablenames:variablenames COMMA variablename:variablename
+    {: 
+        ASTList<DeclarationPart> vars = (ASTList<DeclarationPart>) variablenames;
+	    vars.addLast((DeclarationPart) variablename); 
+    	RESULT = vars; 
+    :}
 ;
 
 variablename ::=
