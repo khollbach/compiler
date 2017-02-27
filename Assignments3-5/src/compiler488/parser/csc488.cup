@@ -452,17 +452,29 @@ arguments ::=
 
 // list of function/procedure formal parameters
 parameters ::=
-    parameter
-    {: RESULT = null; :}
+    parameter:param
+    {:
+     	ASTList<ScalarDecl> scalarDeclarations = new ASTList<ScalarDecl>((ScalarDecl) param);
+    	RESULT = scalarDeclarations; 
+    :}
 
-    | parameters COMMA parameter
-    {: RESULT = null; :}
+    | parameters:params COMMA parameter:param
+    {:
+    	ASTList<ScalarDecl> scalarDeclarations = (ASTList<ScalarDecl>) params;
+    	scalarDeclarations.addLast((ScalarDecl) param); 
+    	RESULT = scalarDeclarations; 
+    :}
 ;
 
 // declare one parameter
 parameter ::=
-    IDENT COLON type
-    {: RESULT = null; :}
+    IDENT:ident COLON type:type_
+    {: 
+	    ScalarDecl sd = new ScalarDecl();
+	    sd.setName(ident);
+	    sd.setType((Type) type_);
+	    RESULT = sd; 
+    :}
 ;
 
 // disjunctions, associate left-to-right
