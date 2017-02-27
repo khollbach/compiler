@@ -322,11 +322,29 @@ declaration ::=
     	RESULT = multiDecl; 
     :}
 
-    | FUNCTION IDENT COLON type scope // declare function
-    {: RESULT = null; :}
+    | FUNCTION IDENT:ident COLON type:type_ scope:scope_ // declare function
+    {: 
+    	Scope scope = (Scope) scope_;
+    	RoutineBody routineBody = new RoutineBody();
+    	routineBody.setBody(scope);
+    	RoutineDecl routineDeclaration = new RoutineDecl();
+    	routineDeclaration.setName(ident);
+    	routineDeclaration.setType((Type) type_);
+    	RESULT = routineDeclaration;
+     :}
 
-    | FUNCTION IDENT L_PAREN parameters R_PAREN COLON type scope
-    {: RESULT = null; :}
+    | FUNCTION IDENT:ident L_PAREN parameters:params R_PAREN COLON type:type_ scope:scope_
+    {:
+    	Scope scope = (Scope) scope_;
+    	RoutineBody routineBody = new RoutineBody();
+    	routineBody.setBody(scope);
+    	routineBody.setParams((ASTList<ScalarDecl>) params);
+    	RoutineDecl routineDeclaration = new RoutineDecl();
+    	routineDeclaration.setName(ident);
+    	routineDeclaration.setType((Type) type_);
+    	RESULT = routineDeclaration;
+
+    :}
 
     | PROCEDURE IDENT scope // declare procedure
     {: RESULT = null; :}
