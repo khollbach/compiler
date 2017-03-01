@@ -493,11 +493,16 @@ conjunction ::=
 
 // negations
 negation ::=
-    compareExpn
-    {: RESULT = null; :}
+    compareExpn:compareExpn
+    {: RESULT = compareExpn; :}
 
-    | NOT negation
-    {: RESULT = null; :}
+    | NOT negation:exp1
+    {: 
+    	NotExpn notExpn = new NotExpn();
+    	notExpn.setOperand((ArithExpn) notExpn);    	
+    	notExpn.setOpSymbol("not");
+    	RESULT = notExpn; 
+    :}
 ;
 
 // comparisons, do not associate
@@ -505,22 +510,25 @@ compareExpn ::=
     arithExpn:arithExpn
     {: RESULT = arithExpn; :}
 
-    | arithExpn:exp1 EQUAL arithExpn:exp1
+    | arithExpn:exp1 EQUAL arithExpn:exp1 // TODO:FIX this stuff please.
     {:
-    	CompareExpn compExpn = new CompareExpn();
-    	compExpn.setLeft((ArithExpn) exp1);
-    	compExpn.setRight((ArithExpn) exp2);
-    	compExpn.setOpSymbol("=");
-     	RESULT = compExpn;
+    	EqualsExpn equalExpn = new EqualsExpn();
+    	equalExpn.setLeft((ArithExpn) exp1);
+    	equalExpn.setRight((ArithExpn) exp2);
+    	equalExpn.setOpSymbol("=");
+     	RESULT = equalExpn;
       :}
 
     | arithExpn:exp1 NOT EQUAL arithExpn:exp2
     {: 
-    	CompareExpn compExpn = new CompareExpn();
-    	compExpn.setLeft((ArithExpn) exp1);
-    	compExpn.setRight((ArithExpn) exp2);
-    	compExpn.setOpSymbol("!=");
-   		RESULT = compExpn; 
+    	NotExpn notExp = new NotExpn();
+    	EqualsExpn equalExpn = new EqualsExpn();
+    	equalExpn.setLeft((ArithExpn) exp1);
+    	equalExpn.setRight((ArithExpn) exp2);
+    	equalExpn.setOpSymbol("=");
+    	notExp.setOperand(equalExpn);
+    	notExp.setOpSymbol("not");
+     	RESULT = notExp;
     :}
 
     | arithExpn:exp1 LESS arithExpn:exp2
