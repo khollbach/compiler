@@ -502,26 +502,62 @@ negation ::=
 
 // comparisons, do not associate
 compareExpn ::=
-    arithExpn
-    {: RESULT = null; :}
+    arithExpn:arithExpn
+    {: RESULT = arithExpn; :}
 
-    | arithExpn EQUAL arithExpn
-    {: RESULT = null; :}
+    | arithExpn:exp1 EQUAL arithExpn:exp1
+    {:
+    	CompareExpn compExpn = new CompareExpn();
+    	compExpn.setLeft((ArithExpn) exp1);
+    	compExpn.setRight((ArithExpn) exp2);
+    	compExpn.setOpSymbol("=");
+     	RESULT = compExpn;
+      :}
 
-    | arithExpn NOT EQUAL arithExpn
-    {: RESULT = null; :}
+    | arithExpn:exp1 NOT EQUAL arithExpn:exp2
+    {: 
+    	CompareExpn compExpn = new CompareExpn();
+    	compExpn.setLeft((ArithExpn) exp1);
+    	compExpn.setRight((ArithExpn) exp2);
+    	compExpn.setOpSymbol("!=");
+   		RESULT = compExpn; 
+    :}
 
-    | arithExpn LESS arithExpn
-    {: RESULT = null; :}
+    | arithExpn:exp1 LESS arithExpn:exp2
+    {:
+        CompareExpn compExpn = new CompareExpn();
+    	compExpn.setLeft((ArithExpn) exp1);
+    	compExpn.setRight((ArithExpn) exp2);
+    	compExpn.setOpSymbol("<");
+   		RESULT = compExpn; 
+    :}
 
-    | arithExpn LESS EQUAL arithExpn
-    {: RESULT = null; :}
+    | arithExpn:exp1 LESS EQUAL arithExpn:exp2
+    {:
+        CompareExpn compExpn = new CompareExpn();
+    	compExpn.setLeft((ArithExpn) exp1);
+    	compExpn.setRight((ArithExpn) exp2);
+    	compExpn.setOpSymbol("<=");
+   		RESULT = compExpn; 
+    :}
 
-    | arithExpn GREATER arithExpn
-    {: RESULT = null; :}
+    | arithExpn:exp1 GREATER arithExpn:exp2
+    {:
+        CompareExpn compExpn = new CompareExpn();
+    	compExpn.setLeft((ArithExpn) exp1);
+    	compExpn.setRight((ArithExpn) exp2);
+    	compExpn.setOpSymbol(">");
+   		RESULT = compExpn; 
+    :}
 
-    | arithExpn GREATER EQUAL arithExpn
-    {: RESULT = null; :}
+    | arithExpn:exp1 GREATER EQUAL arithExpn:exp2
+    {:
+        CompareExpn compExpn = new CompareExpn();
+    	compExpn.setLeft((ArithExpn) exp1);
+    	compExpn.setRight((ArithExpn) exp2);
+    	compExpn.setOpSymbol(">=");
+   		RESULT = compExpn; 
+    :}
 ;
 
 // expressions, associate + , - left-to-right
