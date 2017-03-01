@@ -497,11 +497,11 @@ negation ::=
     {: RESULT = compareExpn; :}
 
     | NOT negation:exp1
-    {: 
+    {:
     	NotExpn notExpn = new NotExpn();
-    	notExpn.setOperand((ArithExpn) notExpn);    	
+    	notExpn.setOperand((ArithExpn) notExpn);
     	notExpn.setOpSymbol("not");
-    	RESULT = notExpn; 
+    	RESULT = notExpn;
     :}
 ;
 
@@ -520,7 +520,7 @@ compareExpn ::=
       :}
 
     | arithExpn:exp1 NOT EQUAL arithExpn:exp2
-    {: 
+    {:
     	NotExpn notExp = new NotExpn();
     	EqualsExpn equalExpn = new EqualsExpn();
     	equalExpn.setLeft((ArithExpn) exp1);
@@ -537,7 +537,7 @@ compareExpn ::=
     	compExpn.setLeft((ArithExpn) exp1);
     	compExpn.setRight((ArithExpn) exp2);
     	compExpn.setOpSymbol("<");
-   		RESULT = compExpn; 
+   		RESULT = compExpn;
     :}
 
     | arithExpn:exp1 LESS EQUAL arithExpn:exp2
@@ -546,7 +546,7 @@ compareExpn ::=
     	compExpn.setLeft((ArithExpn) exp1);
     	compExpn.setRight((ArithExpn) exp2);
     	compExpn.setOpSymbol("<=");
-   		RESULT = compExpn; 
+   		RESULT = compExpn;
     :}
 
     | arithExpn:exp1 GREATER arithExpn:exp2
@@ -555,7 +555,7 @@ compareExpn ::=
     	compExpn.setLeft((ArithExpn) exp1);
     	compExpn.setRight((ArithExpn) exp2);
     	compExpn.setOpSymbol(">");
-   		RESULT = compExpn; 
+   		RESULT = compExpn;
     :}
 
     | arithExpn:exp1 GREATER EQUAL arithExpn:exp2
@@ -564,7 +564,7 @@ compareExpn ::=
     	compExpn.setLeft((ArithExpn) exp1);
     	compExpn.setRight((ArithExpn) exp2);
     	compExpn.setOpSymbol(">=");
-   		RESULT = compExpn; 
+   		RESULT = compExpn;
     :}
 ;
 
@@ -574,42 +574,42 @@ arithExpn ::=
     {: RESULT = term; :}
 
     | arithExpn:exp1 PLUS term:exp2
-    {: 
+    {:
     	ArithExpn arithExpn = new ArithExpn();
     	arithExpn.setLeft(exp1);
     	arithExpn.setRight(exp2);
     	arithExpn.setOpSymbol("+");
-    	RESULT = arithExpn; 
+    	RESULT = arithExpn;
     :}
 
     | arithExpn:exp1 MINUS term:exp2
-    {: 
+    {:
         ArithExpn arithExpn = new ArithExpn();
     	arithExpn.setLeft(exp1);
     	arithExpn.setRight(exp2);
     	arithExpn.setOpSymbol("-");
-    	RESULT = arithExpn; 
+    	RESULT = arithExpn;
     :}
 ;
 
 // terms, associate * , / left-to-right
 term ::=
     factor
-    {: 
-    	RESULT = factor; 
+    {:
+    	RESULT = factor;
     :}
 
     | term:term TIMES factor:factor
-    {: 
+    {:
     	ArithExpn arithExpn = new ArithExpn();
     	arithExpn.setLeft(term);
     	arithExpn.setRight(factor);
     	arithExpn.setOpSymbol("*");
-    	RESULT = arithExpn; 
+    	RESULT = arithExpn;
     :}
 
     | term:term DIVIDE factor:factor
-    {: 
+    {:
     	ArithExpn arithExpn = new ArithExpn();
     	arithExpn.setLeft(term);
     	arithExpn.setRight(factor);
@@ -624,11 +624,11 @@ factor ::=
     {: RESULT = primary; :}
 
     | MINUS factor
-    {: 
+    {:
     	UnaryMinusExpn minus = new UnaryMinusExpn();
     	minus.setOperand((Expn) factor);
     	minus.SetOpSymbol("-");
-	    RESULT = minus; 
+	    RESULT = minus;
 	:}
 ;
 
@@ -640,24 +640,24 @@ primary ::=
     {: RESULT = variable; :}
 
     | IDENT:ident_ L_PAREN arguments:arguments R_PAREN // function call
-    {: 
+    {:
     	FunctionCallExpn fncall = new FunctionCallExpn();
     	fncall.setArguments((ASTList<Expn>) arguments);
     	fncall.setIdent(ident_);
     	RESULT = fncall;
-    
+
      :}
 
     | L_PAREN expression:expression R_PAREN // parenthesized expression
     {: RESULT = expression; :}
 
     | L_PAREN expression:exp1 QUESTION expression:exp2 COLON expression:exp3 R_PAREN
-    {: 
+    {:
     	ConditionalExpn condExpn = new ConditionalExpn();
     	condExpn.setCondition(exp1);
     	condExpn.setTrueValue(exp2);
     	condExpn.setFalseValue(exp3);
-    	RESULT = condExpn; 
+    	RESULT = condExpn;
     :}
 ;
 
@@ -698,6 +698,6 @@ variable ::=
 	    subexpn.setVariable(id);
 	    subexpn.setOperand((Expn) exp1);
 	    subexpn.setOpSymbol("Subscript");
-	    RESULT = subexpn; 
+	    RESULT = subexpn;
     :}
 ;
