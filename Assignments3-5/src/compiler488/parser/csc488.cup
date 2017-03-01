@@ -555,10 +555,15 @@ term ::=
 // unary minus
 factor ::=
     primary
-    {: RESULT = null; :}
+    {: RESULT = primary; :}
 
     | MINUS factor
-    {: RESULT = null; :}
+    {: 
+    	UnaryMinusExpn minus = new UnaryMinusExpn();
+    	minus.setOperand((Expn) factor);
+    	minus.SetOpSymbol("-");
+	    RESULT = minus; 
+	:}
 ;
 
 primary ::=
@@ -566,16 +571,28 @@ primary ::=
     {: RESULT = constant; :}
 
     | variable:variable // scalar, array variable or function call
-    {: RESULT = null; :}
+    {: RESULT = variable; :}
 
-    | IDENT L_PAREN arguments R_PAREN // function call
-    {: RESULT = null; :}
+    | IDENT:ident_ L_PAREN arguments:arguments R_PAREN // function call
+    {: 
+    	FunctionCallExpn fncall = new FunctionCallExpn();
+    	fncall.setArguments((ASTList<Expn>) arguments);
+    	fncall.setIdent(ident_);
+    	RESULT = fncall;
+    
+     :}
 
-    | L_PAREN expression R_PAREN // parenthesized expression
-    {: RESULT = null; :}
+    | L_PAREN expression:expression R_PAREN // parenthesized expression
+    {: RESULT = expression; :}
 
-    | L_PAREN expression QUESTION expression COLON expression R_PAREN
-    {: RESULT = null; :}
+    | L_PAREN expression:exp1 QUESTION expression:exp2 COLON expression:exp3 R_PAREN
+    {: 
+    	ConditionalExpn condExpn = new ConditionalExpn();
+    	condExpn.setCondition(exp1);
+    	condExpn.setTrueValue(exp2);
+    	condExpn.setFalseValue(exp3);
+    	RESULT = condExpn; 
+    :}
 ;
 
 constant ::=
@@ -615,6 +632,6 @@ variable ::=
 	    subexpn.setVariable(id);
 	    subexpn.setOperand((Expn) exp1);
 	    subexpn.setOpSymbol("Subscript");
-	     RESULT = subexpn; 
+	    RESULT = subexpn; 
     :}
 ;
