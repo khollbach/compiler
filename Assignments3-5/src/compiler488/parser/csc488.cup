@@ -530,26 +530,52 @@ compareExpn ::=
 
 // expressions, associate + , - left-to-right
 arithExpn ::=
-    term
-    {: RESULT = null; :}
+    term:term
+    {: RESULT = term; :}
 
-    | arithExpn PLUS term
-    {: RESULT = null; :}
+    | arithExpn:exp1 PLUS term:exp2
+    {: 
+    	ArithExpn arithExpn = new ArithExpn();
+    	arithExpn.setLeft(exp1);
+    	arithExpn.setRight(exp2);
+    	arithExpn.setOpSymbol("+");
+    	RESULT = arithExpn; 
+    :}
 
-    | arithExpn MINUS term
-    {: RESULT = null; :}
+    | arithExpn:exp1 MINUS term:exp2
+    {: 
+        ArithExpn arithExpn = new ArithExpn();
+    	arithExpn.setLeft(exp1);
+    	arithExpn.setRight(exp2);
+    	arithExpn.setOpSymbol("-");
+    	RESULT = arithExpn; 
+    :}
 ;
 
 // terms, associate * , / left-to-right
 term ::=
     factor
-    {: RESULT = null; :}
+    {: 
+    	RESULT = factor; 
+    :}
 
-    | term TIMES factor
-    {: RESULT = null; :}
+    | term:term TIMES factor:factor
+    {: 
+    	ArithExpn arithExpn = new ArithExpn();
+    	arithExpn.setLeft(term);
+    	arithExpn.setRight(factor);
+    	arithExpn.setOpSymbol("*");
+    	RESULT = arithExpn; 
+    :}
 
-    | term DIVIDE factor
-    {: RESULT = null; :}
+    | term:term DIVIDE factor:factor
+    {: 
+    	ArithExpn arithExpn = new ArithExpn();
+    	arithExpn.setLeft(term);
+    	arithExpn.setRight(factor);
+    	arithExpn.setOpSymbol("/");
+    	RESULT = arithExpn;
+    :}
 ;
 
 // unary minus
