@@ -20,7 +20,7 @@ import compiler488.ast.type.*;
  * Code to be used inside the actions triggered when productions are matched.
  * If any common code is needed for more than one action , put it here.
  */
-action code {:	
+action code {:
 :};
 
 /* User code components 2: parser code components.
@@ -248,12 +248,8 @@ statement ::=
 ;
 
 matchedStatement ::=
-    variable:lval COLON EQUAL expression:rval // assignment statement
-    {:
-    IdentExpn lval = new IdentExpn();
-    lval.setIdent(lval)
-    
-     RESULT = null; :}
+    variable COLON EQUAL expression // assignment statement
+    {: RESULT = null; :}
 
     | IF expression THEN matchedStatement ELSE matchedStatement // if statements
     {: RESULT = null; :}
@@ -313,17 +309,17 @@ procedureCall ::=
 
 declaration ::=
     VAR variablenames:varnames COLON type:type_ // declare scalar/array variables
-    {: 
+    {:
 	    MultiDeclarations multiDecl = new MultiDeclarations();
 	    ASTList<DeclarationPart> vars = (ASTList<DeclarationPart>) varnames;
 	    multiDecl.setElements(vars);
 	    Type type = (Type) type_;
 	    multiDecl.setType(type);
-    	RESULT = multiDecl; 
+    	RESULT = multiDecl;
     :}
 
     | FUNCTION IDENT:ident COLON type:type_ scope:scope_ // declare function
-    {: 
+    {:
     	Scope scope = (Scope) scope_;
     	RoutineBody routineBody = new RoutineBody();
     	routineBody.setBody(scope);
@@ -338,7 +334,7 @@ declaration ::=
     	Scope scope = (Scope) scope_;
     	RoutineBody routineBody = new RoutineBody();
     	routineBody.setBody(scope);
-    	routineBody.setParams((ASTList<ScalarDecl>) params);
+    	routineBody.setParameters((ASTList<ScalarDecl>) params);
     	RoutineDecl routineDeclaration = new RoutineDecl();
     	routineDeclaration.setName(ident);
     	routineDeclaration.setType((Type) type_);
@@ -347,7 +343,7 @@ declaration ::=
     :}
 
     | PROCEDURE IDENT:ident scope:scope_ // declare procedure
-    {: 
+    {:
      	Scope scope = (Scope) scope_;
     	RoutineBody routineBody = new RoutineBody();
     	routineBody.setBody(scope);
@@ -361,7 +357,7 @@ declaration ::=
     	Scope scope = (Scope) scope_;
     	RoutineBody routineBody = new RoutineBody();
     	routineBody.setBody(scope);
-    	routineBody.setParams((ASTList<ScalarDecl>) params);
+    	routineBody.setParameters((ASTList<ScalarDecl>) params);
     	RoutineDecl routineDeclaration = new RoutineDecl();
     	routineDeclaration.setName(ident);
     	RESULT = routineDeclaration;
@@ -371,17 +367,17 @@ declaration ::=
 // list of variables being declared
 variablenames ::=
     variablename:variablename
-    {: 
-    	ASTList<DeclarationPart> vars = new AstList();
-	    vars.addLast((DeclarationPart) variablename); 
-    	RESULT = vars; 
+    {:
+    	ASTList<DeclarationPart> vars = new ASTList();
+	    vars.addLast((DeclarationPart) variablename);
+    	RESULT = vars;
     :}
 
     | variablenames:variablenames COMMA variablename:variablename
-    {: 
+    {:
         ASTList<DeclarationPart> vars = (ASTList<DeclarationPart>) variablenames;
-	    vars.addLast((DeclarationPart) variablename); 
-    	RESULT = vars; 
+	    vars.addLast((DeclarationPart) variablename);
+    	RESULT = vars;
     :}
 ;
 
@@ -455,25 +451,25 @@ parameters ::=
     parameter:param
     {:
      	ASTList<ScalarDecl> scalarDeclarations = new ASTList<ScalarDecl>((ScalarDecl) param);
-    	RESULT = scalarDeclarations; 
+    	RESULT = scalarDeclarations;
     :}
 
     | parameters:params COMMA parameter:param
     {:
     	ASTList<ScalarDecl> scalarDeclarations = (ASTList<ScalarDecl>) params;
-    	scalarDeclarations.addLast((ScalarDecl) param); 
-    	RESULT = scalarDeclarations; 
+    	scalarDeclarations.addLast((ScalarDecl) param);
+    	RESULT = scalarDeclarations;
     :}
 ;
 
 // declare one parameter
 parameter ::=
     IDENT:ident COLON type:type_
-    {: 
+    {:
 	    ScalarDecl sd = new ScalarDecl();
 	    sd.setName(ident);
 	    sd.setType((Type) type_);
-	    RESULT = sd; 
+	    RESULT = sd;
     :}
 ;
 
@@ -623,37 +619,37 @@ primary ::=
 
 constant ::=
     INTCONST:intconst_ // integer constant
-    {: 
+    {:
     	IntConstExpn intconst = new IntConstExpn();
     	intconst.setValue(intconst_);
-    	RESULT intconst; 
+    	RESULT = intconst;
     :}
 
     | TRUE // constant true
-    {: 
-    	BoolConstExpn boolconst = BoolConstExpn();
+    {:
+    	BoolConstExpn boolconst = new BoolConstExpn();
     	boolconst.setValue(true);
-    	RESULT = boolconst; 
+    	RESULT = boolconst;
     :}
 
     | FALSE // constant false
     {:
-    	BoolConstExpn boolconst = BoolConstExpn();
-    	boolconst.setValue(false); 
-    	RESULT = boolconst; 
+    	BoolConstExpn boolconst = new BoolConstExpn();
+    	boolconst.setValue(false);
+    	RESULT = boolconst;
     :}
 ;
 
 variable ::=
     IDENT:id // scalar variable or function call
-    {: 
+    {:
 	    IdentExpn identifier = new IdentExpn();
 	    identifier.setIdent(id);
 	    RESULT = identifier;
 	:}
 
     | IDENT:id L_SQUARE expression:exp1 R_SQUARE // element of an array
-    {: 
+    {:
 	    SubsExpn subexpn = new SubsExpn();
 	    subexpn.setVariable(id);
 	    subexpn.setOperand((Expn) exp1);
