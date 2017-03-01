@@ -1,0 +1,12 @@
+{
+    var i : Integer
+    i := 1
+
+    while i < 10 {
+        write "test", newline
+        i := i + 1
+
+        % semantic error - return statement not in function / process
+        if i = 9 then return i
+    }
+}

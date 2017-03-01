@@ -1,0 +1,4 @@
+{
+% semantic error - array lower bound > upper bound
+var A[10..0] : Integer
+}

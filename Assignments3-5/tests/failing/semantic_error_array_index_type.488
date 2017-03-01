@@ -1,0 +1,14 @@
+{
+    var i, B[0..5] : Integer
+    var j : Boolean
+
+    i := 0
+    j := true
+
+    while i < 6 {
+        B[i] := i
+        i := i + 1
+    }
+    % semantic error - indexing array with a boolean
+    write B[j]
+}

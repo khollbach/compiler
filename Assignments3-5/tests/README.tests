@@ -1,0 +1,27 @@
+
+
+Passing tests:
+==============
+A1a.488 : tests semantics of arithmetic, logical, and comparison operators
+A1b.488 : tests semantics of array declarations and indexing
+A1c.488 : tests semantics of loop scopes (while, repeat)
+A1d.488 : tests semantics of function and procedure scopes, with parameter and return type checking
+A1e.488 : tests semantics of recursive functions
+
+Failing tests:
+==============
+
+All file named syntax_error_ * .488 fail due to syntax errors caught by the lexer.
+
+Semantic errors were tested in the following files:
+
+semantic_error_binary_operator.488          : binary operator between integer and boolean
+semantic_error_comparison_type.488          : comparison between integer and boolean
+semantic_error_return_type.488              : integer variable given boolean return value from function
+semantic_error_incorrect_parameter_type.488 : boolean function parameter given integer argument
+semantic_error_array_bounds.488             : array lower bound > upper bound
+semantic_error_array_index_type.488         : attempted array indexing with boolean
+semantic_error_exit_statement.488           : exit statement outside loop
+semantic_error_exit_value.488               : exit k from fewer than k nested loops
+semantic_error_procedure_return.488         : value returned from a procedure
+semantic_error_return_statement.488         : return statement outside of function / procedure
