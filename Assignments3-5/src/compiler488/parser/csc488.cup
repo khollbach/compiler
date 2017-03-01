@@ -562,10 +562,10 @@ factor ::=
 ;
 
 primary ::=
-    constant // integer or boolean constant
-    {: RESULT = null; :}
+    constant:constant // integer or boolean constant
+    {: RESULT = constant; :}
 
-    | variable // scalar, array variable or function call
+    | variable:variable // scalar, array variable or function call
     {: RESULT = null; :}
 
     | IDENT L_PAREN arguments R_PAREN // function call
@@ -579,26 +579,42 @@ primary ::=
 ;
 
 constant ::=
-    INTCONST:intcons // integer constant
-    {: RESULT = (int) intcons; :}
+    INTCONST:intconst_ // integer constant
+    {: 
+    	IntConstExpn intconst = new IntConstExpn();
+    	intconst.setValue(intconst_);
+    	RESULT intconst; 
+    :}
 
     | TRUE // constant true
-    {: RESULT = true; :}
+    {: 
+    	BoolConstExpn boolconst = BoolConstExpn();
+    	boolconst.setValue(true);
+    	RESULT = boolconst; 
+    :}
 
     | FALSE // constant false
-    {: RESULT = false; :}
+    {:
+    	BoolConstExpn boolconst = BoolConstExpn();
+    	boolconst.setValue(false); 
+    	RESULT = boolconst; 
+    :}
 ;
 
 variable ::=
     IDENT:id // scalar variable or function call
-    {: IdentExpn identifier = new IdentExpn();
-    identifier.setIdent(id);
-    RESULT = identifier; :}
+    {: 
+	    IdentExpn identifier = new IdentExpn();
+	    identifier.setIdent(id);
+	    RESULT = identifier;
+	:}
 
     | IDENT:id L_SQUARE expression:exp1 R_SQUARE // element of an array
-    {: SubsExpn subexpn = new SubsExpn();
-    subexpn.setVariable(id);
-    subexpn.setOperand((Expn) exp1);
-    subexpn.setOpSymbol("Subscript");
-     RESULT = subexpn; :}
+    {: 
+	    SubsExpn subexpn = new SubsExpn();
+	    subexpn.setVariable(id);
+	    subexpn.setOperand((Expn) exp1);
+	    subexpn.setOpSymbol("Subscript");
+	     RESULT = subexpn; 
+    :}
 ;
