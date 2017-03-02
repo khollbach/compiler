@@ -21,7 +21,7 @@ public class MultiDeclarations extends Declaration {
 	 */
 	@Override
 	public String toString() {
-		return elements + " : " + type ;
+		return "var " + elements + " : " + type ;
     }
 
 
@@ -35,7 +35,7 @@ public class MultiDeclarations extends Declaration {
 	 */
 	@Override
 	public void printOn(PrintStream out, int depth) {
-		Indentable.printIndentOnLn(out, depth, this + " ");
+		Indentable.printIndentOnLn(out, depth, this + "");
     }
 
 

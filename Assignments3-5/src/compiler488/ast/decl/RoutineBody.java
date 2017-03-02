@@ -29,7 +29,7 @@ public class RoutineBody extends Indentable {
 		if (parameters != null)
 			out.println("(" + parameters + ")");
 		else
-			out.println(" ");
+			out.println("");
 		body.printOn(out, depth);
 	}
 

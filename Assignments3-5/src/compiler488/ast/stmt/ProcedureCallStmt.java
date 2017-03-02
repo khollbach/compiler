@@ -15,9 +15,9 @@ public class ProcedureCallStmt extends Stmt {
 	@Override
 	public String toString() {
 		if (arguments!=null)
-			return "Procedure call: " + name + " (" + arguments + ")";
+			return name + "(" + arguments + ")";
 		else
-			return "Procedure call: " + name + " ";
+			return name + "";
 	}
 
 	public ASTList<Expn> getArguments() {

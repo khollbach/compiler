@@ -14,10 +14,10 @@ public class FunctionCallExpn extends Expn {
 	@Override
 	public String toString() {
 		if (arguments!=null) {
-			return ident + " (" + arguments + ")";
+			return ident + "(" + arguments + ")";
 		}
 		else
-			return ident + " " ;
+			return ident + "" ;
 	}
 
 	public ASTList<Expn> getArguments() {
