@@ -1,9 +1,13 @@
 package compiler488.symbol.td;
 
+import compiler488.ast.InvalidASTException;
 import compiler488.ast.decl.ArrayDeclPart;
 import compiler488.ast.decl.DeclarationPart;
 import compiler488.ast.decl.RoutineDecl;
 import compiler488.ast.decl.ScalarDecl;
+import compiler488.ast.expn.BoolConstExpn;
+import compiler488.ast.expn.ConstExpn;
+import compiler488.ast.expn.IntConstExpn;
 import compiler488.ast.type.BooleanType;
 import compiler488.ast.type.Type;
 
@@ -17,17 +21,26 @@ import java.util.stream.Collectors;
 public class TypeDescriptorFactory {
 
 
-    /*
-    * TODO:
-    *   - factory functions for creating TypeDescriptors from:
-    *       > each subclass of Expn
-    */
 
-    static ScalarTypeDescriptor create(ScalarDecl decl) {
+    public static TypeDescriptor typeOf(ConstExpn expn) {
+        if (expn instanceof IntConstExpn) {
+            return new IntegerTypeDescriptor();
+        } else if (expn instanceof BoolConstExpn) {
+            return new BooleanTypeDescriptor();
+        } else {
+            // We have a TextConstExpn
+            // A correctly built AST should never contain a TextConstExpn
+            // in a place where this method is invoked
+            throw new InvalidASTException();
+        }
+    }
+
+
+    public static ScalarTypeDescriptor create(ScalarDecl decl) {
         return createScalarTDFromType(decl.getType());
     }
 
-    static TypeDescriptor create(DeclarationPart declPart, Type type) {
+    public static TypeDescriptor create(DeclarationPart declPart, Type type) {
         ScalarTypeDescriptor scalarTD = createScalarTDFromType(type);
         if (declPart instanceof ArrayDeclPart) {
             return new ArrayTypeDescriptor(scalarTD);
@@ -36,7 +49,7 @@ public class TypeDescriptorFactory {
         }
     }
 
-    static TypeDescriptor create(RoutineDecl routineDecl) {
+    public static TypeDescriptor create(RoutineDecl routineDecl) {
         // create TypeDescriptor for the return type
         ScalarTypeDescriptor returnType = null;
         if (routineDecl.getType() != null) {
