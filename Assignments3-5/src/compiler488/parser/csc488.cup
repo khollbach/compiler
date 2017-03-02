@@ -414,40 +414,100 @@ type ::=
 
 // list of output expressions
 outputs ::=
-    output
-    {: RESULT = null; :}
+    output:e1_
+    {:
+        Expn e1 = (Expn) e1_;
 
-    | outputs COMMA output
-    {: RESULT = null; :}
+        ASTList<Expn> list = new ASTList<Expn>(e1);
+
+        list.setSourceCoordinateLine(e1_left);
+        list.setSourceCoordinateColumn(e1_right);
+    	RESULT = list;
+    :}
+
+    | outputs:list_ COMMA output:e1_
+    {:
+        ASTList<Expn> list = (ASTList<Expn>) list_;
+        Expn e1 = (Expn) e1_;
+
+    	list.addLast(e1);
+    	RESULT = list;
+    :}
 ;
 
 output ::=
-    expression // integer expression
-    {: RESULT = null; :}
+    // integer expression
+    expression:e1_
+    {:
+        RESULT = e1_;
+    :}
 
-    | TEXTCONST // text constant
-    {: RESULT = null; :}
+    // text constant
+    | TEXTCONST:s
+    {:
+        TextConstExpn e = new TextConstExpn();
+        e.setValue(s);
 
-    | NEWLINE // newline constant
-    {: RESULT = null; :}
+        e.setSourceCoordinateLine(sleft);
+        e.setSourceCoordinateColumn(sright);
+        RESULT = e;
+    :}
+
+    // newline constant
+    | NEWLINE:x
+    {:
+        SkipConstExpn e = new SkipConstExpn();
+
+        e.setSourceCoordinateLine(xleft);
+        e.setSourceCoordinateColumn(xright);
+        RESULT = e;
+    :}
 ;
 
 // list of variables being read into
 inputs ::=
-    variable
-    {: RESULT = null; :}
+    variable:var_
+    {:
+        Readable var = (Readable) var_;
 
-    | inputs COMMA variable
-    {: RESULT = null; :}
+    	ASTList<Readable> list = new ASTList<Readable>(var);
+
+        list.setSourceCoordinateLine(var_left);
+        list.setSourceCoordinateColumn(var_right);
+    	RESULT = list;
+    :}
+
+    | inputs:list_ COMMA variable:var_
+    {:
+        ASTList<Readable> list = (ASTList<Readable>) list_;
+        Readable var = (Readable) var_;
+
+    	list.addLast(var);
+    	RESULT = list;
+    :}
 ;
 
 // list of function/procedure arguments
 arguments ::=
-    expression
-    {: RESULT = null; :}
+    expression:e1_
+    {:
+        Expn e1 = (Expn) e1_;
 
-    | arguments COMMA expression
-    {: RESULT = null; :}
+    	ASTList<Expn> list = new ASTList<Expn>(e1);
+
+        list.setSourceCoordinateLine(e1_left);
+        list.setSourceCoordinateColumn(e1_right);
+    	RESULT = list;
+    :}
+
+    | arguments:list_ COMMA expression:e1_
+    {:
+        ASTList<Expn> list = (ASTList<Expn>) list_;
+        Expn e1 = (Expn) e1_;
+
+    	list.addLast(e1);
+    	RESULT = list;
+    :}
 ;
 
 // list of function/procedure formal parameters
