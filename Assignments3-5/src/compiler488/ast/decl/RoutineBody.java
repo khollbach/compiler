@@ -26,10 +26,10 @@ public class RoutineBody extends Indentable {
 	 */
 	@Override
 	public void printOn(PrintStream out, int depth) {
-		if (parameters != null)
+		if (parameters.size() > 0)
 			out.println("(" + parameters + ")");
 		else
-			out.println(" ");
+			out.println("");
 		body.printOn(out, depth);
 	}
 

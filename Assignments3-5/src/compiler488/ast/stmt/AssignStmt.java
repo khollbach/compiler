@@ -15,7 +15,7 @@ public class AssignStmt extends Stmt {
 	/** Returns a string that describes the assignment statement. */
 	@Override
 	public String toString() {
-		return "Assignment: " + lval + " := " + rval;
+		return lval + " := " + rval;
 	}
 
 	public Expn getLval() {

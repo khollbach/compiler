@@ -18,11 +18,11 @@ public class ExitStmt extends Stmt {
 	@Override
 	public String toString() {
 		  {
-		    String stmt = "exit " ;
+		    String stmt = "exit" ;
 	 	    if( level >= 0 )
-			stmt = stmt + level + " " ;
+			stmt = stmt + " " + level;
                     if( expn != null )
-		        stmt = stmt + "when " + expn + " " ;
+		        stmt = stmt + " when " + expn;
 		    return stmt ;
 		  }
 	}

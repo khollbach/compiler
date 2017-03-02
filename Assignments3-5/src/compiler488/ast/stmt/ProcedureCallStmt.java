@@ -14,10 +14,10 @@ public class ProcedureCallStmt extends Stmt {
 	/** Returns a string describing the procedure call. */
 	@Override
 	public String toString() {
-		if (arguments!=null)
-			return "Procedure call: " + name + " (" + arguments + ")";
+		if (arguments.size() > 0)
+			return name + "(" + arguments + ")";
 		else
-			return "Procedure call: " + name + " ";
+			return name + "";
 	}
 
 	public ASTList<Expn> getArguments() {

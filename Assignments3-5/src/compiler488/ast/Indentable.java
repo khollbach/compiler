@@ -17,10 +17,9 @@ public class Indentable extends AST {
 	 *            How much indentation to use.
 	 */
 	public static void printIndentOn(PrintStream out, int depth) {
-		for (; depth > 1; depth -= 2)
-			out.print('\t');
-		if (1 == depth)
+		for (; depth > 0; depth -= 1) {
 			out.print("    ");
+        }
 	}
 
 	/**

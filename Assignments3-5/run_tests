@@ -1,0 +1,7 @@
+#!/bin/bash
+
+for f in tests/passing/*; do
+    echo "$f"
+    java -jar dist/compiler488.jar -D a -X "$f"
+    echo
+done

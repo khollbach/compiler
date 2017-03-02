@@ -51,13 +51,13 @@ import compiler488.parser.sym;		// cup generated symbols
     /* For tokens with no value. */
     private Symbol symbol(int type)
 	{
-        return new Symbol(type, yyline, yycolumn);
+        return new Symbol(type, yyline + 1, yycolumn + 1);
 	}
     
     /* For tokens with a value of type Object. */
     private Symbol symbol(int type, Object value)
 	{
-        return new Symbol(type, yyline, yycolumn, value);
+        return new Symbol(type, yyline + 1, yycolumn + 1, value);
 	}
 
     /* String for printing version in Main */

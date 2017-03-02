@@ -7,6 +7,6 @@ public class BooleanType extends Type {
 	/** Returns the string <b>"Boolean"</b>. */
 	@Override
 	public String toString() {
-		return "boolean";
+		return "Boolean";
 	}
 }
