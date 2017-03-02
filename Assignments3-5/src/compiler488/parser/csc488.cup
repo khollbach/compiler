@@ -239,57 +239,171 @@ declarations ::=
     :}
 ;
 
-// ----------------------------------------------------------------------------
-// TODO: statement
-// ----------------------------------------------------------------------------
-
-statement ::=
-    matchedStatement
-    {: RESULT = null; :}
-
-    | unmatchedStatement
-    {: RESULT = null; :}
-;
-
 matchedStatement ::=
-    variable COLON EQUAL expression // assignment statement
-    {: RESULT = null; :}
+    // assignment statement
+    variable:var_ COLON EQUAL expression:e1_
+    {:
+        Expn var = (Expn) var_;
+        Expn e1 = (Expn) e1_;
 
-    | IF expression THEN matchedStatement ELSE matchedStatement // if statements
-    {: RESULT = null; :}
+        Stmt stmt = new AssignStmt();
+        stmt.setLval(var);
+        stmt.setRval(e1);
 
-    | WHILE expression DO statement // while statement
-    {: RESULT = null; :}
+        stmt.setSourceCoordinateLine(var_left);
+        stmt.setSourceCoordinateLine(var_right);
+        RESULT = stmt;
+    :}
 
-    | REPEAT statement UNTIL expression // repeat statement
-    {: RESULT = null; :}
+    // if statements
+    | IF:x expression:e1_ THEN matchedStatement:s1_ ELSE matchedStatement:s2_
+    {:
+        Expn e1 = (Expn) e1_;
+        Stmt s1 = (Stmt) s1_;
+        Stmt s2 = (Stmt) s2_;
 
-    | EXIT // exit statements
-    {: RESULT = null; :}
+        Stmt stmt = new IfStmt();
+        stmt.setCondition(e1);
+        stmt.setWhenTrue(s1);
+        stmt.setWhenFalse(s2);
 
-    | EXIT INTCONST
-    {: RESULT = null; :}
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
 
-    | EXIT WHEN expression
-    {: RESULT = null; :}
+    // while statement
+    | WHILE:x expression:e1_ DO statement:s1_
+    {:
+        Expn e1 = (Expn) e1_;
+        Stmt s1 = (Stmt) s1_;
 
-    | EXIT INTCONST WHEN expression
-    {: RESULT = null; :}
+        Stmt stmt = new WhileStmt();
+        stmt.setExpn(e1);
+        stmt.setBody(s1);
 
-    | RETURN WITHX expression
-    {: RESULT = null; :}
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
 
-    | RETURN // return statements
-    {: RESULT = null; :}
+    // repeat statement
+    | REPEAT:x statement:s1_ UNTIL expression:e1_
+    {:
+        Stmt s1 = (Stmt) s1_;
+        Expn e1 = (Expn) e1_;
 
-    | WRITE outputs // input/output statments
-    {: RESULT = null; :}
+        Stmt stmt = new RepeatUntilStmt();
+        stmt.setExpn(e1);
+        stmt.setBody(s1);
 
-    | READ inputs
-    {: RESULT = null; :}
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
 
-    | procedureCall // procedure call
-    {: RESULT = null; :}
+    // exit statements
+    | EXIT:x
+    {:
+        ExitStmt stmt = new ExitStmt();
+        stmt.setLevel(1);
+        stmt.setExpn(null);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    | EXIT:x INTCONST:i
+    {:
+        ExitStmt stmt = new ExitStmt();
+        stmt.setLevel(i);
+        stmt.setExpn(null);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    | EXIT:x WHEN expression:e1_
+    {:
+        Expn e1 = (Expn) e1_;
+
+        ExitStmt stmt = new ExitStmt();
+        stmt.setLevel(1);
+        stmt.setExpn(e1);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    | EXIT:x INTCONST:i WHEN expression:e1_
+    {:
+        Expn e1 = (Expn) e1_;
+
+        ExitStmt stmt = new ExitStmt();
+        stmt.setLevel(i);
+        stmt.setExpn(e1);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    | RETURN:x WITHX expression:e1_
+    {:
+        Expn e1 = (Expn) e1_;
+
+        ReturnStmt stmt = new ReturnStmt();
+        stmt.setValue(e1);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    // return statements
+    | RETURN:x
+    {:
+        ReturnStmt stmt = new ReturnStmt();
+        stmt.setValue(null);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    // input/output statments
+    | WRITE:x outputs:outputs_
+    {:
+        ASTList<Printable> outputs = (ASTList<Printable>) outputs_;
+
+        WriteStmt stmt = new WriteStmt();
+        stmt.setOutputs(outputs);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    | READ:x inputs:inputs_
+    {:
+        ASTList<Readable> outputs = (ASTList<Readable>) outputs_;
+
+        ReadStmt stmt = new ReadStmt();
+        stmt.setInputs(inputs);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    // procedure call
+    | procedureCall:stmt_
+    {:
+        RESULT = stmt_;
+    :}
 
     | scope // embedded scope
     {: RESULT = null; :}
