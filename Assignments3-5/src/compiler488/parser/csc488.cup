@@ -198,10 +198,12 @@ statements ::=
     statement:stmt_
     {:
         Stmt stmt = (Stmt) stmt_;
-        RESULT = new ASTList<Stmt>(stmt);
 
-        // TODO: remove once statement is implemented.
-        RESULT = new ASTList<Stmt>();
+    	ASTList<Stmt> list = new ASTList<Stmt>(stmt);
+
+        list.setSourceCoordinateLine(stmt_left);
+        list.setSourceCoordinateColumn(stmt_right);
+    	RESULT = list;
     :}
 
     | statements:list_ statement:stmt_
@@ -210,9 +212,6 @@ statements ::=
         Stmt stmt = (Stmt) stmt_;
         list.addLast(stmt);
         RESULT = list;
-
-        // TODO: remove once statement is implemented.
-        RESULT = new ASTList<Stmt>();
     :}
 ;
 
