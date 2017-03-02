@@ -13,7 +13,7 @@ public class FunctionCallExpn extends Expn {
 	/** Returns a string describing the function call. */
 	@Override
 	public String toString() {
-		if (arguments!=null) {
+		if (arguments.size() > 0) {
 			return ident + "(" + arguments + ")";
 		}
 		else
