@@ -239,6 +239,10 @@ declarations ::=
     :}
 ;
 
+// ----------------------------------------------------------------------------
+// TODO: statement
+// ----------------------------------------------------------------------------
+
 statement ::=
     matchedStatement
     {: RESULT = null; :}
@@ -493,166 +497,224 @@ conjunction ::=
 
 // negations
 negation ::=
-    compareExpn:compareExpn
-    {: RESULT = compareExpn; :}
+    compareExpn:exp1_
+    {:
+        RESULT = exp1_;
+    :}
 
     | NOT negation:exp1
     {:
-    	NotExpn notExpn = new NotExpn();
-    	notExpn.setOperand((ArithExpn) notExpn);
-    	notExpn.setOpSymbol("not");
-    	RESULT = notExpn;
+        Expn exp1 = (Expn) exp1_;
+
+    	NotExpn e = new NotExpn();
+    	e.setOpSymbol("not");
+    	e.setOperand(exp1);
+    	RESULT = e;
     :}
 ;
 
 // comparisons, do not associate
 compareExpn ::=
-    arithExpn:arithExpn
-    {: RESULT = arithExpn; :}
-
-    | arithExpn:exp1 EQUAL arithExpn:exp1 // TODO:FIX this stuff please.
+    arithExpn:exp1_
     {:
-    	EqualsExpn equalExpn = new EqualsExpn();
-    	equalExpn.setLeft((ArithExpn) exp1);
-    	equalExpn.setRight((ArithExpn) exp2);
-    	equalExpn.setOpSymbol("=");
-     	RESULT = equalExpn;
-      :}
+        RESULT = exp1_;
+    :}
 
-    | arithExpn:exp1 NOT EQUAL arithExpn:exp2
+    | arithExpn:exp1_ EQUAL arithExpn:exp2_
     {:
-    	NotExpn notExp = new NotExpn();
-    	EqualsExpn equalExpn = new EqualsExpn();
-    	equalExpn.setLeft((ArithExpn) exp1);
-    	equalExpn.setRight((ArithExpn) exp2);
-    	equalExpn.setOpSymbol("=");
-    	notExp.setOperand(equalExpn);
-    	notExp.setOpSymbol("not");
-     	RESULT = notExp;
+        Expn exp1 = (Expn) exp1_;
+        Expn exp2 = (Expn) exp2_;
+
+    	EqualsExpn equalsExpn = new EqualsExpn();
+    	equalsExpn.setOpSymbol("=");
+    	equalsExpn.setLeft(exp1);
+    	equalsExpn.setRight(exp2);
+     	RESULT = equalsExpn;
+    :}
+
+    | arithExpn:exp1_ NOT EQUAL arithExpn:exp2_
+    {:
+        Expn exp1 = (Expn) exp1_;
+        Expn exp2 = (Expn) exp2_;
+
+    	EqualsExpn equalsExpn = new EqualsExpn();
+    	equalsExpn.setOpSymbol("=");
+    	equalsExpn.setLeft(exp1);
+    	equalsExpn.setRight(exp2);
+
+    	NotExpn notExpn = new NotExpn();
+    	notExpn.setOpSymbol("not");
+    	notExpn.setOperand(equalsExpn);
+     	RESULT = notExpn;
     :}
 
     | arithExpn:exp1 LESS arithExpn:exp2
     {:
+        Expn exp1 = (Expn) exp1_;
+        Expn exp2 = (Expn) exp2_;
+
         CompareExpn compExpn = new CompareExpn();
-    	compExpn.setLeft((ArithExpn) exp1);
-    	compExpn.setRight((ArithExpn) exp2);
     	compExpn.setOpSymbol("<");
+    	compExpn.setLeft(exp1);
+    	compExpn.setRight(exp2);
    		RESULT = compExpn;
     :}
 
     | arithExpn:exp1 LESS EQUAL arithExpn:exp2
     {:
+        Expn exp1 = (Expn) exp1_;
+        Expn exp2 = (Expn) exp2_;
+
         CompareExpn compExpn = new CompareExpn();
-    	compExpn.setLeft((ArithExpn) exp1);
-    	compExpn.setRight((ArithExpn) exp2);
     	compExpn.setOpSymbol("<=");
+    	compExpn.setLeft(exp1);
+    	compExpn.setRight(exp2);
    		RESULT = compExpn;
     :}
 
     | arithExpn:exp1 GREATER arithExpn:exp2
     {:
+        Expn exp1 = (Expn) exp1_;
+        Expn exp2 = (Expn) exp2_;
+
         CompareExpn compExpn = new CompareExpn();
-    	compExpn.setLeft((ArithExpn) exp1);
-    	compExpn.setRight((ArithExpn) exp2);
     	compExpn.setOpSymbol(">");
+    	compExpn.setLeft(exp1);
+    	compExpn.setRight(exp2);
    		RESULT = compExpn;
     :}
 
     | arithExpn:exp1 GREATER EQUAL arithExpn:exp2
     {:
+        Expn exp1 = (Expn) exp1_;
+        Expn exp2 = (Expn) exp2_;
+
         CompareExpn compExpn = new CompareExpn();
-    	compExpn.setLeft((ArithExpn) exp1);
-    	compExpn.setRight((ArithExpn) exp2);
     	compExpn.setOpSymbol(">=");
+    	compExpn.setLeft(exp1);
+    	compExpn.setRight(exp2);
    		RESULT = compExpn;
     :}
 ;
 
 // expressions, associate + , - left-to-right
 arithExpn ::=
-    term:term
-    {: RESULT = term; :}
+    term:exp1_
+    {:
+        RESULT = exp1_;
+    :}
 
     | arithExpn:exp1 PLUS term:exp2
     {:
+        Expn exp1 = (Expn) exp1_;
+        Expn exp2 = (Expn) exp2_;
+
     	ArithExpn arithExpn = new ArithExpn();
+    	arithExpn.setOpSymbol("+");
     	arithExpn.setLeft(exp1);
     	arithExpn.setRight(exp2);
-    	arithExpn.setOpSymbol("+");
     	RESULT = arithExpn;
     :}
 
     | arithExpn:exp1 MINUS term:exp2
     {:
+        Expn exp1 = (Expn) exp1_;
+        Expn exp2 = (Expn) exp2_;
+
         ArithExpn arithExpn = new ArithExpn();
+    	arithExpn.setOpSymbol("-");
     	arithExpn.setLeft(exp1);
     	arithExpn.setRight(exp2);
-    	arithExpn.setOpSymbol("-");
     	RESULT = arithExpn;
     :}
 ;
 
 // terms, associate * , / left-to-right
 term ::=
-    factor
+    factor:exp1_
     {:
-    	RESULT = factor;
+    	RESULT = exp1_;
     :}
 
-    | term:term TIMES factor:factor
+    | term:exp1_ TIMES factor:exp2_
     {:
+        Expn exp1 = (Expn) exp1_;
+        Expn exp2 = (Expn) exp2_;
+
     	ArithExpn arithExpn = new ArithExpn();
-    	arithExpn.setLeft(term);
-    	arithExpn.setRight(factor);
     	arithExpn.setOpSymbol("*");
+    	arithExpn.setLeft(exp1);
+    	arithExpn.setRight(exp2);
     	RESULT = arithExpn;
     :}
 
-    | term:term DIVIDE factor:factor
+    | term:exp1_ DIVIDE factor:exp2_
     {:
+        Expn exp1 = (Expn) exp1_;
+        Expn exp2 = (Expn) exp2_;
+
     	ArithExpn arithExpn = new ArithExpn();
-    	arithExpn.setLeft(term);
-    	arithExpn.setRight(factor);
     	arithExpn.setOpSymbol("/");
+    	arithExpn.setLeft(exp1);
+    	arithExpn.setRight(exp2);
     	RESULT = arithExpn;
     :}
 ;
 
 // unary minus
 factor ::=
-    primary
-    {: RESULT = primary; :}
-
-    | MINUS factor
+    primary:exp1_
     {:
-    	UnaryMinusExpn minus = new UnaryMinusExpn();
-    	minus.setOperand((Expn) factor);
-    	minus.SetOpSymbol("-");
-	    RESULT = minus;
+        RESULT = exp1_;
+    :}
+
+    | MINUS factor:exp1_
+    {:
+        Expn exp1 = (Expn) exp1_;
+
+    	UnaryMinusExpn e = new UnaryMinusExpn();
+    	e.setOpSymbol("-");
+    	e.setOperand(exp1);
+	    RESULT = e;
 	:}
 ;
 
 primary ::=
-    constant:constant // integer or boolean constant
-    {: RESULT = constant; :}
+    // integer or boolean constant
+    constant:exp1_
+    {:
+        RESULT = exp1_;
+    :}
 
-    | variable:variable // scalar, array variable or function call
-    {: RESULT = variable; :}
+    // scalar, array variable or function call
+    | variable:exp1_
+    {:
+        RESULT = exp1_;
+    :}
 
     | IDENT:ident_ L_PAREN arguments:arguments R_PAREN // function call
     {:
+        ASTList<Expn> args = (ASTList<Expn>) args_;
+
     	FunctionCallExpn fncall = new FunctionCallExpn();
-    	fncall.setArguments((ASTList<Expn>) arguments);
-    	fncall.setIdent(ident_);
+    	fncall.setIdent(ident);
+    	fncall.setArguments(args);
     	RESULT = fncall;
 
      :}
 
-    | L_PAREN expression:expression R_PAREN // parenthesized expression
-    {: RESULT = expression; :}
+    // parenthesized expression
+    | L_PAREN expression:exp1_ R_PAREN
+    {:
+        RESULT = exp1_;
+    :}
 
     | L_PAREN expression:exp1 QUESTION expression:exp2 COLON expression:exp3 R_PAREN
     {:
+        Expn exp1 = (Expn) exp1_;
+        Expn exp2 = (Expn) exp2_;
+        Expn exp3 = (Expn) exp3_;
+
     	ConditionalExpn condExpn = new ConditionalExpn();
     	condExpn.setCondition(exp1);
     	condExpn.setTrueValue(exp2);
@@ -671,33 +733,35 @@ constant ::=
 
     | TRUE // constant true
     {:
-    	BoolConstExpn boolconst = new BoolConstExpn();
-    	boolconst.setValue(true);
-    	RESULT = boolconst;
+    	BoolConstExpn bce = new BoolConstExpn();
+    	bce.setValue(true);
+    	RESULT = bce;
     :}
 
     | FALSE // constant false
     {:
-    	BoolConstExpn boolconst = new BoolConstExpn();
-    	boolconst.setValue(false);
-    	RESULT = boolconst;
+    	BoolConstExpn bce = new BoolConstExpn();
+    	bce.setValue(false);
+    	RESULT = bce;
     :}
 ;
 
 variable ::=
     IDENT:id // scalar variable or function call
     {:
-	    IdentExpn identifier = new IdentExpn();
-	    identifier.setIdent(id);
-	    RESULT = identifier;
+	    IdentExpn e = new IdentExpn();
+	    e.setIdent(id);
+	    RESULT = e;
 	:}
 
     | IDENT:id L_SQUARE expression:exp1 R_SQUARE // element of an array
     {:
-	    SubsExpn subexpn = new SubsExpn();
-	    subexpn.setVariable(id);
-	    subexpn.setOperand((Expn) exp1);
-	    subexpn.setOpSymbol("Subscript");
-	    RESULT = subexpn;
+        Expn exp1 = (Expn) exp1_;
+
+	    SubsExpn e = new SubsExpn();
+	    e.setVariable(id);
+	    e.setOpSymbol(id);
+	    e.setOperand(exp1);
+	    RESULT = e;
     :}
 ;
