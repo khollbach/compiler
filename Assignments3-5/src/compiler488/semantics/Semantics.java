@@ -4,7 +4,7 @@ import java.io.*;
 import compiler488.symbol.SymbolTable;
 
 /** Implement semantic analysis for compiler 488 
- *  @author  <B> Put your names here </B>
+ *  @author  Tarang Marathe, George Gianacopoulos
  */
 public class Semantics {
 	

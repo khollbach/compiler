@@ -3,6 +3,7 @@ package compiler488.ast.stmt;
 import java.io.PrintStream;
 
 import compiler488.ast.Indentable;
+import compiler488.visitor.StatementVisitor;
 
 /**
  * Represents a loop in which the exit condition is evaluated after each pass.
@@ -22,5 +23,10 @@ public class RepeatUntilStmt extends LoopingStmt {
 		body.printOn(out, depth + (body instanceof Scope ? 0 : 1));
 		Indentable.printIndentOnLn(out, depth, "until "  + expn );
 
+	}
+
+	@Override
+	public void accept(StatementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

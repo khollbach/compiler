@@ -1,6 +1,8 @@
 package compiler488.ast.expn;
 
 
+import compiler488.visitor.ExpressionVisitor;
+
 /** Represents a conditional expression (i.e., x>0?3:4). */
 public class ConditionalExpn extends Expn {
 	private Expn condition; // Evaluate this to decide which value to yield.
@@ -37,5 +39,9 @@ public class ConditionalExpn extends Expn {
 
 	public void setTrueValue(Expn trueValue) {
 		this.trueValue = trueValue;
+	}
+
+	public void accept(ExpressionVisitor expnVisitor) {
+		expnVisitor.visit(this);
 	}
 }

@@ -4,6 +4,7 @@ import java.io.PrintStream;
 
 import compiler488.ast.Indentable;
 import compiler488.ast.expn.Expn;
+import compiler488.visitor.StatementVisitor;
 
 /**
  * The command to return from a function or procedure.
@@ -35,5 +36,10 @@ public class ReturnStmt extends Stmt {
 
 	public void setValue(Expn value) {
 		this.value = value;
+	}
+
+	@Override
+	public void accept(StatementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

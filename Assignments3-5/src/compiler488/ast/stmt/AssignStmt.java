@@ -1,6 +1,7 @@
 package compiler488.ast.stmt;
 
 import compiler488.ast.expn.Expn;
+import compiler488.visitor.StatementVisitor;
 
 /**
  * Holds the assignment of an expression to a variable.
@@ -32,5 +33,10 @@ public class AssignStmt extends Stmt {
 
 	public void setRval(Expn rval) {
 		this.rval = rval;
+	}
+
+	@Override
+	public void accept(StatementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

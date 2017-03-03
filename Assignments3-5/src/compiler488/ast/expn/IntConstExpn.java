@@ -1,10 +1,11 @@
 package compiler488.ast.expn;
 
+import compiler488.visitor.ExpressionVisitor;
+
 /**
  * Represents a literal integer constant.
  */
-public class IntConstExpn extends ConstExpn
-    {
+public class IntConstExpn extends ConstExpn {
     private Integer value;	// The value of this literal.
 
     /** Returns a string representing the value of the literal. */
@@ -17,5 +18,9 @@ public class IntConstExpn extends ConstExpn
 
 	public void setValue(Integer value) {
 		this.value = value;
+	}
+
+	public void accept(ExpressionVisitor expnVisitor) {
+		expnVisitor.visit(this);
 	}
 }

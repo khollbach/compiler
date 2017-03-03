@@ -1,16 +1,18 @@
 package compiler488.ast;
 
 import java.io.PrintStream;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.stream.Stream;
 
 /**
  * For nodes with an arbitrary number of children.
  */
-public class ASTList<E> extends AST {
+public class ASTList<E> extends AST implements Iterable<E> {
 	/*
 	 * Keep the list here. We delegate rather than subclass LinkedList
-	 * because Java won't let us override the return type for addLast.
+	 * because Java won't let us override the return typeDescriptor for addLast.
 	 */
 	private LinkedList<E> ll;
 
@@ -87,5 +89,14 @@ public class ASTList<E> extends AST {
 
 			return result.toString();
 		}
+	}
+
+	@Override
+	public Iterator<E> iterator() {
+		return ll.iterator();
+	}
+
+	public Stream<E> stream() {
+		return ll.stream();
 	}
 }

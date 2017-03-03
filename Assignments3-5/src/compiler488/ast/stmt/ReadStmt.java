@@ -2,6 +2,7 @@ package compiler488.ast.stmt;
 
 import compiler488.ast.ASTList;
 import compiler488.ast.Readable;
+import compiler488.visitor.StatementVisitor;
 
 /**
  * The command to read data into one or more variables.
@@ -26,5 +27,10 @@ public class ReadStmt extends Stmt {
 
 	public void setInputs(ASTList<Readable> inputs) {
 		this.inputs = inputs;
+	}
+
+	@Override
+	public void accept(StatementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

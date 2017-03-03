@@ -1,6 +1,7 @@
 package compiler488.ast.expn;
 
 import compiler488.ast.Readable;
+import compiler488.visitor.ExpressionVisitor;
 
 /**
  * References to an array element variable
@@ -24,6 +25,10 @@ public class SubsExpn extends UnaryExpn implements Readable {
 
 	public void setVariable(String variable) {
 		this.variable = variable;
+	}
+
+	public void accept(ExpressionVisitor expnVisitor) {
+		expnVisitor.visit(this);
 	}
 
 }
