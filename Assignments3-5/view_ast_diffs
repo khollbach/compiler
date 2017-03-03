@@ -4,5 +4,5 @@ tmpdir=tmp
 testdir=tests/ast
 
 for f in `ls "$tmpdir"`; do
-    vimdiff "$tmpdir/$f" "$testdir/$f"
+    vimdiff "$testdir/$f" "$tmpdir/$f"
 done
