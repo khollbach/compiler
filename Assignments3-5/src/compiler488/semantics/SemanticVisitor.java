@@ -14,6 +14,7 @@ import compiler488.visitor.StatementVisitor;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimerTask;
 
 /**
  * Created by gg on 01/03/17.
@@ -50,11 +51,26 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(Expn expn) {
+        throw new InvalidASTException();
+    }
 
+    public SemanticVisitor(SymbolTable symbolTable) {
+        this.symbolTable = symbolTable;
     }
 
     @Override
     public void visit(ArithExpn arithExpn) {
+        arithExpn.getLeft().accept(this);
+        arithExpn.getRight().accept(this);
+
+        if (arithExpn.getLeft().evalType().equals(ExpnEvalType.INTEGER) &&
+        (arithExpn.getRight().evalType().equals(ExpnEvalType.INTEGER))){
+            arithExpn.setEvalType(ExpnEvalType.INTEGER);
+        }
+        else {
+            semanticErrors.add(new TypeError(arithExpn));
+            arithExpn.setEvalType(ExpnEvalType.ERROR);
+        }
 
     }
 
@@ -139,7 +155,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         operand.accept(this);
         if (!(operand.evalType().equals(ExpnEvalType.INTEGER))) {
             // bad index type
-            semanticErrors.add(new TypeError(subsExpn));
+            semanticErrors.add(new TypeError(subsExpn, subsExpn.getOperand()));
         }
 
         if (attrs != null) {
@@ -151,7 +167,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
                     subsExpn.setEvalType(ExpnEvalType.BOOLEAN);
                 }
             } else {
-                semanticErrors.add(/*TODO */);
+                semanticErrors.add(new TypeError(subsExpn));
                 subsExpn.setEvalType(ExpnEvalType.ERROR);
             }
         }
