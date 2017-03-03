@@ -22,7 +22,9 @@ public abstract class SemanticError {
      */
     @Override
     public String toString() {
-        //TODO: print error message with error location
-        return String.format("semantic error at line:%d col:%d", offendingNode.getSourceCoordinateLine(), offendingNode.getSourceCoordinateColumn());
+
+        return String.format("at line:%d col:%d - ",
+                offendingNode.getSourceCoordinateLine(),
+                offendingNode.getSourceCoordinateColumn());
     }
 }

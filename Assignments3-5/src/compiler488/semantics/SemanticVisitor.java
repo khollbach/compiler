@@ -23,15 +23,48 @@ import java.util.List;
  */
 public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, StatementVisitor{
 
+    /*
+     *  EXPRESSION TYPES:
+     *  Constants representing the type that an expression evaluates to.
+     */
+    /** Error Type: The expression is semantically incorrect. */
+    private static final int ERROR_T = 0;
+
+    /** Integer Type: The expression evaluates to an Integer. */
+    private static final int INTEGER_T = 1;
+
+    /** Boolean Type: The expression evaluates to a Boolean. */
+    private static final int BOOLEAN_T = 2;
+
+    /** Text Type: The expression is a TextConstExpn. */
+    private static final int TEXT_T = 3;
+
+
+    /*
+     *  INSTANCE VARIABLES:
+     *  This SemanticVisitor's members.
+     */
+    /** The type of the most-recently processed Expn. */
+    private int expressionType;
+
     private SymbolTable symbolTable;
     private List<SemanticError> semanticErrors;
 
     private OnVisitScopeListener visitScopeListener;
 
+    /*
+     *  CONSTRUCTORS:
+     */
+
     public SemanticVisitor() {
         symbolTable = new SymbolTable();
         semanticErrors = new LinkedList<>();
     }
+
+
+    /*
+     * VISITOR IMPLEMENTATION:
+     */
 
     /* *********** */
     /* EXPRESSIONS */
@@ -79,16 +112,22 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(IdentExpn identExpn) {
-        SymbolAttributes attr;
+        SymbolAttributes attrs;
         try {
-            attr = symbolTable.retrieveSymbol(identExpn.getIdent());
+            attrs = symbolTable.retrieveSymbol(identExpn.getIdent());
         } catch (SymbolTable.SymbolNotFoundException e) {
             semanticErrors.add(new UndefinedReferenceError(identExpn));
+            expressionType = ERROR_T;
             return;
         }
 
-        if(!(attr.typeDescriptor instanceof ScalarTypeDescriptor)){
+        if(!(attrs.typeDescriptor instanceof ScalarTypeDescriptor)){
             semanticErrors.add(new TypeError(identExpn));
+            expressionType = ERROR_T;
+        } else if (attrs.typeDescriptor instanceof IntegerTypeDescriptor) {
+            expressionType = INTEGER_T;
+        } else {
+            expressionType = BOOLEAN_T;
         }
     }
 
@@ -98,7 +137,12 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     }
 
     @Override
-    public void visit(NotExpn notExpn) {
+    public void visit(NotExpn notExpn) {        SymbolAttributes attrs;
+        try {
+            attrs = symbolTable.retrieveSymbol(subsExpn.getVariable());
+        } catch (SymbolTable.SymbolNotFoundException e) {
+            semanticErrors.add(new UndefinedReferenceError(subsExpn));
+        }
 
     }
 
@@ -110,6 +154,19 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     @Override
     public void visit(SubsExpn subsExpn) {
 
+        subsExpn.getOperand().accept(this);
+        if (expressionType != INTEGER_T) {
+            semanticErrors.add(new TypeError(subsExpn));
+            expressionType = ERROR_T;
+            return;
+        }
+
+        SymbolAttributes attrs;
+        try {
+            attrs = symbolTable.retrieveSymbol(subsExpn.getVariable());
+        } catch (SymbolTable.SymbolNotFoundException e) {
+            semanticErrors.add(new UndefinedReferenceError(subsExpn));
+        }
     }
 
     @Override
@@ -167,7 +224,9 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
                     if(!(attr.typeDescriptor instanceof IntegerTypeDescriptor)){
                         semanticErrors.add(new ReadError(rIdent));
                     }
-                } catch (SymbolTable.SymbolNotFoundException e) {}
+                } catch (SymbolTable.SymbolNotFoundException e) {
+                    return;
+                }
             }
 
         }

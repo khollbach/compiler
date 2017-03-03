@@ -27,7 +27,7 @@ public class SymbolTable {
          *  Create and initialize a symbol table 
 	 */
 	public SymbolTable(){
-		this.symbolTable = new HashMap<String, Stack<SymbolAttributes>>();
+		this.symbolTable = new HashMap<>();
 		this.scopeStack = new Stack<>();
 	}
 
@@ -64,6 +64,10 @@ public class SymbolTable {
 	 * @param attributes - an object containing all the attributed of the symbol
 	 */
 	public void enterSymbol(String id, SymbolAttributes attributes) throws RedeclarationException {
+
+		if (declaredLocally(id)) {
+			throw new RedeclarationException();
+		}
 
 		if (!symbolTable.containsKey(id)){
 			symbolTable.put(id, new Stack<>());
