@@ -1,0 +1,11 @@
+#!/bin/bash
+
+tmpdir=tmp
+testdir=tests/ast
+
+mkdir -p "$tmpdir"
+
+for f in `ls "$testdir"`; do
+    echo "$f"
+    java -jar dist/compiler488.jar -D a -X "$testdir/$f" > "$tmpdir/$f"
+done
