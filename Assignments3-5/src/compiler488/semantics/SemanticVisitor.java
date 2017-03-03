@@ -7,10 +7,7 @@ import compiler488.ast.expn.*;
 import compiler488.ast.stmt.*;
 import compiler488.symbol.SymbolAttributes;
 import compiler488.symbol.SymbolTable;
-import compiler488.symbol.td.IntegerTypeDescriptor;
-import compiler488.symbol.td.ScalarTypeDescriptor;
-import compiler488.symbol.td.TypeDescriptor;
-import compiler488.symbol.td.TypeDescriptorFactory;
+import compiler488.symbol.td.*;
 import compiler488.visitor.DeclarationVisitor;
 import compiler488.visitor.ExpressionVisitor;
 import compiler488.visitor.StatementVisitor;
@@ -24,28 +21,9 @@ import java.util.List;
 public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, StatementVisitor{
 
     /*
-     *  EXPRESSION TYPES:
-     *  Constants representing the type that an expression evaluates to.
-     */
-    /** Error Type: The expression is semantically incorrect. */
-    private static final int ERROR_T = 0;
-
-    /** Integer Type: The expression evaluates to an Integer. */
-    private static final int INTEGER_T = 1;
-
-    /** Boolean Type: The expression evaluates to a Boolean. */
-    private static final int BOOLEAN_T = 2;
-
-    /** Text Type: The expression is a TextConstExpn. */
-    private static final int TEXT_T = 3;
-
-
-    /*
      *  INSTANCE VARIABLES:
      *  This SemanticVisitor's members.
      */
-    /** The type of the most-recently processed Expn. */
-    private int expressionType;
 
     private SymbolTable symbolTable;
     private List<SemanticError> semanticErrors;
@@ -117,17 +95,17 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
             attrs = symbolTable.retrieveSymbol(identExpn.getIdent());
         } catch (SymbolTable.SymbolNotFoundException e) {
             semanticErrors.add(new UndefinedReferenceError(identExpn));
-            expressionType = ERROR_T;
+            identExpn.setEvalType(ExpnEvalType.ERROR);
             return;
         }
 
         if(!(attrs.typeDescriptor instanceof ScalarTypeDescriptor)){
             semanticErrors.add(new TypeError(identExpn));
-            expressionType = ERROR_T;
+            identExpn.setEvalType(ExpnEvalType.ERROR);
         } else if (attrs.typeDescriptor instanceof IntegerTypeDescriptor) {
-            expressionType = INTEGER_T;
+            identExpn.setEvalType(ExpnEvalType.INTEGER);
         } else {
-            expressionType = BOOLEAN_T;
+            identExpn.setEvalType(ExpnEvalType.BOOLEAN);
         }
     }
 
@@ -137,12 +115,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     }
 
     @Override
-    public void visit(NotExpn notExpn) {        SymbolAttributes attrs;
-        try {
-            attrs = symbolTable.retrieveSymbol(subsExpn.getVariable());
-        } catch (SymbolTable.SymbolNotFoundException e) {
-            semanticErrors.add(new UndefinedReferenceError(subsExpn));
-        }
+    public void visit(NotExpn notExpn) {
 
     }
 
@@ -154,18 +127,33 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     @Override
     public void visit(SubsExpn subsExpn) {
 
-        subsExpn.getOperand().accept(this);
-        if (expressionType != INTEGER_T) {
-            semanticErrors.add(new TypeError(subsExpn));
-            expressionType = ERROR_T;
-            return;
-        }
-
-        SymbolAttributes attrs;
+        SymbolAttributes attrs = null;
         try {
             attrs = symbolTable.retrieveSymbol(subsExpn.getVariable());
         } catch (SymbolTable.SymbolNotFoundException e) {
             semanticErrors.add(new UndefinedReferenceError(subsExpn));
+            subsExpn.setEvalType(ExpnEvalType.ERROR);
+        }
+
+        Expn operand = subsExpn.getOperand();
+        operand.accept(this);
+        if (!(operand.evalType().equals(ExpnEvalType.INTEGER))) {
+            // bad index type
+            semanticErrors.add(new TypeError(subsExpn));
+        }
+
+        if (attrs != null) {
+            if (attrs.typeDescriptor instanceof ArrayTypeDescriptor) {
+                if (((ArrayTypeDescriptor) attrs.typeDescriptor)
+                        .elementType instanceof IntegerTypeDescriptor) {
+                    subsExpn.setEvalType(ExpnEvalType.INTEGER);
+                } else {
+                    subsExpn.setEvalType(ExpnEvalType.BOOLEAN);
+                }
+            } else {
+                semanticErrors.add(/*TODO */);
+                subsExpn.setEvalType(ExpnEvalType.ERROR);
+            }
         }
     }
 

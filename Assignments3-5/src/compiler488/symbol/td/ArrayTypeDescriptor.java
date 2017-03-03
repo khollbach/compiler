@@ -8,7 +8,7 @@ public class ArrayTypeDescriptor extends TypeDescriptor {
     /**
      * Represents the type of an array's elements.
      */
-    final ScalarTypeDescriptor elementType;
+    public final ScalarTypeDescriptor elementType;
 
     ArrayTypeDescriptor(ScalarTypeDescriptor elementType) {
         this.elementType = elementType;
