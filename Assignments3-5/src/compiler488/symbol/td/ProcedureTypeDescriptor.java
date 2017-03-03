@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by gg on 27/02/17.
  */
-class ProcedureTypeDescriptor extends TypeDescriptor {
+public class ProcedureTypeDescriptor extends TypeDescriptor {
 
     /**
      * Represents the types of each of a procedure's parameters. Immutable.

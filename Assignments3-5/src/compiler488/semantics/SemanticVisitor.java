@@ -1,11 +1,14 @@
 package compiler488.semantics;
 
 import compiler488.ast.InvalidASTException;
+import compiler488.ast.Readable;
 import compiler488.ast.decl.*;
 import compiler488.ast.expn.*;
 import compiler488.ast.stmt.*;
 import compiler488.symbol.SymbolAttributes;
 import compiler488.symbol.SymbolTable;
+import compiler488.symbol.td.IntegerTypeDescriptor;
+import compiler488.symbol.td.ScalarTypeDescriptor;
 import compiler488.symbol.td.TypeDescriptor;
 import compiler488.symbol.td.TypeDescriptorFactory;
 import compiler488.visitor.DeclarationVisitor;
@@ -76,7 +79,17 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(IdentExpn identExpn) {
+        SymbolAttributes attr;
+        try {
+            attr = symbolTable.retrieveSymbol(identExpn.getIdent());
+        } catch (SymbolTable.SymbolNotFoundException e) {
+            semanticErrors.add(new UndefinedReferenceError(identExpn));
+            return;
+        }
 
+        if(!(attr.typeDescriptor instanceof ScalarTypeDescriptor)){
+            semanticErrors.add(new TypeError(identExpn));
+        }
     }
 
     @Override
@@ -145,6 +158,19 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(ReadStmt readStmt) {
+        for (Readable r : readStmt.getInputs()){
+            if(r instanceof IdentExpn){
+                IdentExpn rIdent = ((IdentExpn) r);
+                rIdent.accept(this);
+                try {
+                    SymbolAttributes attr = symbolTable.retrieveSymbol(rIdent.getIdent());
+                    if(!(attr.typeDescriptor instanceof IntegerTypeDescriptor)){
+                        semanticErrors.add(new ReadError(rIdent));
+                    }
+                } catch (SymbolTable.SymbolNotFoundException e) {}
+            }
+
+        }
 
     }
 

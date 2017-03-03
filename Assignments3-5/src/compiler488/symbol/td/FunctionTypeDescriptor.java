@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by gg on 27/02/17.
  */
-class FunctionTypeDescriptor extends TypeDescriptor {
+public class FunctionTypeDescriptor extends TypeDescriptor {
 
     /**
      * Represents a function's return typeDescriptor.

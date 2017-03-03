@@ -14,7 +14,7 @@ public abstract class SemanticError {
      *
      * @return the subtree of the AST associated with this SemanticError.
      */
-    protected abstract AST getOffendingNode();
+    protected AST offendingNode;
 
     /**
      * Returns a message describing this SemanticError.
@@ -23,6 +23,6 @@ public abstract class SemanticError {
     @Override
     public String toString() {
         //TODO: print error message with error location
-        return String.format("semantic error at line:%d col:%d", getOffendingNode().getSourceCoordinateLine(), getOffendingNode().getSourceCoordinateColumn());
+        return String.format("semantic error at line:%d col:%d", offendingNode.getSourceCoordinateLine(), offendingNode.getSourceCoordinateColumn());
     }
 }
