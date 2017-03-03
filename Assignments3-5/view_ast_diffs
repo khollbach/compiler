@@ -1,0 +1,8 @@
+#!/bin/bash
+
+tmpdir=tmp
+testdir=tests/ast
+
+for f in `ls "$tmpdir"`; do
+    vimdiff "$testdir/$f" "$tmpdir/$f"
+done

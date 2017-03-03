@@ -30,5 +30,4 @@ public class AST {
 		return sourceCoordinateColumn;
 	}
 
-
 }
