@@ -5,6 +5,8 @@ import java.io.PrintStream;
 import compiler488.ast.ASTList;
 import compiler488.ast.Indentable;
 
+import compiler488.visitor.DeclarationVisitor;
+
 /**
  * Holds the declaration of multiple elements.
  */

@@ -49,8 +49,4 @@ public class RoutineBody extends Indentable {
 	public void setParameters(ASTList<ScalarDecl> parameters) {
 		this.parameters = parameters;
 	}
-
-	public void accept(StatementVisitor stmtVisitor) {
-		stmtVisitor.visit(this);
-	}
 }
