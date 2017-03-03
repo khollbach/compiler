@@ -30,13 +30,12 @@ public class IfStmt extends Stmt {
 	 */
 	@Override
 	public void printOn(PrintStream out, int depth) {
-		Indentable.printIndentOnLn(out, depth, "if " + condition + " then ");
-		whenTrue.printOn(out, 	depth + 1);
+		Indentable.printIndentOnLn(out, depth, "if " + condition + " then");
+        whenTrue.printOn(out, depth + (whenTrue instanceof Scope ? 0 : 1));
 		if (whenFalse != null) {
 			Indentable.printIndentOnLn(out, depth, "else");
-			whenFalse.printOn(out, depth + 1);
+			whenFalse.printOn(out, depth + (whenFalse instanceof Scope ? 0 : 1));
 		}
-		Indentable.printIndentOnLn(out, depth, "End if");
 	}
 
 	public Expn getCondition() {

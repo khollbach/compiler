@@ -1,0 +1,11 @@
+{
+var i : Integer;
+var j : Boolean;
+
+i := 5;
+j := true;
+
+% Semantic error should be caught here - i is an integer, j is a boolean
+i = j;
+
+}

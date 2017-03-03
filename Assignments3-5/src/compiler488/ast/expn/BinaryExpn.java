@@ -13,7 +13,7 @@ public class BinaryExpn extends Expn
     @Override
 	public String toString ()
 	{
-	return ("(" + left + ")" + opSymbol + "(" + right + ")");
+	return ("(" + left + " " + opSymbol + " " + right + ")");
     }
 
 	public Expn getLeft() {

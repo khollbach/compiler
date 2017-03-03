@@ -25,7 +25,7 @@ public class ReturnStmt extends Stmt {
 	public void printOn(PrintStream out, int depth) {
 		Indentable.printIndentOn(out, depth);
 		if (value == null)
-			out.println("return ");
+			out.println("return");
 		else
 			out.println("return with " + value );
 	}

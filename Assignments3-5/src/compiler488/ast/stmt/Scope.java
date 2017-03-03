@@ -30,16 +30,17 @@ public class Scope extends Stmt {
 	 */
 	@Override
 	public void printOn(PrintStream out, int depth) {
-		Indentable.printIndentOnLn(out, depth, "Scope");
-		Indentable.printIndentOnLn(out, depth, "declarations");
+		//Indentable.printIndentOnLn(out, depth, "Scope");
+		//Indentable.printIndentOnLn(out, depth, "declarations");
+		//declarations.printOnSeperateLines(out, depth + 1);
+		//Indentable.printIndentOnLn(out, depth, "statements");
+		//statements.printOnSeperateLines(out, depth + 1);
+		//Indentable.printIndentOnLn(out, depth, "End Scope");
 
+		Indentable.printIndentOnLn(out, depth, "{");
 		declarations.printOnSeperateLines(out, depth + 1);
-
-		Indentable.printIndentOnLn(out, depth, "statements");
-
 		statements.printOnSeperateLines(out, depth + 1);
-
-		Indentable.printIndentOnLn(out, depth, "End Scope");
+		Indentable.printIndentOnLn(out, depth, "}");
 	}
 
 	public ASTList<Declaration> getDeclarations() {

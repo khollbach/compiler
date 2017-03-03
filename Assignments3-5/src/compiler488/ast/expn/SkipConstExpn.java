@@ -11,7 +11,7 @@ public class SkipConstExpn extends ConstExpn implements Printable {
 	/** Returns the string <b>"skip"</b>. */
 	@Override
 	public String toString() {
-		return " newline ";
+		return "newline";
 	}
 
 	public void accept(ExpressionVisitor expnVisitor) {

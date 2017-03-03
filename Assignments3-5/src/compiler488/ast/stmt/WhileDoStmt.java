@@ -19,9 +19,12 @@ public class WhileDoStmt extends LoopingStmt {
 	 */
 	@Override
 	public void printOn(PrintStream out, int depth) {
+		//Indentable.printIndentOnLn(out, depth, "while " + expn + " do");
+		//body.printOn(out, depth + 1);
+		//Indentable.printIndentOnLn(out, depth, "End while-do");
+
 		Indentable.printIndentOnLn(out, depth, "while " + expn + " do");
-		body.printOn(out, depth + 1);
-		Indentable.printIndentOnLn(out, depth, "End while-do");
+		body.printOn(out, depth + (body instanceof Scope ? 0 : 1));
 	}
 
 	@Override

@@ -14,11 +14,11 @@ public class FunctionCallExpn extends Expn {
 	/** Returns a string describing the function call. */
 	@Override
 	public String toString() {
-		if (arguments!=null) {
-			return ident + " (" + arguments + ")";
+		if (arguments.size() > 0) {
+			return ident + "(" + arguments + ")";
 		}
 		else
-			return ident + " " ;
+			return ident + "" ;
 	}
 
 	public ASTList<Expn> getArguments() {

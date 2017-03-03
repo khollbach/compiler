@@ -24,11 +24,11 @@ public class RoutineDecl extends Declaration {
 	public String toString() {
 	  if(type==null)
 	    {
-	      return " procedure " + name;
+	      return "procedure " + name;
 	    }
 	  else
 	    {
-	      return " function " + name + " : " + type ;
+	      return "function " + name + " : " + type ;
 	    }
 	}
 
@@ -42,7 +42,7 @@ public class RoutineDecl extends Declaration {
 	 */
 	@Override
 	public void printOn(PrintStream out, int depth) {
-		Indentable.printIndentOn(out, depth, this + " ");
+		Indentable.printIndentOn(out, depth, this + "");
 		routineBody.printOn(out, depth);
 	}
 

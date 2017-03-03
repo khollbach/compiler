@@ -13,7 +13,7 @@ public class UnaryExpn extends Expn
     @Override
 	public String toString ()
 	{
-	return ( opSymbol + "(" + operand + ")");
+	return ( opSymbol + " " + operand);
     }
 
 	public Expn getOperand() {
