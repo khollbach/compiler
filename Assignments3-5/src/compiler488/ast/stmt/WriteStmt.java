@@ -2,6 +2,7 @@ package compiler488.ast.stmt;
 
 import compiler488.ast.ASTList;
 import compiler488.ast.Printable;
+import compiler488.visitor.StatementVisitor;
 
 /**
  * The command to write data on the output device.
@@ -25,5 +26,10 @@ public class WriteStmt extends Stmt {
 
 	public void setOutputs(ASTList<Printable> outputs) {
 		this.outputs = outputs;
+	}
+
+	@Override
+	public void accept(StatementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import compiler488.ast.ASTList;
 import compiler488.ast.Indentable;
 import compiler488.ast.decl.Declaration;
+import compiler488.visitor.StatementVisitor;
 
 /**
  * Represents the declarations and instructions of a scope construct.
@@ -55,6 +56,11 @@ public class Scope extends Stmt {
 
 	public void setStatements(ASTList<Stmt> statements) {
 		this.statements = statements;
+	}
+
+	@Override
+	public void accept(StatementVisitor visitor) {
+		visitor.visit(this);
 	}
 
 }

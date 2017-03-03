@@ -53,8 +53,8 @@ public class SymbolTable {
 		}
 	}
 
-	public boolean declaredLocally(String id){
-	    List innerScope = scopeStack.peek();
+	private boolean declaredLocally(String id){
+	    List<String> innerScope = scopeStack.peek();
 	    return innerScope.contains(id);
     }
 
@@ -63,7 +63,7 @@ public class SymbolTable {
 	 * @param id - symbol id
 	 * @param attributes - an object containing all the attributed of the symbol
 	 */
-	public void enterSymbol(String id, SymbolAttributes attributes){
+	public void enterSymbol(String id, SymbolAttributes attributes) throws RedeclarationException {
 
 		if (!symbolTable.containsKey(id)){
 			symbolTable.put(id, new Stack<>());
@@ -77,8 +77,20 @@ public class SymbolTable {
 	 * @param id - id string of a symbol
 	 * @return returns attributes of the most local declaration of symbol id
 	 */
-	public SymbolAttributes retrieveSymbol(String id){
+	public SymbolAttributes retrieveSymbol(String id) throws SymbolNotFoundException {
+		if (!symbolTable.containsKey(id)) {
+			throw new SymbolNotFoundException();
+		}
 		return symbolTable.get(id).peek();
 	}
+
+
+	/**
+	 * The Exception thrown if an attempt to enter a symbol
+	 * that is already declaredLocally is made.
+	 */
+	public class RedeclarationException extends Exception {}
+
+	public class SymbolNotFoundException extends Exception {}
 
 }

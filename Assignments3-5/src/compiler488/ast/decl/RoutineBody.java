@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import compiler488.ast.ASTList;
 import compiler488.ast.Indentable;
 import compiler488.ast.stmt.Scope;
+import compiler488.visitor.StatementVisitor;
 
 /**
  * Represents the parameters and instructions associated with a
@@ -47,5 +48,9 @@ public class RoutineBody extends Indentable {
 
 	public void setParameters(ASTList<ScalarDecl> parameters) {
 		this.parameters = parameters;
+	}
+
+	public void accept(StatementVisitor stmtVisitor) {
+		stmtVisitor.visit(this);
 	}
 }

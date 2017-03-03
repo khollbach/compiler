@@ -7,6 +7,7 @@ import compiler488.ast.expn.*;
  */
 public interface ExpressionVisitor {
 
+    void visit(Expn expn);
     void visit(ArithExpn arithExpn);
     void visit(BoolConstExpn boolConst);
     void visit(BoolExpn boolExpn);

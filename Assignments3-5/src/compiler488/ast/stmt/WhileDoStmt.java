@@ -3,6 +3,7 @@ package compiler488.ast.stmt;
 import java.io.PrintStream;
 
 import compiler488.ast.Indentable;
+import compiler488.visitor.StatementVisitor;
 
 /**
  * Represents a loop in which the exit condition is evaluated before each pass.
@@ -21,5 +22,10 @@ public class WhileDoStmt extends LoopingStmt {
 		Indentable.printIndentOnLn(out, depth, "while " + expn + " do");
 		body.printOn(out, depth + 1);
 		Indentable.printIndentOnLn(out, depth, "End while-do");
+	}
+
+	@Override
+	public void accept(StatementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

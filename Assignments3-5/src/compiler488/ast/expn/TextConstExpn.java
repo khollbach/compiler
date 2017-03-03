@@ -1,6 +1,7 @@
 package compiler488.ast.expn;
 
 import compiler488.ast.Printable;
+import compiler488.visitor.ExpressionVisitor;
 
 /**
  * Represents a literal text constant.
@@ -20,5 +21,9 @@ public class TextConstExpn extends ConstExpn implements Printable {
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public void accept(ExpressionVisitor expnVisitor) {
+		expnVisitor.visit(this);
 	}
 }

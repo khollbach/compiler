@@ -4,6 +4,7 @@ import java.io.PrintStream;
 
 import compiler488.ast.ASTList;
 import compiler488.ast.Indentable;
+import compiler488.visitor.DeclarationVisitor;
 
 /**
  * Holds the declaration of multiple elements.
@@ -46,5 +47,9 @@ public class MultiDeclarations extends Declaration {
 
 	public void setElements(ASTList<DeclarationPart> elements) {
 		this.elements = elements;
+	}
+
+	public void accept(DeclarationVisitor visitor) {
+		visitor.visit(this);
 	}
 }

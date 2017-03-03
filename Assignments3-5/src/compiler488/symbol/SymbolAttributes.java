@@ -8,13 +8,13 @@ import compiler488.symbol.td.TypeDescriptor;
  */
 public class SymbolAttributes {
 
-    /* This symbol's scopeStack depth. */
-    public final int depth;
+    /* True if this is the SymbolAttributes of a parameter for a procedure or function. */
+    public final boolean isParameter;
 
     public final TypeDescriptor typeDescriptor;
 
-    public SymbolAttributes(int depth, TypeDescriptor typeDescriptor){
-        this.depth = depth;
+    public SymbolAttributes(boolean isParameter, TypeDescriptor typeDescriptor){
+        this.isParameter = isParameter;
         this.typeDescriptor = typeDescriptor;
 
     }

@@ -1,13 +1,9 @@
 package compiler488.symbol.td;
 
-import compiler488.ast.InvalidASTException;
 import compiler488.ast.decl.ArrayDeclPart;
 import compiler488.ast.decl.DeclarationPart;
 import compiler488.ast.decl.RoutineDecl;
 import compiler488.ast.decl.ScalarDecl;
-import compiler488.ast.expn.BoolConstExpn;
-import compiler488.ast.expn.ConstExpn;
-import compiler488.ast.expn.IntConstExpn;
 import compiler488.ast.type.BooleanType;
 import compiler488.ast.type.Type;
 
@@ -19,22 +15,6 @@ import java.util.stream.Collectors;
  * Created by gg on 27/02/17.
  */
 public class TypeDescriptorFactory {
-
-
-
-    public static TypeDescriptor typeOf(ConstExpn expn) {
-        if (expn instanceof IntConstExpn) {
-            return new IntegerTypeDescriptor();
-        } else if (expn instanceof BoolConstExpn) {
-            return new BooleanTypeDescriptor();
-        } else {
-            // We have a TextConstExpn
-            // A correctly built AST should never contain a TextConstExpn
-            // in a place where this method is invoked
-            throw new InvalidASTException();
-        }
-    }
-
 
     public static ScalarTypeDescriptor create(ScalarDecl decl) {
         return createScalarTDFromType(decl.getType());
