@@ -23,6 +23,6 @@ public abstract class SemanticError {
     @Override
     public String toString() {
         //TODO: print error message with error location
-        return null;
+        return String.format("semantic error at line:%d col:%d", getOffendingNode().getSourceCoordinateLine(), getOffendingNode().getSourceCoordinateColumn());
     }
 }

@@ -29,27 +29,6 @@ public class AST {
 	public int getSourceCoordinateColumn(){
 		return sourceCoordinateColumn;
 	}
-	
 
-    // All nodes in the AST should keep track of where they came from
-	// in the source file.
-	private int sourceCoordinateLine;
-	private int sourceCoordinateColumn;
-
-	public void setSourceCoordinateLine(int lineNumber){
-		sourceCoordinateLine = lineNumber;
-	}
-
-	public void setSourceCoordinateColumn(int columnNumber){
-		sourceCoordinateColumn = columnNumber;
-	}
-
-	public int getSourceCoordinateLine(){
-		return sourceCoordinateLine;
-	}
-
-	public int getSourceCoordinateColumn(){
-		return sourceCoordinateColumn;
-	}
 
 }
