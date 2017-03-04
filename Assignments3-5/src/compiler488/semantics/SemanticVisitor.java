@@ -3,6 +3,7 @@ package compiler488.semantics;
 import compiler488.ast.InvalidASTException;
 import compiler488.ast.Printable;
 import compiler488.ast.Readable;
+import compiler488.ast.Writeable;
 import compiler488.ast.decl.*;
 import compiler488.ast.expn.*;
 import compiler488.ast.stmt.*;
@@ -224,7 +225,17 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(UnaryMinusExpn unaryMinusExpn) {
+        
+        // Visit child expression
+        unaryMinusExpn.getOperand().accept(this);
 
+        // Check for valid type of child expression
+        if (unaryMinusExpn.getOperand().evalType() != ExpnEvalType.INTEGER) {
+            semanticErrors.add(new TypeError(unaryMinusExpn));
+        }
+
+        // Set type to integer.
+        unaryMinusExpn.setEvalType(ExpnEvalType.INTEGER);
     }
 
     /* ********** */
@@ -262,7 +273,16 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(ExitStmt exitStmt) {
+        if (majScopeLoopNestingDepths.peek() < exitStmt.getLevel()) {
+            semanticErrors.add(new ExitLevelError(exitStmt, majScopeLoopNestingDepths.peek()));
+        }
 
+        if (exitStmt.getExpn() != null) {
+            exitStmt.getExpn().accept(this);
+            if (!exitStmt.getExpn().evalType().equals(ExpnEvalType.BOOLEAN)){
+                semanticErrors.add(new TypeError(exitStmt));
+            }
+        }
     }
 
     @Override
@@ -304,9 +324,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
                     semanticErrors.add(new ReadStmtError(sIdent));
                 }
             }
-
         }
-
     }
 
     @Override
@@ -382,6 +400,8 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     public void visit(Declaration decl) {
         throw new InvalidASTException();
     }
+
+    // TODO! array bounds check (left is <= to right)
 
     @Override
     public void visit(MultiDeclarations multiDecl) {

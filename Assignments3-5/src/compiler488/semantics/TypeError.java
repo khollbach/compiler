@@ -1,8 +1,8 @@
 package compiler488.semantics;
 
-import com.sun.xml.internal.ws.server.ServerRtException;
 import compiler488.ast.expn.*;
 import compiler488.ast.stmt.AssignStmt;
+import compiler488.ast.stmt.ExitStmt;
 import compiler488.ast.stmt.IfStmt;
 import compiler488.ast.stmt.WhileDoStmt;
 
@@ -22,9 +22,11 @@ public class TypeError extends SemanticError{
     private static final String NON_BOOLEAN_CONDITION = "non-boolean expression as condition: %s";
     private static final String DIFFERING_TYPES = "value assigned to variable of differing type: %s";
     private static final String ASSIGN_TO_PARAM = "assignment to parameter reference: %s";
+    private static final String NON_BOOLEAN_EXIT_COND = "exit statement has non-boolean condition: %s";
     private static final String NON_INTEGER_COMPARE = "compare expression was passed a non-integer reference: %s";
     private static final String RESULT_TYPE_MISMATCH = "condition statement result types are not the same: %s";
     private static final String EQUAL_TYPE_MISMATCH = "equality condition was passed two different types: %s";
+    private static final String NON_INTEGER_UNARY_MINUS = "unary minus applied to non-integer expression: %s";
 
     /**
      * This TypeError's error message
@@ -71,6 +73,11 @@ public class TypeError extends SemanticError{
         errorMsg = String.format(ASSIGN_TO_PARAM, assignStmt.getLval());
     }
 
+    public TypeError(ExitStmt exitStmt) {
+        offendingNode = exitStmt;
+        errorMsg = String.format(NON_BOOLEAN_EXIT_COND, exitStmt.getExpn());
+    }
+
     public TypeError(CompareExpn compareExpn) {
         offendingNode = compareExpn;
         errorMsg = String.format(NON_INTEGER_COMPARE, compareExpn);
@@ -94,6 +101,11 @@ public class TypeError extends SemanticError{
     public TypeError(WhileDoStmt whileDoStmt) {
         offendingNode = whileDoStmt;
         errorMsg = String.format(NON_BOOLEAN_CONDITION, whileDoStmt);
+    }
+
+    public TypeError(UnaryMinusExpn unaryMinusExpn) {
+        offendingNode = unaryMinusExpn;
+        errorMsg = String.format(NON_INTEGER_UNARY_MINUS, unaryMinusExpn);
     }
 
     @Override
