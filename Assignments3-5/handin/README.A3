@@ -4,13 +4,13 @@ Team Members - Kevan Hollbach, Andrew Trotter, George Gianacopolous, Tarang Mara
 
 All team members worked together, exchanging ideas for the assignment.
 
-Kevan Hollbach - Worked on designing and implementing AST.
+Kevan Hollbach - Worked on designing and implementing AST and semantic rules.
 
-Arturo Mena Cruz - Worked on designing and implementing AST.
+Arturo Mena Cruz - Worked on designing and implementing AST and semantic rules.
 
-George Gianacopolous - Worked on designing and implementing symbol table and type checking.
+George Gianacopolous - Worked on designing and implementing symbol table, semantic rules and type checking.
 
-Tarang Marathe - Worked on designing and implementing symbol table, wrote tests.
+Tarang Marathe - Worked on designing and implementing symbol table, semantic rules, wrote tests.
 
-Andrew Trotter - Helped with stuff.
+Andrew Trotter - Worked on type checking and semantic rules.
 
