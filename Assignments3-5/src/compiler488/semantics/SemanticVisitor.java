@@ -144,7 +144,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     @Override
     public void visit(FunctionCallExpn funcExpn) {
         List<ScalarTypeDescriptor> paramTypes = null;
-
+        
         try {
             SymbolAttributes attrs = symbolTable.retrieveSymbol(funcExpn.getIdent());
             if (attrs.typeDescriptor instanceof FunctionTypeDescriptor) {
@@ -157,7 +157,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
                 } else {
                     funcExpn.setEvalType(ExpnEvalType.BOOLEAN);
                 }
-
+                
                 verifyParamTypes(paramTypes, evalTypes);
             }
         } catch (SymbolTable.SymbolNotFoundException e) {
