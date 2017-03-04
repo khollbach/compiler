@@ -227,7 +227,16 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(ExitStmt exitStmt) {
+        if (majScopeLoopNestingDepths.peek() < exitStmt.getLevel()) {
+            semanticErrors.add(new ExitLevelError(exitStmt, majScopeLoopNestingDepths.peek()));
+        }
 
+        if (exitStmt.getExpn() != null) {
+            exitStmt.getExpn().accept(this);
+            if (!exitStmt.getExpn().evalType().equals(ExpnEvalType.BOOLEAN)){
+                semanticErrors.add(new TypeError(exitStmt));
+            }
+        }
     }
 
     @Override
@@ -269,9 +278,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
                     semanticErrors.add(new ReadStmtError(sIdent));
                 }
             }
-
         }
-
     }
 
     @Override
@@ -337,6 +344,8 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     public void visit(Declaration decl) {
         throw new InvalidASTException();
     }
+
+    // TODO! array bounds check (left is <= to right)
 
     @Override
     public void visit(MultiDeclarations multiDecl) {

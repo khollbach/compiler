@@ -2,6 +2,7 @@ package compiler488.semantics;
 
 import compiler488.ast.expn.*;
 import compiler488.ast.stmt.AssignStmt;
+import compiler488.ast.stmt.ExitStmt;
 import compiler488.ast.stmt.IfStmt;
 
 /**
@@ -20,6 +21,7 @@ public class TypeError extends SemanticError{
     private static final String NON_BOOLEAN_CONDITION = "non-boolean expression as condition to if statement: %s";
     private static final String DIFFERING_TYPES = "value assigned to variable of differing type: %s";
     private static final String ASSIGN_TO_PARAM = "assignment to parameter reference: %s";
+    private static final String NON_BOOLEAN_EXIT_COND = "exit statement has non-boolean condition: %s";
 
     /**
      * This TypeError's error message
@@ -64,6 +66,11 @@ public class TypeError extends SemanticError{
     public TypeError(AssignStmt assignStmt, boolean isParameter) {
         offendingNode = assignStmt;
         errorMsg = String.format(ASSIGN_TO_PARAM, assignStmt.getLval());
+    }
+
+    public TypeError(ExitStmt exitStmt) {
+        offendingNode = exitStmt;
+        errorMsg = String.format(NON_BOOLEAN_EXIT_COND, exitStmt.getExpn());
     }
 
     @Override
