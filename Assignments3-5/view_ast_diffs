@@ -2,7 +2,7 @@
 
 # View diffs of the AST dumps of the passing tests.
 
-tmpdir=tmp
+tmpdir=tmp-test-output
 testdir=tests/ast
 
 for f in `ls "$tmpdir"`; do
