@@ -225,7 +225,17 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(UnaryMinusExpn unaryMinusExpn) {
+        
+        // Visit child expression
+        unaryMinusExpn.getOperand().accept(this);
 
+        // Check for valid type of child expression
+        if (unaryMinusExpn.getOperand().evalType() != ExpnEvalType.INTEGER) {
+            semanticErrors.add(new TypeError(unaryMinusExpn));
+        }
+
+        // Set type to integer.
+        unaryMinusExpn.setEvalType(ExpnEvalType.INTEGER);
     }
 
     /* ********** */
