@@ -2,11 +2,13 @@
 
 Passing tests:
 ==============
-A1a.488 : tests semantics of arithmetic, logical, and comparison operators
-A1b.488 : tests semantics of array declarations and indexing
-A1c.488 : tests semantics of loop scopes (while, repeat)
-A1d.488 : tests semantics of function and procedure scopes, with parameter and return type checking
-A1e.488 : tests semantics of recursive functions
+A1a.488     : tests semantics of arithmetic, logical, and comparison operators
+A1b.488     : tests semantics of array declarations and indexing
+A1c.488     : tests semantics of loop scopes (while, repeat)
+A1d.488     : tests semantics of function and procedure scopes, with parameter and return type checking
+A1e.488     : tests semantics of recursive functions
+empty.488   : tests semantics of empty scope
+runtime_error_array_indexing.488 : tests that a runtime error is NOT caught by semantic analysis (it shouldn't be)
 
 Failing tests:
 ==============
@@ -25,3 +27,6 @@ semantic_error_exit_statement.488           : exit statement outside loop
 semantic_error_exit_value.488               : exit k from fewer than k nested loops
 semantic_error_procedure_return.488         : value returned from a procedure
 semantic_error_return_statement.488         : return statement outside of function / procedure
+semantic_error_array_input_type.488         : incorrect assignment to an array
+semantic_error_redeclaring_symbols.488      : already declared variable in new declaration
+semantic_error_function_duplicate_args.488  : function passed same argument twice
