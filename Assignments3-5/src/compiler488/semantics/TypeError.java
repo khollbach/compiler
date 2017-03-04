@@ -125,6 +125,11 @@ public class TypeError extends SemanticError {
         errorMsg = String.format(WRONG_RETURN_TYPE, expectedType, actualType);
     }
 
+    public TypeError(NotExpn notExpn) {
+        offendingNode = notExpn;
+        errorMsg = String.format(NON_BOOLEAN_OPERAND, notExpn);
+    }
+
     @Override
     public String toString() {
         return super.toString() + errorMsg;
