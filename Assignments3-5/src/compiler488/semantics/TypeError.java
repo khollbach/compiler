@@ -23,6 +23,7 @@ public class TypeError extends SemanticError{
     private static final String ASSIGN_TO_PARAM = "assignment to parameter reference: %s";
     private static final String NON_INTEGER_COMPARE = "compare expression was passed a non-integer reference: %s";
     private static final String RESULT_TYPE_MISMATCH = "condition statement result types are not the same: %s";
+    private static final String EQUAL_TYPE_MISMATCH = "equality condition was passed two different types: %s";
 
     /**
      * This TypeError's error message
@@ -82,6 +83,11 @@ public class TypeError extends SemanticError{
     public TypeError(ConditionalExpn conditionalExpn, Expn falseValue, Expn trueValue) {
         offendingNode = conditionalExpn;
         errorMsg = String.format(RESULT_TYPE_MISMATCH, conditionalExpn);
+    }
+
+    public TypeError(EqualsExpn equalsExpn) {
+        offendingNode =  equalsExpn;
+        errorMsg = String.format(EQUAL_TYPE_MISMATCH, equalsExpn);
     }
 
     @Override

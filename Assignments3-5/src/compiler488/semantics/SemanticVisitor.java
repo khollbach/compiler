@@ -127,6 +127,16 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(EqualsExpn equalsExpn) {
+        equalsExpn.getLeft().accept(this);
+        equalsExpn.getRight().accept(this);
+
+        if (equalsExpn.getLeft().evalType().equals(equalsExpn.getRight().evalType())){
+            equalsExpn.setEvalType(equalsExpn.getLeft().evalType());
+        }
+        else {
+            semanticErrors.add(new TypeError(equalsExpn));
+            equalsExpn.setEvalType(ExpnEvalType.UNDEFINED);
+        }
 
     }
 
