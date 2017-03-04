@@ -1,9 +1,6 @@
 package compiler488.semantics;
 
-import compiler488.ast.expn.ArithExpn;
-import compiler488.ast.expn.Expn;
-import compiler488.ast.expn.IdentExpn;
-import compiler488.ast.expn.SubsExpn;
+import compiler488.ast.expn.*;
 
 /**
  * Created by tarang on 2017-03-02.
@@ -15,8 +12,9 @@ public class TypeError extends SemanticError{
      */
     private static final String UNEXPECTED_NONSCALAR = "unexpected non-scalar reference: %s";
     private static final String NON_INTEGER_INDEX = "array indexed with non integral expression: %s";
-    private static final String NON_INTEGER_OPERAND = "arithmetic expression was passed non-integer type: %s";
+    private static final String NON_INTEGER_OPERAND = "arithmetic expression was passed non-integer reference: %s";
     private static final String INDEXED_NON_ARRAY = "indexed non-array reference: %s";
+    private static final String NON_BOOLEAN_OPERAND = "boolean expression was passed non-boolean reference: %s";
 
     /**
      * This TypeError's error message
@@ -24,8 +22,7 @@ public class TypeError extends SemanticError{
     private String errorMsg;
 
     public TypeError(IdentExpn identExpn) {
-        offendingNode = identExpn;
-        errorMsg = String.format(UNEXPECTED_NONSCALAR, identExpn.getIdent());
+
     }
 
     public TypeError(SubsExpn subsExpn, Expn operand) {
@@ -41,6 +38,11 @@ public class TypeError extends SemanticError{
     public TypeError(SubsExpn subsExpn) {
         offendingNode = subsExpn;
         errorMsg = String.format(INDEXED_NON_ARRAY, subsExpn.getVariable());
+    }
+
+    public TypeError(BoolExpn boolExpn) {
+        offendingNode = boolExpn;
+        errorMsg = String.format(NON_BOOLEAN_OPERAND, boolExpn);
     }
 
     @Override
