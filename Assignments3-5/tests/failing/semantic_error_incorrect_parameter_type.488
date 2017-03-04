@@ -1,11 +1,11 @@
 {
-% type checking was not inclued in this assignment,
-% so this should pass, even though the semantics are incorrect.
+var a : Integer
 function foo ( a : Boolean ) : Integer
     { if a then
         return with 0
       else
         return with 1
     }
-foo ( 5 )
+
+a:= foo ( 5 )
 }

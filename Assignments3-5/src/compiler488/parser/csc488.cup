@@ -50,9 +50,9 @@ parser code {:
 
             if (s.left >= 0) // Check line number.
         {
-                st += " in line " + (s.left + 1);
+                st += " in line " + s.left;
                 if (s.right >= 0) // Check column number.
-                    st += ", column " + (s.right + 1);
+                    st += ", column " + s.right;
         }
             else
                st += " at end of input ";

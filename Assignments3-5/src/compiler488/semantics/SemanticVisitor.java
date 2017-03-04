@@ -144,7 +144,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     @Override
     public void visit(FunctionCallExpn funcExpn) {
         List<ScalarTypeDescriptor> paramTypes = null;
-
+        
         try {
             SymbolAttributes attrs = symbolTable.retrieveSymbol(funcExpn.getIdent());
             if (attrs.typeDescriptor instanceof FunctionTypeDescriptor) {
@@ -157,7 +157,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
                 } else {
                     funcExpn.setEvalType(ExpnEvalType.BOOLEAN);
                 }
-
+                
                 verifyParamTypes(paramTypes, evalTypes);
             }
         } catch (SymbolTable.SymbolNotFoundException e) {
@@ -398,20 +398,20 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
             semanticErrors.add(new ReturnError(returnStmt, false));
         }
 
-        // Procedure return
-        if (returnStmt.getValue() == null) {
-            if (majorScopeInfoStack.peek().getScopeType() == MajorScopeInfo.ScopeType.FUNCTION) {
+        if ((returnStmt.getValue() == null) &&
+                (majorScopeInfoStack.peek().getScopeType() == MajorScopeInfo.ScopeType.FUNCTION)) {
                 semanticErrors.add(new ReturnError(returnStmt));
-            }
-        } // Function return
-        else {
+        }
+
+        if (returnStmt.getValue() != null){
             returnStmt.getValue().accept(this);
 
             if (majorScopeInfoStack.peek().getScopeType() == MajorScopeInfo.ScopeType.PROCEDURE) {
-                semanticErrors.add(new ReturnError(returnStmt));
+                semanticErrors.add(new ReturnError(returnStmt, returnStmt.getValue()));
             }
 
-            if (returnStmt.getValue().evalType() != majorScopeInfoStack.peek().getReturnType()) {
+            if ( majorScopeInfoStack.peek().getScopeType() == MajorScopeInfo.ScopeType.FUNCTION
+                    && returnStmt.getValue().evalType() != majorScopeInfoStack.peek().getReturnType()) {
                 semanticErrors.add(new TypeError(returnStmt,
                         majorScopeInfoStack.peek().getReturnType(), returnStmt.getValue().evalType()));
             }

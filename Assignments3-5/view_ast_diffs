@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# View diffs of the AST dumps of the passing tests.
+
 tmpdir=tmp
 testdir=tests/ast
 

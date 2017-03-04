@@ -15,7 +15,7 @@ public class ReturnError extends SemanticError {
 
     public ReturnError(ReturnStmt returnStmt) {
         offendingNode = returnStmt;
-        errorMsg = String.format(NO_EXPRESSION, returnStmt);
+        errorMsg = String.format(NO_EXPRESSION, returnStmt.toString());
     }
 
     public ReturnError(ReturnStmt returnStmt, Expn ignored) {
@@ -30,6 +30,7 @@ public class ReturnError extends SemanticError {
         offendingNode = returnStmt;
         errorMsg = String.format(NOT_IN_ROUTINE, returnStmt);
     }
+
 
     @Override
     public String toString() {
