@@ -1,6 +1,8 @@
 package compiler488.semantics;
 
 import compiler488.ast.expn.*;
+import compiler488.ast.stmt.AssignStmt;
+import compiler488.ast.stmt.IfStmt;
 
 /**
  * Created by tarang on 2017-03-02.

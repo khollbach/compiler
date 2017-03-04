@@ -218,9 +218,9 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         // Check special case of assigning to routine parameters
         SymbolAttributes attrs = null;
         try {
-            attrs = symbolTable.retrieveSymbol(assignStmt.getLval());
+            attrs = symbolTable.retrieveSymbol(assignStmt.getLval().toString());
 
-        } catch (SymbolNotFoundException ignored) {}        
+        } catch (SymbolTable.SymbolNotFoundException ignored) {}
         if (attrs != null) {
             if (attrs.isParameter) {
                 semanticErrors.add(new TypeError(assignStmt, attrs.isParameter));
