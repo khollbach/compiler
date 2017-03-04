@@ -4,8 +4,8 @@ var i, j : Integer
 i := 0
 j := 30
 
-while i < 10 {
-    while j > 20 {
+while i < 10 do {
+    while j > 20 do {
         if j = 21 then
             % semantic error - exit 3 when there are only 2 loops
             exit 3
