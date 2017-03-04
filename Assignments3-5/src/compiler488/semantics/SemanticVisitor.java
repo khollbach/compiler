@@ -6,6 +6,7 @@ import compiler488.ast.Readable;
 import compiler488.ast.decl.*;
 import compiler488.ast.expn.*;
 import compiler488.ast.stmt.*;
+import compiler488.ast.type.IntegerType;
 import compiler488.symbol.SymbolAttributes;
 import compiler488.symbol.SymbolTable;
 import compiler488.symbol.td.*;
@@ -302,7 +303,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(Program programScope) {
-        majorScopeInfoStack.push(new MajorScopeInfo());
+        majorScopeInfoStack.push(new MajorScopeInfo(MajorScopeInfo.ScopeType.PROGRAM));
         visit((Scope) programScope);
         majorScopeInfoStack.pop();
     }
@@ -343,7 +344,28 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(ReturnStmt returnStmt) {
+        if (majorScopeInfoStack.peek().getScopeType() == MajorScopeInfo.ScopeType.PROGRAM) {
+            semanticErrors.add(new ReturnError(returnStmt, false));
+        }
 
+        // Procedure return
+        if (returnStmt.getValue() == null) {
+            if (majorScopeInfoStack.peek().getScopeType() == MajorScopeInfo.ScopeType.FUNCTION) {
+                semanticErrors.add(new ReturnError(returnStmt));
+            }
+        } // Function return
+        else {
+            returnStmt.getValue().accept(this);
+
+            if (majorScopeInfoStack.peek().getScopeType() == MajorScopeInfo.ScopeType.PROCEDURE) {
+                semanticErrors.add(new ReturnError(returnStmt));
+            }
+
+            if (returnStmt.getValue().evalType() != majorScopeInfoStack.peek().getReturnType()) {
+                semanticErrors.add(new TypeError(returnStmt,
+                        majorScopeInfoStack.peek().getReturnType(), returnStmt.getValue().evalType()));
+            }
+        }
     }
 
     @Override
@@ -442,7 +464,19 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         }
 
         // new major scope
-        majorScopeInfoStack.push(new MajorScopeInfo());
+        if (routineDecl.getType() == null) {
+            majorScopeInfoStack.push(
+                    new MajorScopeInfo(MajorScopeInfo.ScopeType.PROCEDURE));
+        } else {
+            ExpnEvalType type = null;
+            if (routineDecl.getType() instanceof IntegerType) {
+                type = ExpnEvalType.INTEGER;
+            } else  {
+                type = ExpnEvalType.BOOLEAN;
+            }
+            majorScopeInfoStack.push(
+                    new MajorScopeInfo(MajorScopeInfo.ScopeType.FUNCTION, type));
+        }
 
         // hook the declaration of parameters when processing routine scope
         setOnVisitScopeListener(() -> {

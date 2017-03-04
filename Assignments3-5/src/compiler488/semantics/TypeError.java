@@ -24,6 +24,7 @@ public class TypeError extends SemanticError{
     private static final String RESULT_TYPE_MISMATCH = "condition statement result types are not the same: %s";
     private static final String EQUAL_TYPE_MISMATCH = "equality condition was passed two different types: %s";
     private static final String NON_INTEGER_UNARY_MINUS = "unary minus applied to non-integer expression: %s";
+    private static final String WRONG_RETURN_TYPE = "expected return type and actual do not match: %s, %s";
 
     /**
      * This TypeError's error message
@@ -103,6 +104,11 @@ public class TypeError extends SemanticError{
     public TypeError(UnaryMinusExpn unaryMinusExpn) {
         offendingNode = unaryMinusExpn;
         errorMsg = String.format(NON_INTEGER_UNARY_MINUS, unaryMinusExpn);
+    }
+
+    public TypeError(ReturnStmt returnStmt, ExpnEvalType expectedType, ExpnEvalType actualType) {
+        offendingNode = returnStmt;
+        errorMsg = String.format(WRONG_RETURN_TYPE, expectedType, actualType);
     }
 
     @Override
