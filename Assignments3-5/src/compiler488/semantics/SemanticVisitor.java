@@ -595,8 +595,6 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     }
 
     private boolean typesMatch(ScalarTypeDescriptor td, ExpnEvalType evalType) {
-        System.err.println(td);
-        System.err.println(evalType);
         return (td instanceof IntegerTypeDescriptor && evalType.equals(ExpnEvalType.INTEGER)
                 || td instanceof BooleanTypeDescriptor && evalType.equals(ExpnEvalType.BOOLEAN));
     }
