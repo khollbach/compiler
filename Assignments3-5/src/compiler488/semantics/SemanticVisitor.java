@@ -1,6 +1,5 @@
 package compiler488.semantics;
 
-import com.sun.xml.internal.ws.wsdl.writer.document.ParamType;
 import compiler488.ast.ASTList;
 import compiler488.ast.InvalidASTException;
 import compiler488.ast.Printable;
@@ -596,6 +595,10 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
          * before any of the scope body has been processed.
          */
         void onVisitScope();
+    }
+
+    public List<SemanticError> getSemanticErrors() {
+        return semanticErrors;
     }
 
     private class ParamArityMismatchException extends Exception {
