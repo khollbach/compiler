@@ -143,19 +143,30 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     @Override
     public void visit(FunctionCallExpn funcExpn) {
         List<ScalarTypeDescriptor> paramTypes = null;
-
+        
         try {
             SymbolAttributes attrs = symbolTable.retrieveSymbol(funcExpn.getIdent());
             if (attrs.typeDescriptor instanceof FunctionTypeDescriptor) {
                 FunctionTypeDescriptor fnTD = ((FunctionTypeDescriptor) attrs.typeDescriptor);
                 paramTypes = fnTD.parameterTypes;
-                List<ExpnEvalType> evalTypes = evalTypes(funcExpn.getArguments());
+               
+                List<ExpnEvalType> evalTypes = new ArrayList<ExpnEvalType>();
+                for (Expn exp: funcExpn.getArguments()) {
+                	exp.accept(this);
+                }
+                
+                for (Expn exp: funcExpn.getArguments()){
+                	evalTypes.add(exp.evalType());
+                }
+                
 
                 if (fnTD.returnType instanceof IntegerTypeDescriptor) {
                     funcExpn.setEvalType(ExpnEvalType.INTEGER);
                 } else {
                     funcExpn.setEvalType(ExpnEvalType.BOOLEAN);
                 }
+                
+                System.out.println("DEBUG:"+paramTypes.toString()+evalTypes.toString());
 
                 verifyParamTypes(paramTypes, evalTypes);
             }
