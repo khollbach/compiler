@@ -328,7 +328,17 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(RepeatUntilStmt repeatUntilStmt) {
+        repeatUntilStmt.getExpn().accept(this);
 
+        majScopeLoopNestingDepths.push(majScopeLoopNestingDepths.pop() + 1);
+
+        repeatUntilStmt.getBody().accept(this);
+
+        majScopeLoopNestingDepths.push(majScopeLoopNestingDepths.pop() - 1);
+
+        if (repeatUntilStmt.getExpn().evalType() == ExpnEvalType.INTEGER) {
+            semanticErrors.add(new TypeError(repeatUntilStmt));
+        }
     }
 
     @Override
@@ -342,7 +352,6 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
         consumeScopeVisitHook();
 
-        //TODO rest of scope processing
         for (Declaration decl : scope.getDeclarations()) {
             decl.accept(this);
         }

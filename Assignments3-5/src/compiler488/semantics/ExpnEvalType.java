@@ -8,7 +8,7 @@ package compiler488.semantics;
 public enum ExpnEvalType {
 
     /**
-     * The type that expressions with invalid TODO
+     * The type of variable references and function calls when the symbol referenced is undeclared.
      */
     UNDEFINED,
 
