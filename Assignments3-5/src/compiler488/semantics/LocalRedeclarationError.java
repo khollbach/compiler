@@ -11,23 +11,24 @@ import compiler488.ast.decl.ScalarDecl;
  */
 public class LocalRedeclarationError extends SemanticError {
 
-    public LocalRedeclarationError(MultiDeclarations multiDecl, DeclarationPart declPart) {
-        super();
+    private static final String PARAMETER_REDCL = "parameter \"%s\" declared multiple times";
+    private static final String SYM_REDECL = "\"%s\" has already been declared in this scope";
+
+    private String errorMsg;
+
+    public LocalRedeclarationError(DeclarationPart declPart) {
+        errorMsg = String.format(SYM_REDECL, declPart.getName());
+        offendingNode = declPart
     }
 
     public LocalRedeclarationError(RoutineDecl routineDecl) {
-        super();
+        errorMsg = String.format(SYM_REDECL, routineDecl.getName());
+        offendingNode = routineDecl;
     }
 
     public LocalRedeclarationError(ScalarDecl paramDecl) {
-        super();
+        errorMsg = String.format(PARAMETER_REDCL, paramDecl.getName());
+        offendingNode = paramDecl;
     }
 
-    //TODO:
-    //  - Constructors, error message, etc...
-
-    @Override
-    protected AST getOffendingNode() {
-        return null;
-    }
 }
