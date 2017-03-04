@@ -144,17 +144,17 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(IntConstExpn intConstExpn) {
-
+        intConstExpn.setEvalType(ExpnEvalType.INTEGER);
     }
 
     @Override
     public void visit(NotExpn notExpn) {
-
+        notExpn.setEvalType(ExpnEvalType.BOOLEAN);
     }
 
     @Override
     public void visit(SkipConstExpn newlineExpn) {
-
+        newlineExpn.setEvalType(ExpnEvalType.TEXT);
     }
 
     @Override
