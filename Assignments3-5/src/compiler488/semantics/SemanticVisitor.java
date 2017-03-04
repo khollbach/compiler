@@ -352,7 +352,6 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
         consumeScopeVisitHook();
 
-        //TODO rest of scope processing
         for (Declaration decl : scope.getDeclarations()) {
             decl.accept(this);
         }
