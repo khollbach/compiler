@@ -14,6 +14,7 @@ import compiler488.visitor.StatementVisitor;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 import java.util.TimerTask;
 
 /**
@@ -29,6 +30,10 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     private SymbolTable symbolTable;
     private List<SemanticError> semanticErrors;
 
+    // the top of this stack is used to keep track of the current loop
+    // nesting depth in the innermost major scope
+    private Stack<Integer> majScopeLoopNestingDepths;
+
     private OnVisitScopeListener visitScopeListener;
 
     /*
@@ -38,6 +43,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     public SemanticVisitor() {
         symbolTable = new SymbolTable();
         semanticErrors = new LinkedList<>();
+        majScopeLoopNestingDepths = new Stack<>();
     }
 
 
@@ -64,7 +70,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         arithExpn.getRight().accept(this);
 
         if (arithExpn.getLeft().evalType().equals(ExpnEvalType.INTEGER) &&
-        (arithExpn.getRight().evalType().equals(ExpnEvalType.INTEGER))){
+        arithExpn.getRight().evalType().equals(ExpnEvalType.INTEGER)){
             arithExpn.setEvalType(ExpnEvalType.INTEGER);
         }
         else {
@@ -76,11 +82,22 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(BoolConstExpn boolConst) {
-
+        boolConst.setEvalType(ExpnEvalType.BOOLEAN);
     }
 
     @Override
     public void visit(BoolExpn boolExpn) {
+        boolExpn.getLeft().accept(this);
+        boolExpn.getRight().accept(this);
+
+        if(boolExpn.getLeft().evalType().equals(ExpnEvalType.BOOLEAN) &&
+                boolExpn.getRight().evalType().equals(ExpnEvalType.BOOLEAN)){
+            boolExpn.setEvalType(ExpnEvalType.BOOLEAN);
+        }
+        else {
+            semanticErrors.add(new TypeError(boolExpn));
+            boolExpn.setEvalType(ExpnEvalType.ERROR);
+        }
 
     }
 
@@ -157,17 +174,17 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(IntConstExpn intConstExpn) {
-
+        intConstExpn.setEvalType(ExpnEvalType.INTEGER);
     }
 
     @Override
     public void visit(NotExpn notExpn) {
-
+        notExpn.setEvalType(ExpnEvalType.BOOLEAN);
     }
 
     @Override
     public void visit(SkipConstExpn newlineExpn) {
-
+        newlineExpn.setEvalType(ExpnEvalType.TEXT);
     }
 
     @Override
@@ -177,6 +194,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         try {
             attrs = symbolTable.retrieveSymbol(subsExpn.getVariable());
         } catch (SymbolTable.SymbolNotFoundException e) {
+            // nonexistent reference, type of this expn unknown
             semanticErrors.add(new UndefinedReferenceError(subsExpn));
             subsExpn.setEvalType(ExpnEvalType.ERROR);
         }
@@ -224,6 +242,25 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(AssignStmt assignStmt) {
+        assignStmt.getLval().accept(this);
+        assignStmt.getRval().accept(this);
+
+        // Check special case of assigning to routine parameters
+        SymbolAttributes attrs = null;
+        try {
+            attrs = symbolTable.retrieveSymbol(assignStmt.getLval().toString());
+
+        } catch (SymbolTable.SymbolNotFoundException ignored) {}
+        if (attrs != null) {
+            if (attrs.isParameter) {
+                semanticErrors.add(new TypeError(assignStmt, attrs.isParameter));
+            }
+        }
+
+        // Check differing types on either side of assignment statement
+        if (assignStmt.getLval().evalType() != assignStmt.getRval().evalType()) {
+            semanticErrors.add(new TypeError(assignStmt));
+        }
 
     }
 
@@ -234,7 +271,13 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(IfStmt ifStmt) {
+        ifStmt.getCondition().accept(this);
+        ifStmt.getWhenTrue().accept(this);
+        ifStmt.getWhenFalse().accept(this);
 
+        if (ifStmt.getCondition().evalType() != ExpnEvalType.BOOLEAN) {
+            semanticErrors.add(new TypeError(ifStmt));
+        }
     }
 
     @Override
@@ -244,7 +287,9 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(Program programScope) {
-
+        majScopeLoopNestingDepths.push(0);
+        visit((Scope) programScope);
+        majScopeLoopNestingDepths.pop();
     }
 
     @Override
@@ -253,13 +298,14 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
             if(r instanceof IdentExpn){
                 IdentExpn rIdent = ((IdentExpn) r);
                 rIdent.accept(this);
-                try {
-                    SymbolAttributes attr = symbolTable.retrieveSymbol(rIdent.getIdent());
-                    if(!(attr.typeDescriptor instanceof IntegerTypeDescriptor)){
-                        semanticErrors.add(new ReadError(rIdent));
-                    }
-                } catch (SymbolTable.SymbolNotFoundException e) {
-                    return;
+                if (!rIdent.evalType().equals(ExpnEvalType.INTEGER)) {
+                    semanticErrors.add(new ReadStmtError(rIdent));
+                }
+            } else if (r instanceof SubsExpn) {
+                SubsExpn sIdent = (SubsExpn) r;
+                sIdent.accept(this);
+                if (!sIdent.evalType().equals(ExpnEvalType.INTEGER)) {
+                    semanticErrors.add(new ReadStmtError(sIdent));
                 }
             }
 
@@ -288,9 +334,15 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
             decl.accept(this);
         }
 
+        for (Stmt stmt : scope.getStatements()) {
+            stmt.accept(this);
+        }
+
         symbolTable.closeScope();
     }
 
+    // TODO: 03/03/17  
+    
     private void setVisitScopeListener(OnVisitScopeListener listener) {
         this.visitScopeListener = listener;
     }
@@ -329,7 +381,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
             try {
                 symbolTable.enterSymbol(declPart.getName(), attributes);
             } catch (SymbolTable.RedeclarationException e) {
-                semanticErrors.add(new LocalRedeclarationError(multiDecl, declPart));
+                semanticErrors.add(new LocalRedeclarationError(declPart));
             }
         }
     }
