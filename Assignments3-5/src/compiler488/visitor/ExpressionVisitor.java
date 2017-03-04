@@ -18,9 +18,7 @@ public interface ExpressionVisitor {
     void visit(IdentExpn identExpn);
     void visit(IntConstExpn intConstExpn);
     void visit(NotExpn notExpn);
-    void visit(SkipConstExpn newlineExpn);
     void visit(SubsExpn subsExpn);
-    void visit(TextConstExpn textExpn);
     void visit(UnaryMinusExpn unaryMinusExpn);
 
 }

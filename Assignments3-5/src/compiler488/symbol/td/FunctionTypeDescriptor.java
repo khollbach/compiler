@@ -6,17 +6,17 @@ import java.util.List;
 /**
  * Created by gg on 27/02/17.
  */
-class FunctionTypeDescriptor extends TypeDescriptor {
+public class FunctionTypeDescriptor extends TypeDescriptor {
 
     /**
      * Represents a function's return typeDescriptor.
      */
-    final ScalarTypeDescriptor returnType;
+    public final ScalarTypeDescriptor returnType;
 
     /**
      * Represents the types of each of a function's parameters. Immutable.
      */
-    final List<ScalarTypeDescriptor> parameterTypes;
+    public final List<ScalarTypeDescriptor> parameterTypes;
 
     FunctionTypeDescriptor(ScalarTypeDescriptor returnType,
                            List<ScalarTypeDescriptor> parameterTypes) {
