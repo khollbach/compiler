@@ -20,4 +20,9 @@ public class RoutineCallError extends SemanticError {
     public RoutineCallError(FunctionCallExpn funcExpn, int actualNumParams) {
         errorMsg = String.format(PARAM_ARITY_MISMATCH, actualNumParams, funcExpn.getArguments().size());
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + errorMsg;
+    }
 }

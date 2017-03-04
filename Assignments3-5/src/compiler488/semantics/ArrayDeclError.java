@@ -15,4 +15,10 @@ public class ArrayDeclError extends SemanticError {
         errorMsg = String.format(BAD_ARRAY_BOUNDS, arrayDeclPart);
         offendingNode = arrayDeclPart;
     }
+    
+    @Override
+    public String toString() {
+        return super.toString() + errorMsg;
+    }
+    
 }

@@ -1,11 +1,12 @@
 {
-var i : Integer;
-var j : Boolean;
+var i : Integer
+var j : Boolean
 
-i := 5;
-j := true;
+i := 5
+j := true
 
 % Semantic error should be caught here - i is an integer, j is a boolean
-i = j;
-
+if i = j then {
+	write newline
+}
 }

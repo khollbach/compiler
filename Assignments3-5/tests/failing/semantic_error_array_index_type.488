@@ -5,7 +5,7 @@
     i := 0
     j := true
 
-    while i < 6 {
+    while i < 6 do {
         B[i] := i
         i := i + 1
     }
