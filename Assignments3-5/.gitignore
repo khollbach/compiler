@@ -9,4 +9,6 @@ src/compiler488/parser/sym.java
 .idea/
 .idea/workspace.xml
 
+Assignments.iml
+
 tmp/
