@@ -40,4 +40,12 @@ public class ReturnStmt extends Stmt {
     public void accept(StatementVisitor visitor) {
         visitor.visit(this);
     }
+
+    @Override
+    public String toString() {
+        if (value == null)
+            return "return";
+        else
+            return "return with " + value;
+    }
 }
