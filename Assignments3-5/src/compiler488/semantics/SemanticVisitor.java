@@ -150,7 +150,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
             if (attrs.typeDescriptor instanceof FunctionTypeDescriptor) {
                 FunctionTypeDescriptor fnTD = ((FunctionTypeDescriptor) attrs.typeDescriptor);
                 paramTypes = fnTD.parameterTypes;
-                List<ExpnEvalType> evalTypes = evalTypes(funcExpn.getArguments());
+                List<ExpnEvalType> evalTypes = processArgs(funcExpn.getArguments());
 
                 if (fnTD.returnType instanceof IntegerTypeDescriptor) {
                     funcExpn.setEvalType(ExpnEvalType.INTEGER);
@@ -334,21 +334,11 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     public void visit(ProcedureCallStmt procCall) {
         List<ScalarTypeDescriptor> paramTypes = new ArrayList<>();
 
-        for (Expn arg : procCall.getArguments()){
-            arg.accept(this);
-            if (arg.evalType().equals(ExpnEvalType.BOOLEAN)){
-                paramTypes.add(new BooleanTypeDescriptor());
-            }
-            else if (arg.evalType().equals(ExpnEvalType.INTEGER)){
-                paramTypes.add(new IntegerTypeDescriptor());
-            }
-        }
-
         try {
             SymbolAttributes attrs = symbolTable.retrieveSymbol(procCall.getName());
             if (attrs.typeDescriptor instanceof ProcedureTypeDescriptor) {
                 paramTypes = ((ProcedureTypeDescriptor) attrs.typeDescriptor).parameterTypes;
-                List<ExpnEvalType> evalTypes = evalTypes(procCall.getArguments());
+                List<ExpnEvalType> evalTypes = processArgs(procCall.getArguments());
 
                 verifyParamTypes(paramTypes, evalTypes);
             }
@@ -588,7 +578,10 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         }
     }
 
-    private List<ExpnEvalType> evalTypes(ASTList<Expn> expns) {
+    private List<ExpnEvalType> processArgs(ASTList<Expn> expns) {
+        for (Expn e : expns){
+            e.accept(this);
+        }
         return expns.stream()
                 .map(Expn::evalType)
                 .collect(Collectors.toList());
