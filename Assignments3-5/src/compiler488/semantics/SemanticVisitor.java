@@ -32,7 +32,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     // the top of this stack is used to keep track of the current loop
     // nesting depth in the innermost major scope
-    private Stack<Integer> majScopeLoopNestingDepths;
+    private Stack<MajorScopeInfo> majorScopeInfoStack;
 
     private OnVisitScopeListener visitScopeListener;
 
@@ -43,7 +43,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     public SemanticVisitor() {
         symbolTable = new SymbolTable();
         semanticErrors = new LinkedList<>();
-        majScopeLoopNestingDepths = new Stack<>();
+        majorScopeInfoStack = new Stack<>();
     }
 
 
@@ -272,8 +272,8 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(ExitStmt exitStmt) {
-        if (majScopeLoopNestingDepths.peek() < exitStmt.getLevel()) {
-            semanticErrors.add(new ExitLevelError(exitStmt, majScopeLoopNestingDepths.peek()));
+        if (majorScopeInfoStack.peek().getCurrentLoopDepth() < exitStmt.getLevel()) {
+            semanticErrors.add(new ExitLevelError(exitStmt, majorScopeInfoStack.peek().getCurrentLoopDepth()));
         }
 
         if (exitStmt.getExpn() != null) {
@@ -302,9 +302,9 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(Program programScope) {
-        majScopeLoopNestingDepths.push(0);
+        majorScopeInfoStack.push(new MajorScopeInfo());
         visit((Scope) programScope);
-        majScopeLoopNestingDepths.pop();
+        majorScopeInfoStack.pop();
     }
 
     @Override
@@ -330,11 +330,11 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     public void visit(RepeatUntilStmt repeatUntilStmt) {
         repeatUntilStmt.getExpn().accept(this);
 
-        majScopeLoopNestingDepths.push(majScopeLoopNestingDepths.pop() + 1);
+        majorScopeInfoStack.peek().incrementCurrentLoopDepth();
 
         repeatUntilStmt.getBody().accept(this);
 
-        majScopeLoopNestingDepths.push(majScopeLoopNestingDepths.pop() - 1);
+        majorScopeInfoStack.peek().decrementCurrentLoopDepth();
 
         if (repeatUntilStmt.getExpn().evalType() == ExpnEvalType.INTEGER) {
             semanticErrors.add(new TypeError(repeatUntilStmt));
@@ -383,11 +383,11 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
             semanticErrors.add(new TypeError(whileStmt));
         }
 
-        majScopeLoopNestingDepths.push(majScopeLoopNestingDepths.pop() + 1);
+        majorScopeInfoStack.peek().incrementCurrentLoopDepth();
 
         whileStmt.getBody().accept(this);
 
-        majScopeLoopNestingDepths.push(majScopeLoopNestingDepths.pop() - 1);
+        majorScopeInfoStack.peek().decrementCurrentLoopDepth();
     }
 
     @Override
@@ -442,7 +442,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         }
 
         // new major scope
-        majScopeLoopNestingDepths.push(0);
+        majorScopeInfoStack.push(new MajorScopeInfo());
 
         // hook the declaration of parameters when processing routine scope
         setOnVisitScopeListener(() -> {
@@ -469,7 +469,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         routineDecl.getRoutineBody().getBody().accept(this);
 
         // major scope processed
-        majScopeLoopNestingDepths.pop();
+        majorScopeInfoStack.pop();
     }
 
 
