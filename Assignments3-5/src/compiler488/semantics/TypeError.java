@@ -18,10 +18,14 @@ public class TypeError extends SemanticError{
     private static final String NON_INTEGER_OPERAND = "arithmetic expression was passed non-integer reference: %s";
     private static final String INDEXED_NON_ARRAY = "indexed non-array reference: %s";
     private static final String NON_BOOLEAN_OPERAND = "boolean expression was passed non-boolean reference: %s";
-    private static final String NON_BOOLEAN_CONDITION = "non-boolean expression as condition to if statement: %s";
+    private static final String NON_BOOLEAN_CONDITION = "non-boolean expression as condition: %s";
     private static final String DIFFERING_TYPES = "value assigned to variable of differing type: %s";
     private static final String ASSIGN_TO_PARAM = "assignment to parameter reference: %s";
     private static final String NON_BOOLEAN_EXIT_COND = "exit statement has non-boolean condition: %s";
+    private static final String NON_INTEGER_COMPARE = "compare expression was passed a non-integer reference: %s";
+    private static final String RESULT_TYPE_MISMATCH = "condition statement result types are not the same: %s";
+    private static final String EQUAL_TYPE_MISMATCH = "equality condition was passed two different types: %s";
+    private static final String NON_INTEGER_UNARY_MINUS = "unary minus applied to non-integer expression: %s";
 
     /**
      * This TypeError's error message
@@ -71,6 +75,31 @@ public class TypeError extends SemanticError{
     public TypeError(ExitStmt exitStmt) {
         offendingNode = exitStmt;
         errorMsg = String.format(NON_BOOLEAN_EXIT_COND, exitStmt.getExpn());
+    }
+
+    public TypeError(CompareExpn compareExpn) {
+        offendingNode = compareExpn;
+        errorMsg = String.format(NON_INTEGER_COMPARE, compareExpn);
+    }
+
+    public TypeError(ConditionalExpn conditionalExpn) {
+        offendingNode = conditionalExpn;
+        errorMsg = String.format(NON_BOOLEAN_CONDITION, conditionalExpn);
+    }
+
+    public TypeError(ConditionalExpn conditionalExpn, Expn falseValue, Expn trueValue) {
+        offendingNode = conditionalExpn;
+        errorMsg = String.format(RESULT_TYPE_MISMATCH, conditionalExpn);
+    }
+
+    public TypeError(EqualsExpn equalsExpn) {
+        offendingNode =  equalsExpn;
+        errorMsg = String.format(EQUAL_TYPE_MISMATCH, equalsExpn);
+    }
+
+    public TypeError(UnaryMinusExpn unaryMinusExpn) {
+        offendingNode = unaryMinusExpn;
+        errorMsg = String.format(NON_INTEGER_UNARY_MINUS, unaryMinusExpn);
     }
 
     @Override
