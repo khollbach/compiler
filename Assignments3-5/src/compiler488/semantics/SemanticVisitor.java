@@ -1,5 +1,7 @@
 package compiler488.semantics;
 
+import com.sun.xml.internal.ws.wsdl.writer.document.ParamType;
+import compiler488.ast.ASTList;
 import compiler488.ast.InvalidASTException;
 import compiler488.ast.Printable;
 import compiler488.ast.Readable;
@@ -17,6 +19,7 @@ import compiler488.visitor.StatementVisitor;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 /**
  * Created by gg on 01/03/17.
@@ -143,7 +146,31 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(FunctionCallExpn funcExpn) {
+        List<ScalarTypeDescriptor> paramTypes = null;
 
+        try {
+            SymbolAttributes attrs = symbolTable.retrieveSymbol(funcExpn.getIdent());
+            if (attrs.typeDescriptor instanceof FunctionTypeDescriptor) {
+                FunctionTypeDescriptor fnTD = ((FunctionTypeDescriptor) attrs.typeDescriptor);
+                paramTypes = fnTD.parameterTypes;
+                List<ExpnEvalType> evalTypes = evalTypes(funcExpn.getArguments());
+
+                if (fnTD.returnType instanceof IntegerTypeDescriptor) {
+                    funcExpn.setEvalType(ExpnEvalType.INTEGER);
+                } else {
+                    funcExpn.setEvalType(ExpnEvalType.BOOLEAN);
+                }
+
+                verifyParamTypes(paramTypes, evalTypes);
+            }
+        } catch (SymbolTable.SymbolNotFoundException e) {
+            semanticErrors.add(new UndefinedReferenceError(funcExpn));
+            funcExpn.setEvalType(ExpnEvalType.UNDEFINED);
+        } catch (ParamTypeMismatchException e) {
+            semanticErrors.add(new TypeError(funcExpn));
+        } catch (ParamArityMismatchException e) {
+            semanticErrors.add(new RoutineCallError(funcExpn, paramTypes.size()));
+        }
     }
 
     @Override
@@ -298,7 +325,23 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(ProcedureCallStmt procCall) {
+        List<ScalarTypeDescriptor> paramTypes = null;
 
+        try {
+            SymbolAttributes attrs = symbolTable.retrieveSymbol(procCall.getName());
+            if (attrs.typeDescriptor instanceof ProcedureTypeDescriptor) {
+                paramTypes = ((ProcedureTypeDescriptor) attrs.typeDescriptor).parameterTypes;
+                List<ExpnEvalType> evalTypes = evalTypes(procCall.getArguments());
+
+                verifyParamTypes(paramTypes, evalTypes);
+            }
+        } catch (SymbolTable.SymbolNotFoundException e) {
+            semanticErrors.add(new UndefinedReferenceError(procCall));
+        } catch (ParamTypeMismatchException e) {
+            semanticErrors.add(new TypeError(procCall));
+        } catch (ParamArityMismatchException e) {
+            semanticErrors.add(new RoutineCallError(procCall, paramTypes.size()));
+        }
     }
 
     @Override
@@ -431,8 +474,6 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         throw new InvalidASTException();
     }
 
-    // TODO! array bounds check (left is <= to right)
-
     @Override
     public void visit(MultiDeclarations multiDecl) {
         // enter each declPart into the symbol table
@@ -443,6 +484,14 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
                     new SymbolAttributes(false, descriptor);
             try {
                 symbolTable.enterSymbol(declPart.getName(), attributes);
+
+                // check that array bounds are valid
+                if (declPart instanceof ArrayDeclPart) {
+                    ArrayDeclPart arrayDeclPart = (ArrayDeclPart) declPart;
+                    if (arrayDeclPart.getLowerBoundary() > arrayDeclPart.getUpperBoundary()) {
+                        semanticErrors.add(new ArrayDeclError(arrayDeclPart));
+                    }
+                }
             } catch (SymbolTable.RedeclarationException e) {
                 semanticErrors.add(new LocalRedeclarationError(declPart));
             }
@@ -507,6 +556,32 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     }
 
 
+    private void verifyParamTypes(List<ScalarTypeDescriptor> declaredParamTypes,
+                                 List<ExpnEvalType> evalParamTypes)
+            throws ParamTypeMismatchException, ParamArityMismatchException {
+        if (declaredParamTypes.size() != evalParamTypes.size()) {
+            throw new ParamArityMismatchException();
+        } else {
+            for (int i = 0; i < declaredParamTypes.size(); i++) {
+                if (! typesMatch(declaredParamTypes.get(i), evalParamTypes.get(i))) {
+                    throw new ParamTypeMismatchException();
+                }
+            }
+        }
+    }
+
+    private List<ExpnEvalType> evalTypes(ASTList<Expn> expns) {
+        return expns.stream()
+                .map(Expn::evalType)
+                .collect(Collectors.toList());
+    }
+
+    private boolean typesMatch(ScalarTypeDescriptor td, ExpnEvalType evalType) {
+        return (td instanceof IntegerTypeDescriptor && evalType.equals(ExpnEvalType.INTEGER)
+                || td instanceof BooleanTypeDescriptor && evalType.equals(ExpnEvalType.BOOLEAN));
+    }
+
+
     /**
      * Listener used to hook visit(Scope) to perform tasks after a new scope
      * has been opened in the symbol table, but before any of the scope body
@@ -525,8 +600,6 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         void onVisitScope();
     }
 
-    // TODO:
-    //  - Type Visitor to buld type info for Expns and Decls (implement expn visitor and decl visitor)
-    //  - Implement all 3 visitors
-    //  - record semantic analysis operations with the trace function in Semantics
+    private class ParamArityMismatchException extends Exception {}
+    private class ParamTypeMismatchException extends Exception {}
 }

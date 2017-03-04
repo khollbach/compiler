@@ -11,7 +11,7 @@ public class ProcedureTypeDescriptor extends TypeDescriptor {
     /**
      * Represents the types of each of a procedure's parameters. Immutable.
      */
-    final List<ScalarTypeDescriptor> parameterTypes;
+    public final List<ScalarTypeDescriptor> parameterTypes;
 
     ProcedureTypeDescriptor(List<ScalarTypeDescriptor> parameterTypes) {
         this.parameterTypes = Collections.unmodifiableList(parameterTypes);

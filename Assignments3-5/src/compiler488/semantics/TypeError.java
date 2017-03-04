@@ -2,6 +2,9 @@ package compiler488.semantics;
 
 import compiler488.ast.expn.*;
 import compiler488.ast.stmt.*;
+import compiler488.symbol.td.ScalarTypeDescriptor;
+
+import java.util.List;
 
 /**
  * Created by tarang on 2017-03-02.
@@ -24,6 +27,7 @@ public class TypeError extends SemanticError{
     private static final String RESULT_TYPE_MISMATCH = "condition statement result types are not the same: %s";
     private static final String EQUAL_TYPE_MISMATCH = "equality condition was passed two different types: %s";
     private static final String NON_INTEGER_UNARY_MINUS = "unary minus applied to non-integer expression: %s";
+    private static final String ROUTINE_PARAM_TYPE_MISMATCH = "argument types don't match declared parameter types: %s";
     private static final String WRONG_RETURN_TYPE = "expected return type and actual do not match: %s, %s";
 
     /**
@@ -104,6 +108,16 @@ public class TypeError extends SemanticError{
     public TypeError(UnaryMinusExpn unaryMinusExpn) {
         offendingNode = unaryMinusExpn;
         errorMsg = String.format(NON_INTEGER_UNARY_MINUS, unaryMinusExpn);
+    }
+
+    public TypeError(ProcedureCallStmt procCall) {
+        offendingNode = procCall;
+        errorMsg = String.format(ROUTINE_PARAM_TYPE_MISMATCH, procCall);
+    }
+
+    public TypeError(FunctionCallExpn funcExpn) {
+        offendingNode = funcExpn;
+        errorMsg = String.format(ROUTINE_PARAM_TYPE_MISMATCH, funcExpn);
     }
 
     public TypeError(ReturnStmt returnStmt, ExpnEvalType expectedType, ExpnEvalType actualType) {
