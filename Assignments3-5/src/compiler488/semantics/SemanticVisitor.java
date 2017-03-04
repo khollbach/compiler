@@ -86,11 +86,41 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(CompareExpn compareExpn) {
-
+    	compareExpn.getLeft().accept(this);
+    	compareExpn.getRight().accept(this);
+    	
+    	// Check if the two operands have the same type
+        if (compareExpn.getLeft().evalType().equals(ExpnEvalType.INTEGER) &&
+        (compareExpn.getRight().evalType().equals(ExpnEvalType.INTEGER))){
+        	compareExpn.setEvalType(ExpnEvalType.INTEGER);
+        } else {
+            semanticErrors.add(new TypeError(compareExpn));
+            compareExpn.setEvalType(ExpnEvalType.ERROR);
+        }
     }
 
     @Override
     public void visit(ConditionalExpn conditionalExpn) {
+    	
+    	conditionalExpn.getCondition().accept(this);
+    	conditionalExpn.getTrueValue().accept(this);
+    	conditionalExpn.getFalseValue().accept(this);
+    	
+    	Expn cond = conditionalExpn.getCondition();
+    	Expn trueVal = conditionalExpn.getTrueValue();
+    	Expn falseVal = conditionalExpn.getFalseValue();
+    	
+    	// check for a Boolean as a condition
+    	if (cond.evalType() != ExpnEvalType.BOOLEAN){
+    		semanticErrors.add(new TypeError(conditionalExpn, cond.evalType()));
+    	} 
+    	
+    	// Check for matching result types
+    	if (trueVal.evalType() != falseVal.evalType()){
+    		semanticErrors.add(new TypeError(conditionalExpn, 
+    				trueVal.evalType(), falseVal.evalType()));
+    	}
+		conditionalExpn.setEvalType(trueVal.evalType());
 
     }
 
