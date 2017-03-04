@@ -114,31 +114,31 @@ public class Main {
     /**
      * Source file to be compiled
      */
-    private static String sourceFileName = new String();
+    private static String sourceFileName = "";
     /**
      * User option -- alternative file sink for compiler error messages
      */
-    private static String errorFileName = new String();
+    private static String errorFileName = "";
     /**
      * User option -- alternative file sink for compiler output
      */
-    private static String compilerOutputFileName = new String();
+    private static String compilerOutputFileName = "";
     /**
      * User option -- alternative file sink for compiler trace output
      */
-    private static String compilerTraceFileName = new String();
+    private static String compilerTraceFileName = "";
     /**
      * User option -- alternative file sink for compiler dump output
      */
-    private static String compilerDumpFileName = new String();
+    private static String compilerDumpFileName = "";
     /**
      * User option -- alternative file sink for program trace output
      */
-    private static String executeTraceFileName = new String();
+    private static String executeTraceFileName = "";
     /**
      * User option -- alternative file sink for program execution input
      */
-    private static String executeInputFileName = new String();
+    private static String executeInputFileName = "";
   
   /* FILES and STREAMS */
     /**

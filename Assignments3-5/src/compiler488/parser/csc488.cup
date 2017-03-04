@@ -67,7 +67,7 @@ parser code {:
     public void report_fatal_error (String message, Object info) throws SyntaxErrorException
     {
         report_error (message, info);
-/* throw new SyntaxErrorException (lastError); */
+        throw new SyntaxErrorException (lastError);
     }
 
    /** version string for printing version in Main */
