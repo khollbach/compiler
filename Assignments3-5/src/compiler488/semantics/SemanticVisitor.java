@@ -209,7 +209,14 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     @Override
     public void visit(NotExpn notExpn) {
         notExpn.getOperand().accept(this);
-        notExpn.setEvalType(ExpnEvalType.BOOLEAN);
+        if (notExpn.getOperand().evalType().equals(ExpnEvalType.BOOLEAN)){
+            notExpn.setEvalType(ExpnEvalType.BOOLEAN);
+        }
+        else
+        {
+            semanticErrors.add(new TypeError(notExpn));
+            notExpn.setEvalType(ExpnEvalType.BOOLEAN);
+        }
     }
 
     @Override
