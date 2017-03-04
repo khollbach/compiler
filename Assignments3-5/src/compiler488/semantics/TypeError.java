@@ -25,10 +25,11 @@ public class TypeError extends SemanticError{
     private String errorMsg;
 
     public TypeError(IdentExpn identExpn) {
-
+        offendingNode = identExpn;
+        errorMsg = String.format(UNEXPECTED_NONSCALAR, identExpn);
     }
 
-    public TypeError(SubsExpn subsExpn, Expn operand) {
+    public TypeError(SubsExpn subsExpn, Expn ignored) {
         offendingNode = subsExpn;
         errorMsg = String.format(NON_INTEGER_INDEX, subsExpn);
     }

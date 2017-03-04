@@ -14,6 +14,7 @@ import compiler488.visitor.StatementVisitor;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 import java.util.TimerTask;
 
 /**
@@ -29,6 +30,10 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     private SymbolTable symbolTable;
     private List<SemanticError> semanticErrors;
 
+    // the top of this stack is used to keep track of the current loop
+    // nesting depth in the innermost major scope
+    private Stack<Integer> majScopeLoopNestingDepths;
+
     private OnVisitScopeListener visitScopeListener;
 
     /*
@@ -38,6 +43,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     public SemanticVisitor() {
         symbolTable = new SymbolTable();
         semanticErrors = new LinkedList<>();
+        majScopeLoopNestingDepths = new Stack<>();
     }
 
 
@@ -138,17 +144,17 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(IntConstExpn intConstExpn) {
-
+        intConstExpn.setEvalType(ExpnEvalType.INTEGER);
     }
 
     @Override
     public void visit(NotExpn notExpn) {
-
+        notExpn.setEvalType(ExpnEvalType.BOOLEAN);
     }
 
     @Override
     public void visit(SkipConstExpn newlineExpn) {
-
+        newlineExpn.setEvalType(ExpnEvalType.TEXT);
     }
 
     @Override
@@ -251,7 +257,9 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(Program programScope) {
-
+        majScopeLoopNestingDepths.push(0);
+        visit((Scope) programScope);
+        majScopeLoopNestingDepths.pop();
     }
 
     @Override
@@ -261,7 +269,13 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
                 IdentExpn rIdent = ((IdentExpn) r);
                 rIdent.accept(this);
                 if (!rIdent.evalType().equals(ExpnEvalType.INTEGER)) {
-                    semanticErrors.add()
+                    semanticErrors.add(new ReadStmtError(rIdent));
+                }
+            } else if (r instanceof SubsExpn) {
+                SubsExpn sIdent = (SubsExpn) r;
+                sIdent.accept(this);
+                if (!sIdent.evalType().equals(ExpnEvalType.INTEGER)) {
+                    semanticErrors.add(new ReadStmtError(sIdent));
                 }
             }
 
@@ -288,6 +302,10 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         //TODO rest of scope processing
         for (Declaration decl : scope.getDeclarations()) {
             decl.accept(this);
+        }
+
+        for (Stmt stmt : scope.getStatements()) {
+            stmt.accept(this);
         }
 
         symbolTable.closeScope();
@@ -333,7 +351,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
             try {
                 symbolTable.enterSymbol(declPart.getName(), attributes);
             } catch (SymbolTable.RedeclarationException e) {
-                semanticErrors.add(new LocalRedeclarationError(multiDecl, declPart));
+                semanticErrors.add(new LocalRedeclarationError(declPart));
             }
         }
     }

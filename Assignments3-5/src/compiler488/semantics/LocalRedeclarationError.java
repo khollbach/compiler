@@ -18,7 +18,7 @@ public class LocalRedeclarationError extends SemanticError {
 
     public LocalRedeclarationError(DeclarationPart declPart) {
         errorMsg = String.format(SYM_REDECL, declPart.getName());
-        offendingNode = declPart
+        offendingNode = declPart;
     }
 
     public LocalRedeclarationError(RoutineDecl routineDecl) {
@@ -31,4 +31,8 @@ public class LocalRedeclarationError extends SemanticError {
         offendingNode = paramDecl;
     }
 
+    @Override
+    public String toString() {
+        return super.toString() + errorMsg;
+    }
 }
