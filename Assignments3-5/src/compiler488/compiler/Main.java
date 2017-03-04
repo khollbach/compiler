@@ -8,6 +8,7 @@ import compiler488.ast.stmt.Program;
 import compiler488.semantics.SemanticError;
 import compiler488.semantics.SemanticVisitor;
 import compiler488.semantics.Semantics;
+import compiler488.semantics.TypeError;
 import compiler488.symbol.SymbolTable;
 import compiler488.codegen.CodeGen;
 import compiler488.runtime.*;
@@ -521,7 +522,8 @@ public class Main {
             SemanticVisitor visitAST = new SemanticVisitor();
             programAST.accept(visitAST);
             for (SemanticError se : visitAST.getSemanticErrors()) {
-                System.out.println(se);
+            	System.out.println(se);
+            	errorOccurred = true;
             }
         } catch (Exception e) {
             System.err.println("Exception during Semantic Analysis");

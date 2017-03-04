@@ -320,7 +320,9 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     public void visit(IfStmt ifStmt) {
         ifStmt.getCondition().accept(this);
         ifStmt.getWhenTrue().accept(this);
-        ifStmt.getWhenFalse().accept(this);
+        if (ifStmt.getWhenFalse() != null){
+        	ifStmt.getWhenFalse().accept(this);
+        }
 
         if (ifStmt.getCondition().evalType() != ExpnEvalType.BOOLEAN) {
             semanticErrors.add(new TypeError(ifStmt));
