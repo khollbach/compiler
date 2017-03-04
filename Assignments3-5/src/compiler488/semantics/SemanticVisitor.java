@@ -351,7 +351,17 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(WhileDoStmt whileStmt) {
+        whileStmt.getExpn().accept(this);
 
+        if (whileStmt.getExpn().evalType() == ExpnEvalType.INTEGER) {
+            semanticErrors.add(new TypeError(whileStmt));
+        }
+
+        majScopeLoopNestingDepths.push(majScopeLoopNestingDepths.pop() + 1);
+
+        whileStmt.getBody().accept(this);
+
+        majScopeLoopNestingDepths.push(majScopeLoopNestingDepths.pop() - 1);
     }
 
     @Override
