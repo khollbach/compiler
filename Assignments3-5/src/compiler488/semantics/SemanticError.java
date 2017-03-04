@@ -4,7 +4,7 @@ import compiler488.ast.AST;
 
 /**
  * The umbrella exception for reporting all semantic errors.
- *
+ * <p>
  * Created by gg on 01/03/17.
  */
 public abstract class SemanticError {
@@ -18,6 +18,7 @@ public abstract class SemanticError {
 
     /**
      * Returns a message describing this SemanticError.
+     *
      * @return the message, as a String
      */
     @Override

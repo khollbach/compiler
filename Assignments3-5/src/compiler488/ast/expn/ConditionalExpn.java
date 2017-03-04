@@ -3,45 +3,49 @@ package compiler488.ast.expn;
 
 import compiler488.visitor.ExpressionVisitor;
 
-/** Represents a conditional expression (i.e., x>0?3:4). */
+/**
+ * Represents a conditional expression (i.e., x>0?3:4).
+ */
 public class ConditionalExpn extends Expn {
-	private Expn condition; // Evaluate this to decide which value to yield.
+    private Expn condition; // Evaluate this to decide which value to yield.
 
-	private Expn trueValue; // The value is this when the condition is true.
+    private Expn trueValue; // The value is this when the condition is true.
 
-	private Expn falseValue; // Otherwise, the value is this.
+    private Expn falseValue; // Otherwise, the value is this.
 
-	/** Returns a string that describes the conditional expression. */
-	@Override
-	public String toString() {
-		return "(" + condition + " ? " + trueValue + " : " + falseValue + ")";
-	}
+    /**
+     * Returns a string that describes the conditional expression.
+     */
+    @Override
+    public String toString() {
+        return "(" + condition + " ? " + trueValue + " : " + falseValue + ")";
+    }
 
-	public Expn getCondition() {
-		return condition;
-	}
+    public Expn getCondition() {
+        return condition;
+    }
 
-	public void setCondition(Expn condition) {
-		this.condition = condition;
-	}
+    public void setCondition(Expn condition) {
+        this.condition = condition;
+    }
 
-	public Expn getFalseValue() {
-		return falseValue;
-	}
+    public Expn getFalseValue() {
+        return falseValue;
+    }
 
-	public void setFalseValue(Expn falseValue) {
-		this.falseValue = falseValue;
-	}
+    public void setFalseValue(Expn falseValue) {
+        this.falseValue = falseValue;
+    }
 
-	public Expn getTrueValue() {
-		return trueValue;
-	}
+    public Expn getTrueValue() {
+        return trueValue;
+    }
 
-	public void setTrueValue(Expn trueValue) {
-		this.trueValue = trueValue;
-	}
+    public void setTrueValue(Expn trueValue) {
+        this.trueValue = trueValue;
+    }
 
-	public void accept(ExpressionVisitor expnVisitor) {
-		expnVisitor.visit(this);
-	}
+    public void accept(ExpressionVisitor expnVisitor) {
+        expnVisitor.visit(this);
+    }
 }

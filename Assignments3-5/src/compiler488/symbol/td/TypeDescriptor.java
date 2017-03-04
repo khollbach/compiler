@@ -2,7 +2,7 @@ package compiler488.symbol.td;
 
 /**
  * Class used to keep track of types in the compiler488 SymbolTable
- *
+ * <p>
  * Created by George Gianacopoulos on 24/02/17.
  */
 public abstract class TypeDescriptor {

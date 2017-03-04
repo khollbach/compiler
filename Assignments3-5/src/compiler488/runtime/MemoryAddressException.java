@@ -1,12 +1,13 @@
 package compiler488.runtime;
 
-/** Exception subclass for reporting machine address errors 
- * @version $Revision: 7 $  $Date: #
+/**
+ * Exception subclass for reporting machine address errors
+ *
  * @author Danny House
+ * @version $Revision: 7 $  $Date: #
  */
-public class MemoryAddressException  extends Exception
-  {
-	public  MemoryAddressException( String msg ){
-	    super( msg ) ;
-        }
-  }
+public class MemoryAddressException extends Exception {
+    public MemoryAddressException(String msg) {
+        super(msg);
+    }
+}

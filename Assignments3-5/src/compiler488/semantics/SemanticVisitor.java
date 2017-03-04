@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 /**
  * Created by gg on 01/03/17.
  */
-public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, StatementVisitor{
+public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, StatementVisitor {
 
     /*
      *  INSTANCE VARIABLES:
@@ -70,7 +70,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         arithExpn.getRight().accept(this);
 
         if (!(arithExpn.getLeft().evalType().equals(ExpnEvalType.INTEGER)
-                && arithExpn.getRight().evalType().equals(ExpnEvalType.INTEGER))){
+                && arithExpn.getRight().evalType().equals(ExpnEvalType.INTEGER))) {
             semanticErrors.add(new TypeError(arithExpn));
         }
 
@@ -87,8 +87,8 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         boolExpn.getLeft().accept(this);
         boolExpn.getRight().accept(this);
 
-        if(!(boolExpn.getLeft().evalType().equals(ExpnEvalType.BOOLEAN)
-                && boolExpn.getRight().evalType().equals(ExpnEvalType.BOOLEAN))){
+        if (!(boolExpn.getLeft().evalType().equals(ExpnEvalType.BOOLEAN)
+                && boolExpn.getRight().evalType().equals(ExpnEvalType.BOOLEAN))) {
             semanticErrors.add(new TypeError(boolExpn));
         }
         boolExpn.setEvalType(ExpnEvalType.BOOLEAN);
@@ -98,14 +98,13 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     public void visit(CompareExpn compareExpn) {
         compareExpn.getLeft().accept(this);
         compareExpn.getRight().accept(this);
-         if (compareExpn.getLeft().evalType().equals(ExpnEvalType.INTEGER) &&
-                 compareExpn.getRight().evalType().equals(ExpnEvalType.INTEGER)){
-             compareExpn.setEvalType(ExpnEvalType.BOOLEAN);
-         }
-         else {
-             semanticErrors.add(new TypeError(compareExpn));
-             compareExpn.setEvalType(ExpnEvalType.BOOLEAN);
-         }
+        if (compareExpn.getLeft().evalType().equals(ExpnEvalType.INTEGER) &&
+                compareExpn.getRight().evalType().equals(ExpnEvalType.INTEGER)) {
+            compareExpn.setEvalType(ExpnEvalType.BOOLEAN);
+        } else {
+            semanticErrors.add(new TypeError(compareExpn));
+            compareExpn.setEvalType(ExpnEvalType.BOOLEAN);
+        }
 
     }
 
@@ -115,13 +114,12 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         conditionalExpn.getTrueValue().accept(this);
         conditionalExpn.getFalseValue().accept(this);
 
-        if (!conditionalExpn.getCondition().evalType().equals(ExpnEvalType.BOOLEAN)){
+        if (!conditionalExpn.getCondition().evalType().equals(ExpnEvalType.BOOLEAN)) {
             semanticErrors.add(new TypeError(conditionalExpn));
         }
-        if (conditionalExpn.getTrueValue().evalType().equals(conditionalExpn.getFalseValue().evalType())){
+        if (conditionalExpn.getTrueValue().evalType().equals(conditionalExpn.getFalseValue().evalType())) {
             conditionalExpn.setEvalType(conditionalExpn.getTrueValue().evalType());
-        }
-        else{
+        } else {
             semanticErrors.add(new TypeError(conditionalExpn, conditionalExpn.getFalseValue(),
                     conditionalExpn.getTrueValue()));
             conditionalExpn.setEvalType(ExpnEvalType.UNDEFINED);
@@ -134,10 +132,9 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         equalsExpn.getLeft().accept(this);
         equalsExpn.getRight().accept(this);
 
-        if (equalsExpn.getLeft().evalType().equals(equalsExpn.getRight().evalType())){
+        if (equalsExpn.getLeft().evalType().equals(equalsExpn.getRight().evalType())) {
             equalsExpn.setEvalType(equalsExpn.getLeft().evalType());
-        }
-        else {
+        } else {
             semanticErrors.add(new TypeError(equalsExpn));
             equalsExpn.setEvalType(ExpnEvalType.UNDEFINED);
         }
@@ -184,7 +181,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
             return;
         }
 
-        if(!(attrs.typeDescriptor instanceof ScalarTypeDescriptor)){
+        if (!(attrs.typeDescriptor instanceof ScalarTypeDescriptor)) {
             // corner case for poor language design:
             // functions without params
             if (attrs.typeDescriptor instanceof FunctionTypeDescriptor
@@ -252,7 +249,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(UnaryMinusExpn unaryMinusExpn) {
-        
+
         // Visit child expression
         unaryMinusExpn.getOperand().accept(this);
 
@@ -284,7 +281,8 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         try {
             attrs = symbolTable.retrieveSymbol(assignStmt.getLval().toString());
 
-        } catch (SymbolTable.SymbolNotFoundException ignored) {}
+        } catch (SymbolTable.SymbolNotFoundException ignored) {
+        }
         if (attrs != null) {
             if (attrs.isParameter) {
                 semanticErrors.add(new TypeError(assignStmt, attrs.isParameter));
@@ -306,7 +304,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
         if (exitStmt.getExpn() != null) {
             exitStmt.getExpn().accept(this);
-            if (!exitStmt.getExpn().evalType().equals(ExpnEvalType.BOOLEAN)){
+            if (!exitStmt.getExpn().evalType().equals(ExpnEvalType.BOOLEAN)) {
                 semanticErrors.add(new TypeError(exitStmt));
             }
         }
@@ -353,8 +351,8 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(ReadStmt readStmt) {
-        for (Readable r : readStmt.getInputs()){
-            if(r instanceof IdentExpn){
+        for (Readable r : readStmt.getInputs()) {
+            if (r instanceof IdentExpn) {
                 IdentExpn rIdent = ((IdentExpn) r);
                 rIdent.accept(this);
                 if (!rIdent.evalType().equals(ExpnEvalType.INTEGER)) {
@@ -427,7 +425,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
         symbolTable.closeScope();
     }
-    
+
     private void setOnVisitScopeListener(OnVisitScopeListener listener) {
         this.visitScopeListener = listener;
     }
@@ -520,7 +518,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
             ExpnEvalType type = null;
             if (routineDecl.getType() instanceof IntegerType) {
                 type = ExpnEvalType.INTEGER;
-            } else  {
+            } else {
                 type = ExpnEvalType.BOOLEAN;
             }
             majorScopeInfoStack.push(
@@ -557,13 +555,13 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
 
     private void verifyParamTypes(List<ScalarTypeDescriptor> declaredParamTypes,
-                                 List<ExpnEvalType> evalParamTypes)
+                                  List<ExpnEvalType> evalParamTypes)
             throws ParamTypeMismatchException, ParamArityMismatchException {
         if (declaredParamTypes.size() != evalParamTypes.size()) {
             throw new ParamArityMismatchException();
         } else {
             for (int i = 0; i < declaredParamTypes.size(); i++) {
-                if (! typesMatch(declaredParamTypes.get(i), evalParamTypes.get(i))) {
+                if (!typesMatch(declaredParamTypes.get(i), evalParamTypes.get(i))) {
                     throw new ParamTypeMismatchException();
                 }
             }
@@ -586,7 +584,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
      * Listener used to hook visit(Scope) to perform tasks after a new scope
      * has been opened in the symbol table, but before any of the scope body
      * has been processed.
-     *
+     * <p>
      * This interface was created to facilitate adding routine parameters to
      * the symbol table without writing an entirely new function to process
      * routine scopes.
@@ -600,6 +598,9 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         void onVisitScope();
     }
 
-    private class ParamArityMismatchException extends Exception {}
-    private class ParamTypeMismatchException extends Exception {}
+    private class ParamArityMismatchException extends Exception {
+    }
+
+    private class ParamTypeMismatchException extends Exception {
+    }
 }

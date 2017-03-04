@@ -8,17 +8,29 @@ import compiler488.ast.expn.*;
 public interface ExpressionVisitor {
 
     void visit(Expn expn);
+
     void visit(ArithExpn arithExpn);
+
     void visit(BoolConstExpn boolConst);
+
     void visit(BoolExpn boolExpn);
+
     void visit(CompareExpn compareExpn);
+
     void visit(ConditionalExpn conditionalExpn);
+
     void visit(EqualsExpn equalsExpn);
+
     void visit(FunctionCallExpn funcExpn);
+
     void visit(IdentExpn identExpn);
+
     void visit(IntConstExpn intConstExpn);
+
     void visit(NotExpn notExpn);
+
     void visit(SubsExpn subsExpn);
+
     void visit(UnaryMinusExpn unaryMinusExpn);
 
 }

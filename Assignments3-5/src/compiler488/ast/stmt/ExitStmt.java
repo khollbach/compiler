@@ -9,43 +9,44 @@ import compiler488.visitor.StatementVisitor;
 
 public class ExitStmt extends Stmt {
 
-	// condition for 'exit when'
-        private Expn expn = null;
-	private Integer level = -1 ;
+    // condition for 'exit when'
+    private Expn expn = null;
+    private Integer level = -1;
 
-	/** Returns the string <b>"exit"</b> or <b>"exit when e"</b>" 
-            or  <b>"exit"</b> level  or  <b>"exit"</b> level  when e 
-	*/
-	@Override
-	public String toString() {
-		  {
-		    String stmt = "exit" ;
-	 	    if( level >= 0 )
-			stmt = stmt + " " + level;
-                    if( expn != null )
-		        stmt = stmt + " when " + expn;
-		    return stmt ;
-		  }
-	}
+    /**
+     * Returns the string <b>"exit"</b> or <b>"exit when e"</b>"
+     * or  <b>"exit"</b> level  or  <b>"exit"</b> level  when e
+     */
+    @Override
+    public String toString() {
+        {
+            String stmt = "exit";
+            if (level >= 0)
+                stmt = stmt + " " + level;
+            if (expn != null)
+                stmt = stmt + " when " + expn;
+            return stmt;
+        }
+    }
 
-	public Expn getExpn() {
-		return expn;
-	}
+    public Expn getExpn() {
+        return expn;
+    }
 
-	public void setExpn(Expn expn) {
-		this.expn = expn;
-	}
+    public void setExpn(Expn expn) {
+        this.expn = expn;
+    }
 
-	public Integer getLevel() {
-		return level;
-	}
+    public Integer getLevel() {
+        return level;
+    }
 
-	public void setLevel(Integer level) {
-		this.level = level;
-	}
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
 
-	@Override
-	public void accept(StatementVisitor visitor) {
-		visitor.visit(this);
-	}
+    @Override
+    public void accept(StatementVisitor visitor) {
+        visitor.visit(this);
+    }
 }

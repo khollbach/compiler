@@ -13,6 +13,8 @@ public interface DeclarationVisitor {
     // should code from typedescriptorfactory be migrated to a new visitor?
 
     void visit(Declaration decl);
+
     void visit(MultiDeclarations multiDecl);
+
     void visit(RoutineDecl routineDecl);
 }

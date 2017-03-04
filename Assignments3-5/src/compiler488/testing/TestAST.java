@@ -13,6 +13,7 @@ package compiler488.testing;
 
 import compiler488.ast.stmt.Scope;
 import compiler488.parser.*;
+
 import java.io.*;
 
 
@@ -22,25 +23,25 @@ import java.io.*;
  * parsing is done.
  */
 class TestAST {
-	
-	static public void main(String argv[]) {
-		/* Start the parser */
-		try {
-			System.out.println("Start parsing");
-			PrintAST (new File (argv[0]));
-			System.out.println("End parsing");
-		} catch (Exception e) {
+
+    static public void main(String argv[]) {
+        /* Start the parser */
+        try {
+            System.out.println("Start parsing");
+            PrintAST(new File(argv[0]));
+            System.out.println("End parsing");
+        } catch (Exception e) {
 			/* do cleanup here -- possibly rethrow e */
-			System.out.println("Exception during Parsing");
-			e.printStackTrace();
-		}
-	}
-	
-	static public void PrintAST (File file) throws Exception {
-		Parser p = new Parser(new Lexer(new FileReader(file)));
-		Scope s = (Scope) p.parse().value;
+            System.out.println("Exception during Parsing");
+            e.printStackTrace();
+        }
+    }
+
+    static public void PrintAST(File file) throws Exception {
+        Parser p = new Parser(new Lexer(new FileReader(file)));
+        Scope s = (Scope) p.parse().value;
 		/*  Print the entire AST from it's root */
-		s.printOn(System.out, 0);		
-	}
+        s.printOn(System.out, 0);
+    }
 
 }

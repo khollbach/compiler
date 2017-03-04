@@ -12,41 +12,39 @@ import compiler488.visitor.StatementVisitor;
  * function or procedure.
  */
 public class RoutineBody extends Indentable {
-	private ASTList<ScalarDecl> parameters; // The formal parameters of the routine.
+    private ASTList<ScalarDecl> parameters; // The formal parameters of the routine.
 
-	private Scope body; // Execute this scope when routine is called.
+    private Scope body; // Execute this scope when routine is called.
 
-	/**
-	 * Print a description of the formal parameters and the scope for this
-	 * routine.
-	 * 
-	 * @param out
-	 *            Where to print the description.
-	 * @param depth
-	 *            How much indentation to use while printing.
-	 */
-	@Override
-	public void printOn(PrintStream out, int depth) {
-		if (parameters.size() > 0)
-			out.println("(" + parameters + ")");
-		else
-			out.println("");
-		body.printOn(out, depth);
-	}
+    /**
+     * Print a description of the formal parameters and the scope for this
+     * routine.
+     *
+     * @param out   Where to print the description.
+     * @param depth How much indentation to use while printing.
+     */
+    @Override
+    public void printOn(PrintStream out, int depth) {
+        if (parameters.size() > 0)
+            out.println("(" + parameters + ")");
+        else
+            out.println("");
+        body.printOn(out, depth);
+    }
 
-	public Scope getBody() {
-		return body;
-	}
+    public Scope getBody() {
+        return body;
+    }
 
-	public void setBody(Scope body) {
-		this.body = body;
-	}
+    public void setBody(Scope body) {
+        this.body = body;
+    }
 
-	public ASTList<ScalarDecl> getParameters() {
-		return parameters;
-	}
+    public ASTList<ScalarDecl> getParameters() {
+        return parameters;
+    }
 
-	public void setParameters(ASTList<ScalarDecl> parameters) {
-		this.parameters = parameters;
-	}
+    public void setParameters(ASTList<ScalarDecl> parameters) {
+        this.parameters = parameters;
+    }
 }

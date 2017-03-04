@@ -7,7 +7,7 @@ import compiler488.ast.expn.SubsExpn;
 /**
  * Created by tarang on 2017-03-02.
  */
-public class ReadStmtError extends SemanticError{
+public class ReadStmtError extends SemanticError {
 
     private static final String NON_INTEGER_READ_PARAM = "read given non-integral identifier: %s";
 

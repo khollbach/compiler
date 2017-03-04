@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by tarang on 2017-03-02.
  */
-public class TypeError extends SemanticError{
+public class TypeError extends SemanticError {
 
     /*
         Error message format strings corresponding to various type errors
@@ -96,7 +96,7 @@ public class TypeError extends SemanticError{
     }
 
     public TypeError(EqualsExpn equalsExpn) {
-        offendingNode =  equalsExpn;
+        offendingNode = equalsExpn;
         errorMsg = String.format(EQUAL_TYPE_MISMATCH, equalsExpn);
     }
 

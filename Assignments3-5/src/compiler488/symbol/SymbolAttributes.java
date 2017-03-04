@@ -13,7 +13,7 @@ public class SymbolAttributes {
 
     public final TypeDescriptor typeDescriptor;
 
-    public SymbolAttributes(boolean isParameter, TypeDescriptor typeDescriptor){
+    public SymbolAttributes(boolean isParameter, TypeDescriptor typeDescriptor) {
         this.isParameter = isParameter;
         this.typeDescriptor = typeDescriptor;
 

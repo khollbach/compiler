@@ -7,15 +7,17 @@ import compiler488.ast.AST;
  */
 public class DeclarationPart extends AST {
 
-	/** The name of the thing being declared. */
-	protected String name;
+    /**
+     * The name of the thing being declared.
+     */
+    protected String name;
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }

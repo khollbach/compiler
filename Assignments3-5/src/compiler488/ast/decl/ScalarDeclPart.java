@@ -5,12 +5,12 @@ package compiler488.ast.decl;
  */
 public class ScalarDeclPart extends DeclarationPart {
 
-	/**
-	 * Returns a string describing the name of the object being
-	 * declared.
-	 */
-	@Override
-	public String toString() {
-		return name;
-	}
+    /**
+     * Returns a string describing the name of the object being
+     * declared.
+     */
+    @Override
+    public String toString() {
+        return name;
+    }
 }
