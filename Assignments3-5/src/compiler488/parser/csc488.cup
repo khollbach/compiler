@@ -165,14 +165,14 @@ program ::=
         prog.setStatements(scope.getStatements());
 
         prog.setSourceCoordinateLine(scope_left);
-        prog.setSourceCoordinateLine(scope_right);
+        prog.setSourceCoordinateColumn(scope_right);
         RESULT = prog;
     :}
 ;
 
 scope ::=
     // scope with declarations and statements
-    L_CURLEY declarations:decls_ statements:stmts_ R_CURLEY
+    L_CURLEY:x declarations:decls_ statements:stmts_ R_CURLEY
     {:
         ASTList<Declaration> decls = (ASTList<Declaration>) decls_;
         ASTList<Stmt> stmts = (ASTList<Stmt>) stmts_;
@@ -181,20 +181,20 @@ scope ::=
         scope.setDeclarations(decls);
         scope.setStatements(stmts);
 
-        scope.setSourceCoordinateLine(decls_left);
-        scope.setSourceCoordinateLine(decls_right);
+        scope.setSourceCoordinateLine(xleft);
+        scope.setSourceCoordinateColumn(xright);
         RESULT = scope;
     :}
 
-    | L_CURLEY statements:stmts_ R_CURLEY // scope with statments only
+    | L_CURLEY:x statements:stmts_ R_CURLEY // scope with statments only
     {:
         ASTList<Stmt> stmts = (ASTList<Stmt>) stmts_;
 
         Scope scope = new Scope();
         scope.setStatements(stmts);
 
-        scope.setSourceCoordinateLine(stmts_left);
-        scope.setSourceCoordinateColumn(stmts_right);
+        scope.setSourceCoordinateLine(xleft);
+        scope.setSourceCoordinateColumn(xright);
         RESULT = scope;
     :}
 
@@ -214,11 +214,11 @@ statements ::=
     {:
         Stmt stmt = (Stmt) stmt_;
 
-    	ASTList<Stmt> list = new ASTList<Stmt>(stmt);
+        ASTList<Stmt> list = new ASTList<Stmt>(stmt);
 
         list.setSourceCoordinateLine(stmt_left);
         list.setSourceCoordinateColumn(stmt_right);
-    	RESULT = list;
+        RESULT = list;
     :}
 
     | statements:list_ statement:stmt_
@@ -237,11 +237,11 @@ declarations ::=
     {:
         Declaration decl = (Declaration) decl_;
 
-    	ASTList<Declaration> list = new ASTList<Declaration>(decl);
+        ASTList<Declaration> list = new ASTList<Declaration>(decl);
 
         list.setSourceCoordinateLine(decl_left);
         list.setSourceCoordinateColumn(decl_right);
-    	RESULT = list;
+        RESULT = list;
     :}
 
     | declarations:list_ declaration:decl_
@@ -278,7 +278,7 @@ matchedStatement ::=
         stmt.setRval(e1);
 
         stmt.setSourceCoordinateLine(var_left);
-        stmt.setSourceCoordinateLine(var_right);
+        stmt.setSourceCoordinateColumn(var_right);
         RESULT = stmt;
     :}
 
@@ -473,9 +473,13 @@ unmatchedStatement ::=
 procedureCall ::=
     IDENT:id // call procedure with no parameters
     {:
+        ASTList<Expn> args = new ASTList<Expn>();
+        args.setSourceCoordinateLine(idleft);
+        args.setSourceCoordinateColumn(idright);
+
         ProcedureCallStmt s = new ProcedureCallStmt();
         s.setName(id);
-        s.setArguments(new ASTList<Expn>());
+        s.setArguments(args);
 
         s.setSourceCoordinateLine(idleft);
         s.setSourceCoordinateColumn(idright);
@@ -497,95 +501,109 @@ procedureCall ::=
 ;
 
 declaration ::=
-    VAR variablenames:varnames_ COLON type:type_ // declare scalar/array variables
+    VAR:x variablenames:varnames_ COLON type:type_ // declare scalar/array variables
     {:
         ASTList<DeclarationPart> varnames = (ASTList<DeclarationPart>) varnames_;
-	    Type type = (Type) type_;
+        Type type = (Type) type_;
 
-	    MultiDeclarations multiDecl = new MultiDeclarations();
-	    multiDecl.setElements(varnames);
-	    multiDecl.setType(type);
+        MultiDeclarations multiDecl = new MultiDeclarations();
+        multiDecl.setElements(varnames);
+        multiDecl.setType(type);
 
-        multiDecl.setSourceCoordinateLine(varnames_left);
-        multiDecl.setSourceCoordinateColumn(varnames_right);
-    	RESULT = multiDecl;
+        multiDecl.setSourceCoordinateLine(xleft);
+        multiDecl.setSourceCoordinateColumn(xright);
+        RESULT = multiDecl;
     :}
 
-    | FUNCTION IDENT:ident COLON type:type_ scope:scope_ // declare function
+    | FUNCTION:x IDENT:ident COLON:y type:type_ scope:scope_ // declare function
     {:
-    	Scope scope = (Scope) scope_;
-    	Type type = (Type) type_;
+        Scope scope = (Scope) scope_;
+        Type type = (Type) type_;
 
-    	RoutineBody routineBody = new RoutineBody();
-        routineBody.setParameters(new ASTList<ScalarDecl>());
-    	routineBody.setBody(scope);
+        ASTList<ScalarDecl> params = new ASTList<ScalarDecl>();
+        params.setSourceCoordinateLine(yleft);
+        params.setSourceCoordinateColumn(yright);
 
-    	RoutineDecl routineDeclaration = new RoutineDecl();
-    	routineDeclaration.setName(ident);
-    	routineDeclaration.setType(type);
-    	routineDeclaration.setRoutineBody(routineBody);
-
-        routineDeclaration.setSourceCoordinateLine(identleft);
-        routineDeclaration.setSourceCoordinateColumn(identright);
-    	RESULT = routineDeclaration;
-     :}
-
-    | FUNCTION IDENT:ident L_PAREN parameters:params_ R_PAREN COLON type:type_ scope:scope_
-    {:
-    	Scope scope = (Scope) scope_;
-        ASTList<ScalarDecl> params = (ASTList<ScalarDecl>) params_;
-    	Type type = (Type) type_;
-
-    	RoutineBody routineBody = new RoutineBody();
+        RoutineBody routineBody = new RoutineBody();
         routineBody.setParameters(params);
-    	routineBody.setBody(scope);
+        routineBody.setBody(scope);
+        routineBody.setSourceCoordinateLine(scope_left);
+        routineBody.setSourceCoordinateColumn(scope_right);
 
-    	RoutineDecl routineDeclaration = new RoutineDecl();
-    	routineDeclaration.setName(ident);
-    	routineDeclaration.setType(type);
-    	routineDeclaration.setRoutineBody(routineBody);
+        RoutineDecl routineDeclaration = new RoutineDecl();
+        routineDeclaration.setName(ident);
+        routineDeclaration.setType(type);
+        routineDeclaration.setRoutineBody(routineBody);
 
-        routineDeclaration.setSourceCoordinateLine(identleft);
-        routineDeclaration.setSourceCoordinateColumn(identright);
-    	RESULT = routineDeclaration;
+        routineDeclaration.setSourceCoordinateLine(xleft);
+        routineDeclaration.setSourceCoordinateColumn(xright);
+        RESULT = routineDeclaration;
+    :}
+
+    | FUNCTION:x IDENT:ident L_PAREN parameters:params_ R_PAREN COLON type:type_ scope:scope_
+    {:
+        Scope scope = (Scope) scope_;
+        ASTList<ScalarDecl> params = (ASTList<ScalarDecl>) params_;
+        Type type = (Type) type_;
+
+        RoutineBody routineBody = new RoutineBody();
+        routineBody.setParameters(params);
+        routineBody.setBody(scope);
+        routineBody.setSourceCoordinateLine(scope_left);
+        routineBody.setSourceCoordinateColumn(scope_right);
+
+        RoutineDecl routineDeclaration = new RoutineDecl();
+        routineDeclaration.setName(ident);
+        routineDeclaration.setType(type);
+        routineDeclaration.setRoutineBody(routineBody);
+
+        routineDeclaration.setSourceCoordinateLine(xleft);
+        routineDeclaration.setSourceCoordinateColumn(xright);
+        RESULT = routineDeclaration;
     :}
 
     | PROCEDURE IDENT:ident scope:scope_ // declare procedure
     {:
-     	Scope scope = (Scope) scope_;
+        Scope scope = (Scope) scope_;
 
-    	RoutineBody routineBody = new RoutineBody();
-        routineBody.setParameters(new ASTList<ScalarDecl>());
-    	routineBody.setBody(scope);
+        ASTList<ScalarDecl> params = new ASTList<ScalarDecl>();
+        params.setSourceCoordinateLine(scope_left);
+        params.setSourceCoordinateColumn(scope_right);
 
-    	RoutineDecl routineDeclaration = new RoutineDecl();
-    	routineDeclaration.setName(ident);
-    	routineDeclaration.setType(null);
-    	routineDeclaration.setRoutineBody(routineBody);
+        RoutineBody routineBody = new RoutineBody();
+        routineBody.setParameters(params);
+        routineBody.setBody(scope);
+
+        RoutineDecl routineDeclaration = new RoutineDecl();
+        routineDeclaration.setName(ident);
+        routineDeclaration.setType(null);
+        routineDeclaration.setRoutineBody(routineBody);
 
         routineDeclaration.setSourceCoordinateLine(identleft);
         routineDeclaration.setSourceCoordinateColumn(identright);
-    	RESULT = routineDeclaration;
+        RESULT = routineDeclaration;
      :}
 
-    | PROCEDURE IDENT:ident L_PAREN parameters:params_ R_PAREN scope:scope_
+    | PROCEDURE:x IDENT:ident L_PAREN parameters:params_ R_PAREN scope:scope_
     {:
-    	Scope scope = (Scope) scope_;
+        Scope scope = (Scope) scope_;
         ASTList<ScalarDecl> params = (ASTList<ScalarDecl>) params_;
 
-    	RoutineBody routineBody = new RoutineBody();
+        RoutineBody routineBody = new RoutineBody();
         routineBody.setParameters(params);
-    	routineBody.setBody(scope);
+        routineBody.setBody(scope);
+        routineBody.setSourceCoordinateLine(scope_left);
+        routineBody.setSourceCoordinateColumn(scope_right);
 
-    	RoutineDecl routineDeclaration = new RoutineDecl();
-    	routineDeclaration.setName(ident);
+        RoutineDecl routineDeclaration = new RoutineDecl();
+        routineDeclaration.setName(ident);
         routineDeclaration.setType(null);
-    	routineDeclaration.setRoutineBody(routineBody);
+        routineDeclaration.setRoutineBody(routineBody);
 
-        routineDeclaration.setSourceCoordinateLine(identleft);
-        routineDeclaration.setSourceCoordinateColumn(identright);
-    	RESULT = routineDeclaration;
-	:}
+        routineDeclaration.setSourceCoordinateLine(xleft);
+        routineDeclaration.setSourceCoordinateColumn(xright);
+        RESULT = routineDeclaration;
+    :}
 ;
 
 // list of variables being declared
@@ -594,11 +612,11 @@ variablenames ::=
     {:
         DeclarationPart varname = (DeclarationPart) varname_;
 
-    	ASTList<DeclarationPart> list = new ASTList(varname);
+        ASTList<DeclarationPart> list = new ASTList(varname);
 
         list.setSourceCoordinateLine(varname_left);
         list.setSourceCoordinateColumn(varname_right);
-    	RESULT = list;
+        RESULT = list;
     :}
 
     | variablenames:list_ COMMA variablename:varname_
@@ -694,7 +712,7 @@ outputs ::=
 
         list.setSourceCoordinateLine(e1_left);
         list.setSourceCoordinateColumn(e1_right);
-    	RESULT = list;
+        RESULT = list;
     :}
 
     | outputs:list_ COMMA output:e1_
@@ -702,8 +720,8 @@ outputs ::=
         ASTList<Expn> list = (ASTList<Expn>) list_;
         Expn e1 = (Expn) e1_;
 
-    	list.addLast(e1);
-    	RESULT = list;
+        list.addLast(e1);
+        RESULT = list;
     :}
 ;
 
@@ -742,11 +760,11 @@ inputs ::=
     {:
         Readable var = (Readable) var_;
 
-    	ASTList<Readable> list = new ASTList<Readable>(var);
+        ASTList<Readable> list = new ASTList<Readable>(var);
 
         list.setSourceCoordinateLine(var_left);
         list.setSourceCoordinateColumn(var_right);
-    	RESULT = list;
+        RESULT = list;
     :}
 
     | inputs:list_ COMMA variable:var_
@@ -754,8 +772,8 @@ inputs ::=
         ASTList<Readable> list = (ASTList<Readable>) list_;
         Readable var = (Readable) var_;
 
-    	list.addLast(var);
-    	RESULT = list;
+        list.addLast(var);
+        RESULT = list;
     :}
 ;
 
@@ -765,11 +783,11 @@ arguments ::=
     {:
         Expn e1 = (Expn) e1_;
 
-    	ASTList<Expn> list = new ASTList<Expn>(e1);
+        ASTList<Expn> list = new ASTList<Expn>(e1);
 
         list.setSourceCoordinateLine(e1_left);
         list.setSourceCoordinateColumn(e1_right);
-    	RESULT = list;
+        RESULT = list;
     :}
 
     | arguments:list_ COMMA expression:e1_
@@ -777,8 +795,8 @@ arguments ::=
         ASTList<Expn> list = (ASTList<Expn>) list_;
         Expn e1 = (Expn) e1_;
 
-    	list.addLast(e1);
-    	RESULT = list;
+        list.addLast(e1);
+        RESULT = list;
     :}
 ;
 
@@ -788,20 +806,20 @@ parameters ::=
     {:
         ScalarDecl param = (ScalarDecl) param_;
 
-     	ASTList<ScalarDecl> list = new ASTList<ScalarDecl>(param);
+        ASTList<ScalarDecl> list = new ASTList<ScalarDecl>(param);
 
         list.setSourceCoordinateLine(param_left);
         list.setSourceCoordinateColumn(param_right);
-    	RESULT = list;
+        RESULT = list;
     :}
 
     | parameters:list_ COMMA parameter:param_
     {:
         ScalarDecl param = (ScalarDecl) param_;
-    	ASTList<ScalarDecl> list = (ASTList<ScalarDecl>) list_;
+        ASTList<ScalarDecl> list = (ASTList<ScalarDecl>) list_;
 
-    	list.addLast(param);
-    	RESULT = list;
+        list.addLast(param);
+        RESULT = list;
     :}
 ;
 
@@ -809,15 +827,15 @@ parameters ::=
 parameter ::=
     IDENT:ident COLON type:type_
     {:
-	    Type type = (Type) type_;
+        Type type = (Type) type_;
 
-	    ScalarDecl sd = new ScalarDecl();
-	    sd.setName(ident);
-	    sd.setType(type);
+        ScalarDecl sd = new ScalarDecl();
+        sd.setName(ident);
+        sd.setType(type);
 
         sd.setSourceCoordinateLine(identleft);
         sd.setSourceCoordinateColumn(identright);
-	    RESULT = sd;
+        RESULT = sd;
     :}
 ;
 
@@ -833,14 +851,14 @@ expression ::=
         Expn e1 = (Expn) e1_;
         Expn e2 = (Expn) e2_;
 
-    	BoolExpn e = new BoolExpn();
-    	e.setOpSymbol("or");
-    	e.setLeft(e1);
-    	e.setRight(e2);
+        BoolExpn e = new BoolExpn();
+        e.setOpSymbol("or");
+        e.setLeft(e1);
+        e.setRight(e2);
 
         e.setSourceCoordinateLine(e1_left);
         e.setSourceCoordinateColumn(e1_right);
-     	RESULT = e;
+        RESULT = e;
     :}
 ;
 
@@ -856,14 +874,14 @@ conjunction ::=
         Expn e1 = (Expn) e1_;
         Expn e2 = (Expn) e2_;
 
-    	BoolExpn e = new BoolExpn();
-    	e.setOpSymbol("and");
-    	e.setLeft(e1);
-    	e.setRight(e2);
+        BoolExpn e = new BoolExpn();
+        e.setOpSymbol("and");
+        e.setLeft(e1);
+        e.setRight(e2);
 
         e.setSourceCoordinateLine(e1_left);
         e.setSourceCoordinateColumn(e1_right);
-     	RESULT = e;
+        RESULT = e;
     :}
 ;
 
@@ -878,13 +896,13 @@ negation ::=
     {:
         Expn e1 = (Expn) e1_;
 
-    	NotExpn e = new NotExpn();
-    	e.setOpSymbol("not");
-    	e.setOperand(e1);
+        NotExpn e = new NotExpn();
+        e.setOpSymbol("not");
+        e.setOperand(e1);
 
         e.setSourceCoordinateLine(e1_left);
         e.setSourceCoordinateColumn(e1_right);
-    	RESULT = e;
+        RESULT = e;
     :}
 ;
 
@@ -900,14 +918,14 @@ compareExpn ::=
         Expn e1 = (Expn) e1_;
         Expn e2 = (Expn) e2_;
 
-    	EqualsExpn e = new EqualsExpn();
-    	e.setOpSymbol("=");
-    	e.setLeft(e1);
-    	e.setRight(e2);
+        EqualsExpn e = new EqualsExpn();
+        e.setOpSymbol("=");
+        e.setLeft(e1);
+        e.setRight(e2);
 
         e.setSourceCoordinateLine(e1_left);
         e.setSourceCoordinateColumn(e1_right);
-     	RESULT = e;
+        RESULT = e;
     :}
 
     | arithExpn:e1_ NOT EQUAL arithExpn:e2_
@@ -915,18 +933,20 @@ compareExpn ::=
         Expn e1 = (Expn) e1_;
         Expn e2 = (Expn) e2_;
 
-    	EqualsExpn equalsExpn = new EqualsExpn();
-    	equalsExpn.setOpSymbol("=");
-    	equalsExpn.setLeft(e1);
-    	equalsExpn.setRight(e2);
+        EqualsExpn equalsExpn = new EqualsExpn();
+        equalsExpn.setOpSymbol("=");
+        equalsExpn.setLeft(e1);
+        equalsExpn.setRight(e2);
+        equalsExpn.setSourceCoordinateLine(e1_left);
+        equalsExpn.setSourceCoordinateColumn(e1_right);
 
-    	NotExpn notExpn = new NotExpn();
-    	notExpn.setOpSymbol("not");
-    	notExpn.setOperand(equalsExpn);
+        NotExpn notExpn = new NotExpn();
+        notExpn.setOpSymbol("not");
+        notExpn.setOperand(equalsExpn);
 
         notExpn.setSourceCoordinateLine(e1_left);
         notExpn.setSourceCoordinateColumn(e1_right);
-     	RESULT = notExpn;
+        RESULT = notExpn;
     :}
 
     | arithExpn:e1_ LESS arithExpn:e2_
@@ -935,13 +955,13 @@ compareExpn ::=
         Expn e2 = (Expn) e2_;
 
         CompareExpn e = new CompareExpn();
-    	e.setOpSymbol("<");
-    	e.setLeft(e1);
-    	e.setRight(e2);
+        e.setOpSymbol("<");
+        e.setLeft(e1);
+        e.setRight(e2);
 
         e.setSourceCoordinateLine(e1_left);
         e.setSourceCoordinateColumn(e1_right);
-   		RESULT = e;
+        RESULT = e;
     :}
 
     | arithExpn:e1_ LESS EQUAL arithExpn:e2_
@@ -950,13 +970,13 @@ compareExpn ::=
         Expn e2 = (Expn) e2_;
 
         CompareExpn e = new CompareExpn();
-    	e.setOpSymbol("<=");
-    	e.setLeft(e1);
-    	e.setRight(e2);
+        e.setOpSymbol("<=");
+        e.setLeft(e1);
+        e.setRight(e2);
 
         e.setSourceCoordinateLine(e1_left);
         e.setSourceCoordinateColumn(e1_right);
-   		RESULT = e;
+        RESULT = e;
     :}
 
     | arithExpn:e1_ GREATER arithExpn:e2_
@@ -965,13 +985,13 @@ compareExpn ::=
         Expn e2 = (Expn) e2_;
 
         CompareExpn e = new CompareExpn();
-    	e.setOpSymbol(">");
-    	e.setLeft(e1);
-    	e.setRight(e2);
+        e.setOpSymbol(">");
+        e.setLeft(e1);
+        e.setRight(e2);
 
         e.setSourceCoordinateLine(e1_left);
         e.setSourceCoordinateColumn(e1_right);
-   		RESULT = e;
+        RESULT = e;
     :}
 
     | arithExpn:e1_ GREATER EQUAL arithExpn:e2_
@@ -980,13 +1000,13 @@ compareExpn ::=
         Expn e2 = (Expn) e2_;
 
         CompareExpn e = new CompareExpn();
-    	e.setOpSymbol(">=");
-    	e.setLeft(e1);
-    	e.setRight(e2);
+        e.setOpSymbol(">=");
+        e.setLeft(e1);
+        e.setRight(e2);
 
         e.setSourceCoordinateLine(e1_left);
         e.setSourceCoordinateColumn(e1_right);
-   		RESULT = e;
+        RESULT = e;
     :}
 ;
 
@@ -1002,14 +1022,14 @@ arithExpn ::=
         Expn e1 = (Expn) e1_;
         Expn e2 = (Expn) e2_;
 
-    	ArithExpn e = new ArithExpn();
-    	e.setOpSymbol("+");
-    	e.setLeft(e1);
-    	e.setRight(e2);
+        ArithExpn e = new ArithExpn();
+        e.setOpSymbol("+");
+        e.setLeft(e1);
+        e.setRight(e2);
 
         e.setSourceCoordinateLine(e1_left);
         e.setSourceCoordinateColumn(e1_right);
-    	RESULT = e;
+        RESULT = e;
     :}
 
     | arithExpn:e1_ MINUS term:e2_
@@ -1018,13 +1038,13 @@ arithExpn ::=
         Expn e2 = (Expn) e2_;
 
         ArithExpn e = new ArithExpn();
-    	e.setOpSymbol("-");
-    	e.setLeft(e1);
-    	e.setRight(e2);
+        e.setOpSymbol("-");
+        e.setLeft(e1);
+        e.setRight(e2);
 
         e.setSourceCoordinateLine(e1_left);
         e.setSourceCoordinateColumn(e1_right);
-    	RESULT = e;
+        RESULT = e;
     :}
 ;
 
@@ -1032,7 +1052,7 @@ arithExpn ::=
 term ::=
     factor:e1_
     {:
-    	RESULT = e1_;
+        RESULT = e1_;
     :}
 
     | term:e1_ TIMES factor:e2_
@@ -1040,14 +1060,14 @@ term ::=
         Expn e1 = (Expn) e1_;
         Expn e2 = (Expn) e2_;
 
-    	ArithExpn e = new ArithExpn();
-    	e.setOpSymbol("*");
-    	e.setLeft(e1);
-    	e.setRight(e2);
+        ArithExpn e = new ArithExpn();
+        e.setOpSymbol("*");
+        e.setLeft(e1);
+        e.setRight(e2);
 
         e.setSourceCoordinateLine(e1_left);
         e.setSourceCoordinateColumn(e1_right);
-    	RESULT = e;
+        RESULT = e;
     :}
 
     | term:e1_ DIVIDE factor:e2_
@@ -1055,14 +1075,14 @@ term ::=
         Expn e1 = (Expn) e1_;
         Expn e2 = (Expn) e2_;
 
-    	ArithExpn e = new ArithExpn();
-    	e.setOpSymbol("/");
-    	e.setLeft(e1);
-    	e.setRight(e2);
+        ArithExpn e = new ArithExpn();
+        e.setOpSymbol("/");
+        e.setLeft(e1);
+        e.setRight(e2);
 
         e.setSourceCoordinateLine(e1_left);
         e.setSourceCoordinateColumn(e1_right);
-    	RESULT = e;
+        RESULT = e;
     :}
 ;
 
@@ -1077,14 +1097,14 @@ factor ::=
     {:
         Expn e1 = (Expn) e1_;
 
-    	UnaryMinusExpn e = new UnaryMinusExpn();
-    	e.setOpSymbol("-");
-    	e.setOperand(e1);
+        UnaryMinusExpn e = new UnaryMinusExpn();
+        e.setOpSymbol("-");
+        e.setOperand(e1);
 
         e.setSourceCoordinateLine(e1_left);
         e.setSourceCoordinateColumn(e1_right);
-	    RESULT = e;
-	:}
+        RESULT = e;
+    :}
 ;
 
 primary ::=
@@ -1104,13 +1124,13 @@ primary ::=
     {:
         ASTList<Expn> args = (ASTList<Expn>) args_;
 
-    	FunctionCallExpn e = new FunctionCallExpn();
-    	e.setIdent(ident);
-    	e.setArguments(args);
+        FunctionCallExpn e = new FunctionCallExpn();
+        e.setIdent(ident);
+        e.setArguments(args);
 
         e.setSourceCoordinateLine(identleft);
         e.setSourceCoordinateColumn(identright);
-    	RESULT = e;
+        RESULT = e;
 
      :}
 
@@ -1126,71 +1146,71 @@ primary ::=
         Expn e2 = (Expn) e2_;
         Expn e3 = (Expn) e3_;
 
-    	ConditionalExpn e = new ConditionalExpn();
-    	e.setCondition(e1);
-    	e.setTrueValue(e2);
-    	e.setFalseValue(e3);
+        ConditionalExpn e = new ConditionalExpn();
+        e.setCondition(e1);
+        e.setTrueValue(e2);
+        e.setFalseValue(e3);
 
         e.setSourceCoordinateLine(e1_left);
         e.setSourceCoordinateColumn(e1_right);
-    	RESULT = e;
+        RESULT = e;
     :}
 ;
 
 constant ::=
     INTCONST:i // integer constant
     {:
-    	IntConstExpn e = new IntConstExpn();
-    	e.setValue(i);
+        IntConstExpn e = new IntConstExpn();
+        e.setValue(i);
 
         e.setSourceCoordinateLine(ileft);
         e.setSourceCoordinateColumn(iright);
-    	RESULT = e;
+        RESULT = e;
     :}
 
     | TRUE:x // constant true
     {:
-    	BoolConstExpn e = new BoolConstExpn();
-    	e.setValue(true);
+        BoolConstExpn e = new BoolConstExpn();
+        e.setValue(true);
 
         e.setSourceCoordinateLine(xleft);
         e.setSourceCoordinateColumn(xright);
-    	RESULT = e;
+        RESULT = e;
     :}
 
     | FALSE:x // constant false
     {:
-    	BoolConstExpn e = new BoolConstExpn();
-    	e.setValue(false);
+        BoolConstExpn e = new BoolConstExpn();
+        e.setValue(false);
 
         e.setSourceCoordinateLine(xleft);
         e.setSourceCoordinateColumn(xright);
-    	RESULT = e;
+        RESULT = e;
     :}
 ;
 
 variable ::=
     IDENT:id // scalar variable or function call
     {:
-	    IdentExpn e = new IdentExpn();
-	    e.setIdent(id);
+        IdentExpn e = new IdentExpn();
+        e.setIdent(id);
 
         e.setSourceCoordinateLine(idleft);
         e.setSourceCoordinateColumn(idright);
-	    RESULT = e;
-	:}
+        RESULT = e;
+    :}
 
     | IDENT:id L_SQUARE expression:e1_ R_SQUARE // element of an array
     {:
         Expn e1 = (Expn) e1_;
 
-	    SubsExpn e = new SubsExpn();
-	    e.setVariable(id);
-	    e.setOpSymbol(id);
-	    e.setOperand(e1);
+        SubsExpn e = new SubsExpn();
+        e.setVariable(id);
+        e.setOpSymbol(id);
+        e.setOperand(e1);
 
         e.setSourceCoordinateLine(idleft);
         e.setSourceCoordinateColumn(idright);
-	    RESULT = e;
+        RESULT = e;
     :}
 ;

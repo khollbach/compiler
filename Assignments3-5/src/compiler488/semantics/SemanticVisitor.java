@@ -15,6 +15,7 @@ import compiler488.visitor.DeclarationVisitor;
 import compiler488.visitor.ExpressionVisitor;
 import compiler488.visitor.StatementVisitor;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -149,16 +150,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
             if (attrs.typeDescriptor instanceof FunctionTypeDescriptor) {
                 FunctionTypeDescriptor fnTD = ((FunctionTypeDescriptor) attrs.typeDescriptor);
                 paramTypes = fnTD.parameterTypes;
-               
-                List<ExpnEvalType> evalTypes = new ArrayList<ExpnEvalType>();
-                for (Expn exp: funcExpn.getArguments()) {
-                	exp.accept(this);
-                }
-                
-                for (Expn exp: funcExpn.getArguments()){
-                	evalTypes.add(exp.evalType());
-                }
-                
+                List<ExpnEvalType> evalTypes = processArgs(funcExpn.getArguments());
 
                 if (fnTD.returnType instanceof IntegerTypeDescriptor) {
                     funcExpn.setEvalType(ExpnEvalType.INTEGER);
@@ -166,8 +158,6 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
                     funcExpn.setEvalType(ExpnEvalType.BOOLEAN);
                 }
                 
-                System.out.println("DEBUG:"+paramTypes.toString()+evalTypes.toString());
-
                 verifyParamTypes(paramTypes, evalTypes);
             }
         } catch (SymbolTable.SymbolNotFoundException e) {
@@ -342,13 +332,13 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(ProcedureCallStmt procCall) {
-        List<ScalarTypeDescriptor> paramTypes = null;
+        List<ScalarTypeDescriptor> paramTypes = new ArrayList<>();
 
         try {
             SymbolAttributes attrs = symbolTable.retrieveSymbol(procCall.getName());
             if (attrs.typeDescriptor instanceof ProcedureTypeDescriptor) {
                 paramTypes = ((ProcedureTypeDescriptor) attrs.typeDescriptor).parameterTypes;
-                List<ExpnEvalType> evalTypes = evalTypes(procCall.getArguments());
+                List<ExpnEvalType> evalTypes = processArgs(procCall.getArguments());
 
                 verifyParamTypes(paramTypes, evalTypes);
             }
@@ -576,6 +566,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     private void verifyParamTypes(List<ScalarTypeDescriptor> declaredParamTypes,
                                   List<ExpnEvalType> evalParamTypes)
             throws ParamTypeMismatchException, ParamArityMismatchException {
+
         if (declaredParamTypes.size() != evalParamTypes.size()) {
             throw new ParamArityMismatchException();
         } else {
@@ -587,7 +578,10 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         }
     }
 
-    private List<ExpnEvalType> evalTypes(ASTList<Expn> expns) {
+    private List<ExpnEvalType> processArgs(ASTList<Expn> expns) {
+        for (Expn e : expns){
+            e.accept(this);
+        }
         return expns.stream()
                 .map(Expn::evalType)
                 .collect(Collectors.toList());
