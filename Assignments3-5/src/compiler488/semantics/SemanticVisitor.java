@@ -15,6 +15,7 @@ import compiler488.visitor.DeclarationVisitor;
 import compiler488.visitor.ExpressionVisitor;
 import compiler488.visitor.StatementVisitor;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -331,7 +332,16 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(ProcedureCallStmt procCall) {
-        List<ScalarTypeDescriptor> paramTypes = null;
+        List<ScalarTypeDescriptor> paramTypes = new ArrayList<>();
+
+        for (Expn arg : procCall.getArguments()){
+            if (arg.evalType().equals(ExpnEvalType.BOOLEAN)){
+                paramTypes.add(new BooleanTypeDescriptor());
+            }
+            else if (arg.evalType().equals(ExpnEvalType.INTEGER)){
+                paramTypes.add(new IntegerTypeDescriptor());
+            }
+        }
 
         try {
             SymbolAttributes attrs = symbolTable.retrieveSymbol(procCall.getName());
@@ -565,6 +575,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     private void verifyParamTypes(List<ScalarTypeDescriptor> declaredParamTypes,
                                   List<ExpnEvalType> evalParamTypes)
             throws ParamTypeMismatchException, ParamArityMismatchException {
+
         if (declaredParamTypes.size() != evalParamTypes.size()) {
             throw new ParamArityMismatchException();
         } else {
@@ -583,6 +594,8 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     }
 
     private boolean typesMatch(ScalarTypeDescriptor td, ExpnEvalType evalType) {
+        System.err.println(td);
+        System.err.println(evalType);
         return (td instanceof IntegerTypeDescriptor && evalType.equals(ExpnEvalType.INTEGER)
                 || td instanceof BooleanTypeDescriptor && evalType.equals(ExpnEvalType.BOOLEAN));
     }
