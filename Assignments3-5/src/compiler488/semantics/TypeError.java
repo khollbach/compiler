@@ -4,6 +4,7 @@ import compiler488.ast.expn.*;
 import compiler488.ast.stmt.AssignStmt;
 import compiler488.ast.stmt.ExitStmt;
 import compiler488.ast.stmt.IfStmt;
+import compiler488.ast.stmt.WhileDoStmt;
 
 /**
  * Created by tarang on 2017-03-02.
@@ -95,6 +96,11 @@ public class TypeError extends SemanticError{
     public TypeError(EqualsExpn equalsExpn) {
         offendingNode =  equalsExpn;
         errorMsg = String.format(EQUAL_TYPE_MISMATCH, equalsExpn);
+    }
+
+    public TypeError(WhileDoStmt whileDoStmt) {
+        offendingNode = whileDoStmt;
+        errorMsg = String.format(NON_BOOLEAN_CONDITION, whileDoStmt);
     }
 
     public TypeError(UnaryMinusExpn unaryMinusExpn) {
