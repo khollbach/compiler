@@ -1,0 +1,8 @@
+#!/bin/bash
+
+tmpdir=tmp
+testdir=tests/failing
+
+for f in `ls "$tmpdir"`; do
+    vim "$testdir/$f" "$tmpdir/$f"
+done

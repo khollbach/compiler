@@ -1,0 +1,11 @@
+#!/bin/bash
+
+rm -rf tmp
+mkdir -p tmp
+
+testdir=tests/failing
+
+for f in `ls $testdir | grep 'semantic_error_*'`; do
+    echo "$f"
+    java -jar dist/compiler488.jar -X "$testdir/$f" &> "tmp/$f"
+done
