@@ -17,7 +17,7 @@ public class TypeError extends SemanticError{
     private static final String NON_BOOLEAN_OPERAND = "boolean expression was passed non-boolean reference: %s";
     private static final String NON_BOOLEAN_CONDITION = "non-boolean expression as condition to if statement: %s";
     private static final String DIFFERING_TYPES = "value assigned to variable of differing type: %s";
-
+    private static final String ASSIGN_TO_PARAM = "assignment to parameter reference: %s";
 
     /**
      * This TypeError's error message
@@ -50,12 +50,17 @@ public class TypeError extends SemanticError{
 
     public TypeError(IfStmt ifStmt) {
         offendingNode = ifStmt;
-        errorMsg = String.format(NON_BOOLEAN_CONDITION, ifStmt.condition);
+        errorMsg = String.format(NON_BOOLEAN_CONDITION, ifStmt.getCondition());
     }
 
     public TypeError(AssignStmt assignStmt) {
         offendingNode = assignStmt;
-        errorMsg = String.format(DIFFERING_TYPES, assignStmt.lval);
+        errorMsg = String.format(DIFFERING_TYPES, assignStmt.getLval());
+    }
+
+    public TypeError(AssignStmt assignStmt, boolean isParameter) {
+        offendingNode = assignStmt;
+        errorMsg = String.format(ASSIGN_TO_PARAM, assignStmt.getLval());
     }
 
     @Override

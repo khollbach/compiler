@@ -206,7 +206,23 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(AssignStmt assignStmt) {
-        if (assignStmt.lval.evalType() != assignStmt.rval.evalType()) {
+        assignStmt.getLval().accept(this);
+        assignStmt.getRval().accept(this);
+
+        // Check special case of assigning to routine parameters
+        SymbolAttributes attrs = null;
+        try {
+            attrs = symbolTable.retrieveSymbol(assignStmt.getLval());
+
+        } catch (SymbolNotFoundException ignored) {}        
+        if (attrs != null) {
+            if (attrs.isParameter) {
+                semanticErrors.add(new TypeError(assignStmt, attrs.isParameter));
+            }
+        }
+
+        // Check differing types on either side of assignment statement
+        if (assignStmt.getLval().evalType() != assignStmt.getRval().evalType()) {
             semanticErrors.add(new TypeError(assignStmt));
         }
 
@@ -219,7 +235,11 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(IfStmt ifStmt) {
-        if (ifStmt.condition.evalType() != ExpnEvalType.BOOLEAN) {
+        ifStmt.getCondition().accept(this);
+        ifStmt.getWhenTrue().accept(this);
+        ifStmt.getWhenFalse().accept(this);
+
+        if (ifStmt.getCondition().evalType() != ExpnEvalType.BOOLEAN) {
             semanticErrors.add(new TypeError(ifStmt));
         }
     }
