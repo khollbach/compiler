@@ -212,6 +212,9 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(AssignStmt assignStmt) {
+        if (assignStmt.lval.evalType() != assignStmt.rval.evalType()) {
+            semanticErrors.add(new TypeError(assignStmt));
+        }
 
     }
 
@@ -222,7 +225,9 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(IfStmt ifStmt) {
-
+        if (ifStmt.condition.evalType() != ExpnEvalType.BOOLEAN) {
+            semanticErrors.add(new TypeError(ifStmt));
+        }
     }
 
     @Override

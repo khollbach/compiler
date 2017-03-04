@@ -15,6 +15,9 @@ public class TypeError extends SemanticError{
     private static final String NON_INTEGER_OPERAND = "arithmetic expression was passed non-integer reference: %s";
     private static final String INDEXED_NON_ARRAY = "indexed non-array reference: %s";
     private static final String NON_BOOLEAN_OPERAND = "boolean expression was passed non-boolean reference: %s";
+    private static final String NON_BOOLEAN_CONDITION = "non-boolean expression as condition to if statement: %s";
+    private static final String DIFFERING_TYPES = "value assigned to variable of differing type: %s";
+
 
     /**
      * This TypeError's error message
@@ -44,6 +47,16 @@ public class TypeError extends SemanticError{
     public TypeError(BoolExpn boolExpn) {
         offendingNode = boolExpn;
         errorMsg = String.format(NON_BOOLEAN_OPERAND, boolExpn);
+    }
+
+    public TypeError(IfStmt ifStmt) {
+        offendingNode = ifStmt;
+        errorMsg = String.format(NON_BOOLEAN_CONDITION, ifStmt.condition);
+    }
+
+    public TypeError(AssignStmt assignStmt) {
+        offendingNode = assignStmt;
+        errorMsg = String.format(DIFFERING_TYPES, assignStmt.lval);
     }
 
     @Override
