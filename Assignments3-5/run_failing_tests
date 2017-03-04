@@ -1,0 +1,24 @@
+#!/bin/bash
+
+rm -f tmp-test-output.txt
+
+testdir=tests/failing
+
+echo Syntax errors: >> tmp-test-output.txt
+echo >> tmp-test-output.txt
+for f in `ls $testdir | grep 'syntax_error_*'`; do
+    echo "$f"
+    echo "$f" >> tmp-test-output.txt
+    java -jar dist/compiler488.jar -X "$testdir/$f" &>> tmp-test-output.txt
+    echo >> tmp-test-output.txt
+done
+echo >> tmp-test-output.txt
+echo >> tmp-test-output.txt
+
+echo Semantic errors: >> tmp-test-output.txt
+for f in `ls $testdir | grep 'semantic_error_*'`; do
+    echo "$f"
+    echo "$f" >> tmp-test-output.txt
+    java -jar dist/compiler488.jar -X "$testdir/$f" &>> tmp-test-output.txt
+    echo >> tmp-test-output.txt
+done

@@ -2,12 +2,13 @@
 
 # Dump ASTs of passing tests, for diff'ing with the source files later.
 
-rm -rf tmp
-mkdir -p tmp
-
+tmpdir=tmp-test-output
 testdir=tests/ast
+
+rm -rf "$tmpdir"
+mkdir -p "$tmpdir"
 
 for f in `ls "$testdir"`; do
     echo "$f"
-    java -jar dist/compiler488.jar -D a -X "$testdir/$f" > "tmp/$f"
+    java -jar dist/compiler488.jar -D a -X "$testdir/$f" > "$tmpdir/$f"
 done

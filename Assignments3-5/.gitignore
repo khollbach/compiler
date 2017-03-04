@@ -12,4 +12,5 @@ out/
 
 Assignments3-5.iml
 
-tmp/
+tmp-test-output/
+tmp-test-output.txt
