@@ -1,10 +1,7 @@
 package compiler488.semantics;
 
 import compiler488.ast.expn.*;
-import compiler488.ast.stmt.AssignStmt;
-import compiler488.ast.stmt.ExitStmt;
-import compiler488.ast.stmt.IfStmt;
-import compiler488.ast.stmt.WhileDoStmt;
+import compiler488.ast.stmt.*;
 
 /**
  * Created by tarang on 2017-03-02.
@@ -98,7 +95,7 @@ public class TypeError extends SemanticError{
         errorMsg = String.format(EQUAL_TYPE_MISMATCH, equalsExpn);
     }
 
-    public TypeError(WhileDoStmt whileDoStmt) {
+    public TypeError(LoopingStmt whileDoStmt) {
         offendingNode = whileDoStmt;
         errorMsg = String.format(NON_BOOLEAN_CONDITION, whileDoStmt);
     }
