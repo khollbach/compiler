@@ -5,7 +5,7 @@ doc/javadoc/
 src/compiler488/parser/Lexer.java
 src/compiler488/parser/Parser.java
 src/compiler488/parser/sym.java
-
+tests/passing/basic.488
 .idea/
 .idea/workspace.xml
 out/
