@@ -5,7 +5,7 @@ var c : Boolean
 % semantic error - return value from a procedure
 procedure p ( a : Integer, b : Integer, c : Boolean )
     { if c then
-        return a + b
+        return with a + b
       else
         return with a - b
     }
