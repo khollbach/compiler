@@ -8,7 +8,6 @@ import compiler488.ast.stmt.Program;
 import compiler488.semantics.SemanticError;
 import compiler488.semantics.SemanticVisitor;
 import compiler488.semantics.Semantics;
-import compiler488.semantics.TypeError;
 import compiler488.symbol.SymbolTable;
 import compiler488.codegen.CodeGen;
 import compiler488.runtime.*;
@@ -52,7 +51,7 @@ public class Main {
      * This can be used by parsing, semantic analysis or code generation
      * to quit early if errors have occurred.
      */
-    public static boolean errorOccurred = false;
+    private static boolean errorOccurred = false;
 
   /*
    * Options set by the user 
@@ -79,29 +78,29 @@ public class Main {
     /**
      * User option -- dump symbol table after semantic analysis
      */
-    public static boolean dumpSymbolTable = false;
+    private static boolean dumpSymbolTable = false;
 
   /* TRACE options switches */
     /**
      * User option -- trace lexical analysis
      */
-    public static boolean traceLexical = false;
+    private static boolean traceLexical = false;
     /**
      * User option -- trace syntax analysis
      */
-    public static boolean traceSyntax = false;
+    private static boolean traceSyntax = false;
     /**
      * User option -- trace AST operations
      */
-    public static boolean traceAST = false;
+    private static boolean traceAST = false;
     /**
      * User option -- trace semantic analysis
      */
-    public static boolean traceSemantics = false;
+    private static boolean traceSemantics = false;
     /**
      * User option -- trace symbol table operations
      */
-    public static boolean traceSymbols = false;
+    private static boolean traceSymbols = false;
     /**
      * User option -- trace code generation
      */
@@ -217,22 +216,18 @@ public class Main {
      * @param arguments is an array of strings containing command line arguments.
      */
 
-    private static void commandLineArgs(String arguments[]) {
-        int length = arguments.length; //number of command line arguments passed
-        int optionLen = 0;        //number of arguments passed
-        //for current option
-
-        int i, j, k;        //just a counter
+    private static void processArgs(String arguments[]) {
+        int j, k;        //just a counter
         String argTmp;        //temp argument strings for -D and -T
         final String badUsage = "Incorrect usage of command line arguments."
                 + " Please refer to the man page.";
 
-        if (length > 0)
+        if (arguments.length > 0) {
             try {        // catch arrayOutOfBoundsException for bad argument list
-                for (i = 0; i < length; i++) {
-                    if (arguments[i].equals("-X"))
+                for (int i = 0; i < arguments.length; i++) {
+                    if (arguments[i].equals("-X")) {
                         supressExecution = true;
-                    else if (arguments[i].equals("-D")) {
+                    } else if (arguments[i].equals("-D")) {
                         i++;    // advance to next argument
                         argTmp = arguments[i];
                         dumpAST1 = argTmp.indexOf('a') >= 0;
@@ -261,33 +256,33 @@ public class Main {
                                         argTmp.charAt(j) + "' for -T option (ignored)");
                     } else if (arguments[i].equals("-E")) {
                         i++;   // advance to next argument
-                        errorFileName = new String(arguments[i]);
+                        errorFileName = arguments[i];
                     } else if (arguments[i].equals("-O")) {
                         i++;   // advance to next argument
-                        compilerOutputFileName = new String(arguments[i]);
+                        compilerOutputFileName = arguments[i];
                     } else if (arguments[i].equals("-R")) {
                         i++;   // advance to next argument
-                        compilerTraceFileName = new String(arguments[i]);
+                        compilerTraceFileName = arguments[i];
                     } else if (arguments[i].equals("-S")) {
                         i++;   // advance to next argument
-                        executeTraceFileName = new String(arguments[i]);
+                        executeTraceFileName = arguments[i];
                     } else if (arguments[i].equals("-U")) {
                         i++;   // advance to next argument
-                        compilerDumpFileName = new String(arguments[i]);
+                        compilerDumpFileName = arguments[i];
                     } else if (arguments[i].equals("-I")) {
                         i++;
-                        executeInputFileName = new String(arguments[i]);
+                        executeInputFileName = arguments[i];
                     } else if (arguments[i].equals("-V"))
                         printVersion();
 
                         //if the argument does not begin with '-' then it must be
                         //the source file
                     else if (arguments[i].charAt(0) != '-') {
-                        sourceFileName = new String(arguments[i]);
+                        sourceFileName = arguments[i];
                         i++;
                         //i should be equal to length at this point.
                         //If not then we have an error
-                        if (i != length) {
+                        if (i != arguments.length) {
                             System.err.println(badUsage);
                             errorOccurred = true;
                             return;
@@ -304,6 +299,7 @@ public class Main {
                 errorOccurred = true;
                 return;
             }
+        }
         //no source file was given or the command line arguments where
         //not used correctly
         if (sourceFileName.length() == 0) {
@@ -444,7 +440,8 @@ public class Main {
 
 	/* process user options and arguments */
         try {
-            commandLineArgs(argv);
+            //processArgs doesn't throw exceptions...
+            processArgs(argv);
         } catch (Exception e) {
             System.err.println("Exception during command line argument processing");
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
@@ -457,13 +454,15 @@ public class Main {
         }
 
 	/* Setup files for compilation  */
-        if (errorFileName.length() > 0)
+        if (errorFileName.length() > 0) {
             setErrorSink(errorFileName);
-        if (compilerOutputFileName.length() > 0)
+        }
+        if (compilerOutputFileName.length() > 0) {
             setOutputSink(compilerOutputFileName);
+        }
         setTraceStream(compilerTraceFileName);
 
-  	/* sourceFileName must exist or commandLineArgs would have exited */
+  	/* sourceFileName must exist or processArgs would have exited */
 
 	/* Scan and Parse the program	*/
         try {
@@ -496,7 +495,7 @@ public class Main {
         }
 
         // Dump AST after parsing if requested
-        if (dumpAST1)
+        if (dumpAST1) {
             try {
                 if (compilerDumpFileName.length() > 0) {
                     dumpFile = new File(compilerDumpFileName);
@@ -512,11 +511,12 @@ public class Main {
                 e.printStackTrace();
                 System.exit(100);
             }
+        }
 
         try {
-            SemanticVisitor visitAST = new SemanticVisitor();
-            programAST.accept(visitAST);
-            for (SemanticError se : visitAST.getSemanticErrors()) {
+            SemanticVisitor semanticVisitor = new SemanticVisitor();
+            programAST.accept(semanticVisitor);
+            for (SemanticError se : semanticVisitor.getSemanticErrors()) {
             	System.out.println(se);
             	errorOccurred = true;
             }
@@ -533,7 +533,7 @@ public class Main {
         }
 
         // Dump AST after semantic analysis  if requested
-        if (dumpAST2)
+        if (dumpAST2) {
             try {
                 if (compilerDumpFileName.length() > 0) {
                     if (!dumpAST1) {    // dump stream wasn't opened above
@@ -542,14 +542,16 @@ public class Main {
                     }
                     programAST.printOn(dumpStream, 0);
                     dumpStream.close();
-                } else
+                } else {
                     programAST.printOn(saveSysOut, 0);
+                }
             } catch (Exception e) {
                 System.err.println("Exception during AST dump after semantic analysis");
                 System.err.println(e.getClass().getName() + ": " + e.getMessage());
                 e.printStackTrace();
                 System.exit(110);
             }
+        }
 
         // Initialize Machine before code generation
         try {
@@ -582,11 +584,13 @@ public class Main {
         if (supressExecution) {
             System.out.println("Program execution supressed by command line argument");
             return;        // normal termination
-        } else
+        } else {
             System.out.println("Begin Execution");
+        }
 
-        if (traceStream != null && traceStream != saveSysOut)
+        if (traceStream != null && traceStream != saveSysOut) {
             traceStream.close();    // finish compilation trace
+        }
 
         setTraceStream(executeTraceFileName);
         setInputSource(executeInputFileName);
@@ -607,8 +611,9 @@ public class Main {
             System.exit(200);
         }
 
-        if (traceStream != null && traceStream != saveSysOut)
+        if (traceStream != null && traceStream != saveSysOut) {
             traceStream.close();    // finish exceution trace
+        }
 
         System.out.println("End of Execution");
 
