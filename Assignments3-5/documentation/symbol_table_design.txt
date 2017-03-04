@@ -1,4 +1,4 @@
-Symbol Table Design - George Gianacopolous, Tarang Marathe
+Symbol Table Design - George Gianacopoulos, Tarang Marathe
 
 The way we implemented the symbol table was as a hash map of id strings (symbol identifiers) to a stack of SymbolAttributes objects.
 While traversing the AST, every time a new symbol is encounters, we check if its identifier string is in the hash map. If it is not, we create a new entry with an empty stack, and push the corresponding SymbolAttributes object onto the stack.
