@@ -133,7 +133,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         equalsExpn.getRight().accept(this);
 
         if (equalsExpn.getLeft().evalType().equals(equalsExpn.getRight().evalType())) {
-            equalsExpn.setEvalType(equalsExpn.getLeft().evalType());
+            equalsExpn.setEvalType(ExpnEvalType.BOOLEAN);
         } else {
             semanticErrors.add(new TypeError(equalsExpn));
             equalsExpn.setEvalType(ExpnEvalType.UNDEFINED);
