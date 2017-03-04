@@ -92,11 +92,36 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(CompareExpn compareExpn) {
+        compareExpn.getLeft().accept(this);
+        compareExpn.getRight().accept(this);
+         if (compareExpn.getLeft().evalType().equals(ExpnEvalType.INTEGER) &&
+                 compareExpn.getRight().evalType().equals(ExpnEvalType.INTEGER)){
+             compareExpn.setEvalType(ExpnEvalType.BOOLEAN);
+         }
+         else {
+             semanticErrors.add(new TypeError(compareExpn));
+             compareExpn.setEvalType(ExpnEvalType.BOOLEAN);
+         }
 
     }
 
     @Override
     public void visit(ConditionalExpn conditionalExpn) {
+        conditionalExpn.getCondition().accept(this);
+        conditionalExpn.getTrueValue().accept(this);
+        conditionalExpn.getFalseValue().accept(this);
+
+        if (!conditionalExpn.getCondition().evalType().equals(ExpnEvalType.BOOLEAN)){
+            semanticErrors.add(new TypeError(conditionalExpn));
+        }
+        if (conditionalExpn.getTrueValue().evalType().equals(conditionalExpn.getFalseValue().evalType())){
+            conditionalExpn.setEvalType(conditionalExpn.getTrueValue().evalType());
+        }
+        else{
+            semanticErrors.add(new TypeError(conditionalExpn, conditionalExpn.getFalseValue(),
+                    conditionalExpn.getTrueValue()));
+            conditionalExpn.setEvalType(ExpnEvalType.UNDEFINED);
+        }
 
     }
 

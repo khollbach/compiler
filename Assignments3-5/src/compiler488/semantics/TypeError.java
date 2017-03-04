@@ -1,5 +1,6 @@
 package compiler488.semantics;
 
+import com.sun.xml.internal.ws.server.ServerRtException;
 import compiler488.ast.expn.*;
 import compiler488.ast.stmt.AssignStmt;
 import compiler488.ast.stmt.IfStmt;
@@ -17,9 +18,11 @@ public class TypeError extends SemanticError{
     private static final String NON_INTEGER_OPERAND = "arithmetic expression was passed non-integer reference: %s";
     private static final String INDEXED_NON_ARRAY = "indexed non-array reference: %s";
     private static final String NON_BOOLEAN_OPERAND = "boolean expression was passed non-boolean reference: %s";
-    private static final String NON_BOOLEAN_CONDITION = "non-boolean expression as condition to if statement: %s";
+    private static final String NON_BOOLEAN_CONDITION = "non-boolean expression as condition: %s";
     private static final String DIFFERING_TYPES = "value assigned to variable of differing type: %s";
     private static final String ASSIGN_TO_PARAM = "assignment to parameter reference: %s";
+    private static final String NON_INTEGER_COMPARE = "compare expression was passed a non-integer reference: %s";
+    private static final String RESULT_TYPE_MISMATCH = "condition statement result types are not the same: %s";
 
     /**
      * This TypeError's error message
@@ -64,6 +67,21 @@ public class TypeError extends SemanticError{
     public TypeError(AssignStmt assignStmt, boolean isParameter) {
         offendingNode = assignStmt;
         errorMsg = String.format(ASSIGN_TO_PARAM, assignStmt.getLval());
+    }
+
+    public TypeError(CompareExpn compareExpn) {
+        offendingNode = compareExpn;
+        errorMsg = String.format(NON_INTEGER_COMPARE, compareExpn);
+    }
+
+    public TypeError(ConditionalExpn conditionalExpn) {
+        offendingNode = conditionalExpn;
+        errorMsg = String.format(NON_BOOLEAN_CONDITION, conditionalExpn);
+    }
+
+    public TypeError(ConditionalExpn conditionalExpn, Expn falseValue, Expn trueValue) {
+        offendingNode = conditionalExpn;
+        errorMsg = String.format(RESULT_TYPE_MISMATCH, conditionalExpn);
     }
 
     @Override
