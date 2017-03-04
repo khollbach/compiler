@@ -467,11 +467,19 @@ public class Main {
 	/* Scan and Parse the program	*/
         try {
             Parser p = new Parser(new Lexer(new FileReader(sourceFileName)));
-            if (traceSyntax)
-                parserResult = p.debug_parse().value;  //DEBUG Output
-            else
-                parserResult = p.parse().value;
-            programAST = (Program) parserResult;
+            java_cup.runtime.Symbol s;
+            if (traceSyntax) {
+                s = p.debug_parse();  //DEBUG Output
+            } else {
+                s = p.parse();
+            }
+            if (s != null) {
+                parserResult = s.value;
+                programAST = (Program) parserResult;
+            } else {
+                errorOccurred = true;
+            }
+
         } catch (SyntaxErrorException e) {  // parser has already printed an error message
             errorOccurred = true;
         } catch (Exception e) {
