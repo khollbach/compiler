@@ -64,7 +64,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         arithExpn.getRight().accept(this);
 
         if (arithExpn.getLeft().evalType().equals(ExpnEvalType.INTEGER) &&
-        (arithExpn.getRight().evalType().equals(ExpnEvalType.INTEGER))){
+        arithExpn.getRight().evalType().equals(ExpnEvalType.INTEGER)){
             arithExpn.setEvalType(ExpnEvalType.INTEGER);
         }
         else {
@@ -76,11 +76,22 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(BoolConstExpn boolConst) {
-
+        boolConst.setEvalType(ExpnEvalType.BOOLEAN);
     }
 
     @Override
     public void visit(BoolExpn boolExpn) {
+        boolExpn.getLeft().accept(this);
+        boolExpn.getRight().accept(this);
+
+        if(boolExpn.getLeft().evalType().equals(ExpnEvalType.BOOLEAN) &&
+                boolExpn.getRight().evalType().equals(ExpnEvalType.BOOLEAN)){
+            boolExpn.setEvalType(ExpnEvalType.BOOLEAN);
+        }
+        else {
+            semanticErrors.add(new TypeError(boolExpn));
+            boolExpn.setEvalType(ExpnEvalType.ERROR);
+        }
 
     }
 
