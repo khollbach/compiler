@@ -1,8 +1,0 @@
-#!/bin/bash
-
-tmpdir=tmp
-testdir=tests/failing
-
-for f in `ls "$tmpdir"`; do
-    vim -c ":e $tmpdir/$f" -c ":vsplit" -c ":e $testdir/$f"
-done
