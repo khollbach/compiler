@@ -131,6 +131,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         try {
             attrs = symbolTable.retrieveSymbol(subsExpn.getVariable());
         } catch (SymbolTable.SymbolNotFoundException e) {
+            // nonexistent reference, type of this expn unknown
             semanticErrors.add(new UndefinedReferenceError(subsExpn));
             subsExpn.setEvalType(ExpnEvalType.ERROR);
         }
@@ -207,13 +208,8 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
             if(r instanceof IdentExpn){
                 IdentExpn rIdent = ((IdentExpn) r);
                 rIdent.accept(this);
-                try {
-                    SymbolAttributes attr = symbolTable.retrieveSymbol(rIdent.getIdent());
-                    if(!(attr.typeDescriptor instanceof IntegerTypeDescriptor)){
-                        semanticErrors.add(new ReadError(rIdent));
-                    }
-                } catch (SymbolTable.SymbolNotFoundException e) {
-                    return;
+                if (!rIdent.evalType().equals(ExpnEvalType.INTEGER)) {
+                    semanticErrors.add()
                 }
             }
 
@@ -245,6 +241,8 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         symbolTable.closeScope();
     }
 
+    // TODO: 03/03/17  
+    
     private void setVisitScopeListener(OnVisitScopeListener listener) {
         this.visitScopeListener = listener;
     }
