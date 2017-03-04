@@ -3,7 +3,7 @@
 # Dump ASTs of passing tests, for diff'ing with the source files later.
 
 tmpdir=tmp-test-output
-testdir=tests/ast
+testdir=tests/passing
 
 rm -rf "$tmpdir"
 mkdir -p "$tmpdir"
