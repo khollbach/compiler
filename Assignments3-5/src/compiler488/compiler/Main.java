@@ -514,11 +514,6 @@ public class Main {
             }
 
         try {
-            // INSERT CODE HERE TO DO SEMANTIC ANALYSIS
-            // e.g.
-            // programAST.doSemantics() ;
-            // or
-            // Semantics.doIt( programAST );
             SemanticVisitor visitAST = new SemanticVisitor();
             programAST.accept(visitAST);
             for (SemanticError se : visitAST.getSemanticErrors()) {
