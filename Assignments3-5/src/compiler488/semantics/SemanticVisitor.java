@@ -335,6 +335,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         List<ScalarTypeDescriptor> paramTypes = new ArrayList<>();
 
         for (Expn arg : procCall.getArguments()){
+            arg.accept(this);
             if (arg.evalType().equals(ExpnEvalType.BOOLEAN)){
                 paramTypes.add(new BooleanTypeDescriptor());
             }
