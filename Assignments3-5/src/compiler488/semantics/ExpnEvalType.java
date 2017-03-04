@@ -6,21 +6,20 @@ package compiler488.semantics;
  * Created by gg on 03/03/17.
  */
 public enum ExpnEvalType {
-    /**
-     * The type that an erroneous expression evaluates to.
-     */
-    ERROR,
 
     /**
-     * The type that valid arithmetic expressions evaluate to.
+     * The type that expressions with invalid TODO
+     */
+    UNDEFINED,
+
+    /**
+     * The type that arithmetic expressions evaluate to.
      */
     INTEGER,
 
     /**
-     * The type that ... TODO
+     * The type that boolean expressions evaluate to.
      */
-    BOOLEAN,
-
-    TEXT
+    BOOLEAN
 
 }
