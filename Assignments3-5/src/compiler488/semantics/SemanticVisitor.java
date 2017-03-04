@@ -400,8 +400,6 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
         throw new InvalidASTException();
     }
 
-    // TODO! array bounds check (left is <= to right)
-
     @Override
     public void visit(MultiDeclarations multiDecl) {
         // enter each declPart into the symbol table
@@ -412,6 +410,14 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
                     new SymbolAttributes(false, descriptor);
             try {
                 symbolTable.enterSymbol(declPart.getName(), attributes);
+
+                // check that array bounds are valid
+                if (declPart instanceof ArrayDeclPart) {
+                    ArrayDeclPart arrayDeclPart = (ArrayDeclPart) declPart;
+                    if (arrayDeclPart.getLowerBoundary() > arrayDeclPart.getUpperBoundary()) {
+                        semanticErrors.add(new ArrayDeclError(arrayDeclPart));
+                    }
+                }
             } catch (SymbolTable.RedeclarationException e) {
                 semanticErrors.add(new LocalRedeclarationError(declPart));
             }
