@@ -2,6 +2,7 @@ package compiler488.semantics;
 
 import compiler488.ast.InvalidASTException;
 import compiler488.ast.Readable;
+import compiler488.ast.Writeable;
 import compiler488.ast.decl.*;
 import compiler488.ast.expn.*;
 import compiler488.ast.stmt.*;
@@ -362,7 +363,10 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
     @Override
     public void visit(WriteStmt writeStmt) {
-
+        // process outputs
+        for (Printable printItem : writeStmt.getOutputs()) {
+            printItem.accept(this);
+        }
     }
 
     @Override
