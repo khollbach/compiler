@@ -2,10 +2,6 @@
 var a, b : Integer
 var c : Boolean
 
-a := 10
-b := 5
-c := true
-
 % semantic error - return value from a procedure
 procedure p ( a : Integer, b : Integer, c : Boolean )
     { if c then
@@ -13,5 +9,9 @@ procedure p ( a : Integer, b : Integer, c : Boolean )
       else
         return with a - b
     }
+
+a := 10
+b := 5
+c := true
 
 }
