@@ -398,20 +398,20 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
             semanticErrors.add(new ReturnError(returnStmt, false));
         }
 
-        // Procedure return
-        if (returnStmt.getValue() == null) {
-            if (majorScopeInfoStack.peek().getScopeType() == MajorScopeInfo.ScopeType.FUNCTION) {
+        if ((returnStmt.getValue() == null) &&
+                (majorScopeInfoStack.peek().getScopeType() == MajorScopeInfo.ScopeType.FUNCTION)) {
                 semanticErrors.add(new ReturnError(returnStmt));
-            }
-        } // Function return
-        else {
+        }
+
+        if (returnStmt.getValue() != null){
             returnStmt.getValue().accept(this);
 
             if (majorScopeInfoStack.peek().getScopeType() == MajorScopeInfo.ScopeType.PROCEDURE) {
-                semanticErrors.add(new ReturnError(returnStmt));
+                semanticErrors.add(new ReturnError(returnStmt, returnStmt.getValue()));
             }
 
-            if (returnStmt.getValue().evalType() != majorScopeInfoStack.peek().getReturnType()) {
+            if ( majorScopeInfoStack.peek().getScopeType() == MajorScopeInfo.ScopeType.FUNCTION
+                    && returnStmt.getValue().evalType() != majorScopeInfoStack.peek().getReturnType()) {
                 semanticErrors.add(new TypeError(returnStmt,
                         majorScopeInfoStack.peek().getReturnType(), returnStmt.getValue().evalType()));
             }
