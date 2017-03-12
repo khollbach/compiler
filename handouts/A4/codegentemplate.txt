@@ -1,0 +1,18 @@
+Design document for code generation.
+Authors: Kevan Hollbach, Tarang Marathe, George Gianacopolous, Arturo Mena Cruz, Andrew Trotter.
+
+
+1. Storage
+a) Variables are allocated in a new stack frame. The constant they refer to is stored at the top of memory (at address memorySize-1). 
+b) As function/procedure calls are made, stack frames are created with instances of the required variables.
+c) 
+d) All boolean variables point to either the 'true' or 'false' boolean constants, which are stored at the top of memory. Integer constants can be created as required. 
+e) Text constants can also be created as required, stored in the top of memory.
+
+2. Expressions
+
+3. Functions and Procedures
+
+4. Statements
+
+5. Everything Else
