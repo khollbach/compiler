@@ -59,7 +59,7 @@ STORE    // p= not false or not q and r
 // p
 ADDR 0 4
 LOAD
-PUSH machinecode046
+PUSH <2-8_start>
 BF
 // a := 3
 ADDR 0 0
@@ -68,7 +68,7 @@ STORE
 
 // 2-8
 // p or not p
-ADDR 0 4
+ADDR 0 4                                // <2-8_start>
 LOAD
 ADDR 0 4
 LOAD
@@ -81,51 +81,51 @@ BF
 ADDR 0 1
 PUSH 2
 STORE
-PUSH machinecode063
+PUSH <2-9_start>
 BR
 // b:= 0 line 8 else block
-ADDR 0 1                               // <2-8_else-block>
+ADDR 0 1                                // <2-8_else-block>
 PUSH 0
 STORE
 
 // 2-9
 // while c < 7 do
-ADDR 0 2
+ADDR 0 2                                // <2-9_start>
 LOAD
 PUSH 7
 LT
-PUSH machinecode074
+PUSH <2-10_start>
 BF
 // c := 6
-ADDR 0 3
+ADDR 0 2
 PUSH 6
 STORE
-PUSH machinecode063
+PUSH <2-9_start>
 BR
 
 // 2-10
 // while true do
-PUSH MACHINE_TRUE
-PUSH machinecode085
+PUSH MACHINE_TRUE                       // <2-10_start>
+PUSH <2-11_start>
 BF
 // b := b + 1
-ADDR 0 2
-ADDR 0 2
+ADDR 0 1
+ADDR 0 1
 LOAD
 PUSH 1
 ADD
 STORE
-PUSH machinecode074
+PUSH <2-10_start>
 BR
 
 // 2-11
 // repeat
 // a := 3
-ADDR 0 0
+ADDR 0 0                                // <2-11_start>
 PUSH 3
 STORE
 // exit
-PUSH machinecode096
+PUSH <2-12_start>
 BR
 // b := 7
 ADDR 0 1
@@ -133,13 +133,13 @@ PUSH 7
 STORE
 // until false
 PUSH MACHINE_FALSE
-PUSH machinecode085
+PUSH <2-12_start>
 BF
 
 // 2-12
 // while q or r and not p do exit when b not = 10
 // q or r and not p
-ADDR 0 5
+ADDR 0 5                                // <2-12_start>
 LOAD
 ADDR 0 6
 LOAD
@@ -149,7 +149,7 @@ PUSH MACHINE_FALSE
 EQ
 MUL
 OR
-PUSH machinecode120
+PUSH <2-13_start>
 BF
 // b not = 10 ...is this even correct?
 ADDR 0 1
@@ -159,16 +159,14 @@ EQ
 PUSH MACHINE_FALSE
 EQ
 // when b not = 10
-PUSH MACHINE_FALSE
-EQ
-PUSH machinecode120
+PUSH <2-13_start>
 BF
-PUSH machinecode096
+PUSH <2-12_start>
 BR
 
 // 2-13
 // write "Value is ", a / b, "or not ", newline
-PUSH 'V'
+PUSH 'V'                                // <2-13_start>
 PRINTC
 PUSH 'a'
 PRINTC
