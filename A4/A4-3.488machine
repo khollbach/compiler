@@ -1,0 +1,39 @@
+// 3-2
+// <open major scope>
+
+// 3-3
+// <declare variables maybe>
+
+// 3-4
+// <declare variables maybe>
+
+// 3-5
+// <declare procedure> TODO
+
+// 3-6
+// <open major scope>
+
+// 3-7
+// <declare variables maybe>
+
+// 3-8
+ADDR 0 5 // q
+LOAD
+PUSH <addr 3-9>
+BF
+// <return from procedure> TODO
+
+// 3-9
+ADDR 1 0 // e
+ADDR 0 0 // a
+LOAD
+STORE
+
+// 3-10
+// <return from procedure> TODO
+
+// 3-11
+// <close major scope>
+
+// 3-12
+
