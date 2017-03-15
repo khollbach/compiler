@@ -1,170 +1,170 @@
-// 2-3                                 
-PUSH 0                                 // machinecode000
-PUSH 0                                 // machinecode001
-PUSH 0                                 // machinecode002
-PUSH 0                                 // machinecode003
+// 2-3
+PUSH 0
+PUSH 0
+PUSH 0
+PUSH 0
 
 // 2-4
-PUSH MACHINE_FALSE                     // machinecode004
-PUSH MACHINE_FALSE                     // machinecode005
-PUSH MACHINE_FALSE                     // machinecode006
+PUSH MACHINE_FALSE
+PUSH MACHINE_FALSE
+PUSH MACHINE_FALSE
 
 // 2-5
-ADDR 0 0 // a                          // machinecode007
+ADDR 0 0 // a
 // b
-ADDR 0 1                               // machinecode008
-LOAD                                   // machinecode009
+ADDR 0 1
+LOAD
 // c
-ADDR 0 2                               // machinecode010
-LOAD                                   // machinecode011
-ADD      // b + c                      // machinecode012
+ADDR 0 2
+LOAD
+ADD      // b + c
 // d
-ADDR 0 3                               // machinecode013
-LOAD                                   // machinecode014
+ADDR 0 3
+LOAD
 // c
-ADDR 0 2                               // machinecode015
-LOAD                                   // machinecode016
-MUL      // d * c                      // machinecode017
-SUB      // b + c - d * c              // machinecode018
+ADDR 0 2
+LOAD
+MUL      // d * c
+SUB      // b + c - d * c
 // b
-ADDR 0 1                               // machinecode019
-LOAD                                   // machinecode020
+ADDR 0 1
+LOAD
 // c
-ADDR 0 2                               // machinecode021
-LOAD                                   // machinecode022
-DIV      // b / c                      // machinecode023
-ADD      // b + c - d * c + b / c      // machinecode024
-STORE    // a:= b + c - d * c + b / c  // machinecode025
+ADDR 0 2
+LOAD
+DIV      // b / c
+ADD      // b + c - d * c + b / c
+STORE    // a:= b + c - d * c + b / c
 
 // 2-6
-ADDR 0 4 // p                          // machinecode026
-PUSH MACHINE_FALSE // false            // machinecode027
+ADDR 0 4 // p
+PUSH MACHINE_FALSE // false
 // not false
-PUSH MACHINE_FALSE                     // machinecode028
-EQ                                     // machinecode029
+PUSH MACHINE_FALSE
+EQ
 // q
-ADDR 0 5                               // machinecode030
-LOAD                                   // machinecode031
+ADDR 0 5
+LOAD
 // r
-ADDR 0 6                               // machinecode032
-LOAD                                   // machinecode033
-MUL      // q and r                    // machinecode034
+ADDR 0 6
+LOAD
+MUL      // q and r
 // not q and r
-PUSH MACHINE_FALSE                     // machinecode035
-EQ                                     // machinecode036
-OR       // not false or not q and r   // machinecode037
-STORE    // p= not false or not q and r// machinecode038
+PUSH MACHINE_FALSE
+EQ
+OR       // not false or not q and r
+STORE    // p= not false or not q and r
 
 // 2-7
 // p
-ADDR 0 4                               // machinecode039
-LOAD                                   // machinecode040
-PUSH machinecode046                    // machinecode041
-BF                                     // machinecode042
+ADDR 0 4
+LOAD
+PUSH machinecode046
+BF
 // a := 3
-ADDR 0 0                               // machinecode043
-PUSH 3                                 // machinecode044
-STORE                                  // machinecode045
+ADDR 0 0
+PUSH 3
+STORE
 
 // 2-8
 // p or not p
-ADDR 0 4                               // machinecode046
-LOAD                                   // machinecode047
-ADDR 0 4                               // machinecode048
-LOAD                                   // machinecode049
-PUSH MACHINE_FALSE                     // machinecode050
-EQ                                     // machinecode051
-OR                                     
+ADDR 0 4
+LOAD
+ADDR 0 4
+LOAD
+PUSH MACHINE_FALSE
+EQ
+OR
 PUSH <2-8_else-block>
-BF                                     
-// b:= 2              
-ADDR 0 1                           
-PUSH 2                                
-STORE                                 
-PUSH machinecode063                    
-BR                                     
+BF
+// b:= 2
+ADDR 0 1
+PUSH 2
+STORE
+PUSH machinecode063
+BR
 // b:= 0 line 8 else block
 ADDR 0 1                               // <2-8_else-block>
-PUSH 0                                
-STORE                             
+PUSH 0
+STORE
 
 // 2-9
 // while c < 7 do
-ADDR 0 2                               // machinecode063
-LOAD                                   // machinecode064
-PUSH 7                                 // machinecode065
-LT                                     // machinecode066
-PUSH machinecode074                    // machinecode067
-BF                                     // machinecode068
+ADDR 0 2
+LOAD
+PUSH 7
+LT
+PUSH machinecode074
+BF
 // c := 6
-ADDR 0 3                               // machinecode069
-PUSH 6                                 // machinecode070
-STORE                                  // machinecode071
-PUSH machinecode063                    // machinecode072
-BR                                     // machinecode073
+ADDR 0 3
+PUSH 6
+STORE
+PUSH machinecode063
+BR
 
 // 2-10
 // while true do
-PUSH MACHINE_TRUE                      // machinecode074
-PUSH machinecode085                    // machinecode075
-BF                                     // machinecode076
+PUSH MACHINE_TRUE
+PUSH machinecode085
+BF
 // b := b + 1
-ADDR 0 2                               // machinecode077
-ADDR 0 2                               // machinecode078
-LOAD                                   // machinecode079
-PUSH 1                                 // machinecode080
-ADD                                    // machinecode081
-STORE                                  // machinecode082
-PUSH machinecode074                    // machinecode083
-BR                                     // machinecode084
+ADDR 0 2
+ADDR 0 2
+LOAD
+PUSH 1
+ADD
+STORE
+PUSH machinecode074
+BR
 
 // 2-11
 // repeat
 // a := 3
-ADDR 0 0                               // machinecode085
-PUSH 3                                 // machinecode086
-STORE                                  // machinecode087
+ADDR 0 0
+PUSH 3
+STORE
 // exit
-PUSH machinecode096                    // machinecode088
-BR                                     // machinecode089
+PUSH machinecode096
+BR
 // b := 7
-ADDR 0 1                               // machinecode090
-PUSH 7                                 // machinecode091
-STORE                                  // machinecode092
+ADDR 0 1
+PUSH 7
+STORE
 // until false
-PUSH MACHINE_FALSE                     // machinecode093
-PUSH machinecode085                    // machinecode094
-BF                                     // machinecode095
+PUSH MACHINE_FALSE
+PUSH machinecode085
+BF
 
 // 2-12
 // while q or r and not p do exit when b not = 10
-// q or r and not p 
-ADDR 0 5                               // machinecode096
-LOAD                                   // machinecode097
-ADDR 0 6                               // machinecode098
-LOAD                                   // machinecode099
-ADDR 0 4                               // machinecode100
-LOAD                                   // machinecode101
-PUSH MACHINE_FALSE                     // machinecode102
-EQ                                     // machinecode103
-MUL                                    // machinecode104
-OR                                     // machinecode105
-PUSH machinecode120                    // machinecode106
-BF                                     // machinecode107
+// q or r and not p
+ADDR 0 5
+LOAD
+ADDR 0 6
+LOAD
+ADDR 0 4
+LOAD
+PUSH MACHINE_FALSE
+EQ
+MUL
+OR
+PUSH machinecode120
+BF
 // b not = 10 ...is this even correct?
-ADDR 0 1                               // machinecode108
-LOAD                                   // machinecode109
-PUSH 10                                // machinecode110
-EQ                                     // machinecode111
-PUSH MACHINE_FALSE                     // machinecode112
-EQ                                     // machinecode113
+ADDR 0 1
+LOAD
+PUSH 10
+EQ
+PUSH MACHINE_FALSE
+EQ
 // when b not = 10
-PUSH MACHINE_FALSE                     // machinecode114
-EQ                                     // machinecode115
-PUSH machinecode120                    // machinecode116
-BF                                     // machinecode117
-PUSH machinecode096                    // machinecode118
-BR                                     // machinecode119
+PUSH MACHINE_FALSE
+EQ
+PUSH machinecode120
+BF
+PUSH machinecode096
+BR
 
 // 2-13
 // write "Value is ", a / b, "or not ", newline
@@ -251,7 +251,7 @@ STORE
 
 // 2-19
 // var p, q, r : INTEGER
-PUSH 0 
+PUSH 0
 PUSH 0
 PUSH 0
 
@@ -320,7 +320,7 @@ BR
 
 // 2-28
 // p or q or r
-ADDR 0 4 // THIS ADDRESS REFERENCED BY 2-33 code 
+ADDR 0 4 // THIS ADDRESS REFERENCED BY 2-33 code
 LOAD
 ADDR 0 5
 LOAD
