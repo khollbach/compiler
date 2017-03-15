@@ -30,7 +30,7 @@ SUB      // b + c - d * c              // machinecode018
 ADDR 0 1                               // machinecode019
 LOAD                                   // machinecode020
 // c
-ADDR 0 0                               // machinecode021
+ADDR 0 2                               // machinecode021
 LOAD                                   // machinecode022
 DIV      // b / c                      // machinecode023
 ADD      // b + c - d * c + b / c      // machinecode024
@@ -43,10 +43,10 @@ PUSH MACHINE_FALSE // false            // machinecode027
 PUSH MACHINE_FALSE                     // machinecode028
 EQ                                     // machinecode029
 // q
-ADDR 0 4                               // machinecode030
+ADDR 0 5                               // machinecode030
 LOAD                                   // machinecode031
 // r
-ADDR 0 5                               // machinecode032
+ADDR 0 6                               // machinecode032
 LOAD                                   // machinecode033
 MUL      // q and r                    // machinecode034
 // not q and r
@@ -57,7 +57,7 @@ STORE    // p= not false or not q and r// machinecode038
 
 // 2-7
 // p
-ADDR 0 3                               // machinecode039
+ADDR 0 4                               // machinecode039
 LOAD                                   // machinecode040
 PUSH machinecode046                    // machinecode041
 BF                                     // machinecode042
@@ -68,25 +68,25 @@ STORE                                  // machinecode045
 
 // 2-8
 // p or not p
-ADDR 0 3                               // machinecode046
+ADDR 0 4                               // machinecode046
 LOAD                                   // machinecode047
-ADDR 0 3                               // machinecode048
+ADDR 0 4                               // machinecode048
 LOAD                                   // machinecode049
 PUSH MACHINE_FALSE                     // machinecode050
 EQ                                     // machinecode051
-OR                                     // machinecode052
-PUSH machinecode060                    // machinecode053
-BF                                     // machinecode054
+OR                                     
+PUSH <2-8_else-block>
+BF                                     
 // b:= 2              
-ADDR 0 1                               // machinecode055
-PUSH 2                                 // machinecode056
-STORE                                  // machinecode057
-PUSH machinecode063                    // machinecode058
-BR                                     // machinecode059
-// b:= 0
-ADDR 0 1                               // machinecode060
-PUSH 0                                 // machinecode061
-STORE                                  // machinecode062
+ADDR 0 1                           
+PUSH 2                                
+STORE                                 
+PUSH machinecode063                    
+BR                                     
+// b:= 0 line 8 else block
+ADDR 0 1                               // <2-8_else-block>
+PUSH 0                                
+STORE                             
 
 // 2-9
 // while c < 7 do
@@ -385,37 +385,3 @@ BR
 
 // 2-35
 // exit 2
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        
-
-
-
-
-
-
-
-          
-
-
-
-
-
-
-
