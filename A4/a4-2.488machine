@@ -118,7 +118,59 @@ STORE                                  // machinecode082
 PUSH machinecode074                    // machinecode083
 BR                                     // machinecode084
 
-//2-11
+// 2-11
+// repeat
+// a := 3
+ADDR 0 0                               // machinecode085
+PUSH 3                                 // machinecode086
+STORE                                  // machinecode087
+// exit
+PUSH machinecode096                    // machinecode088
+BR                                     // machinecode089
+// b := 7
+ADDR 0 1                               // machinecode090
+PUSH 7                                 // machinecode091
+STORE                                  // machinecode092
+// until false
+PUSH MACHINE_FALSE                     // machinecode093
+PUSH machinecode085                    // machinecode094
+BF                                     // machinecode095
+
+// 2-12
+// while q or r and not p do exit when b not = 10
+// q or r and not p 
+ADDR 0 5                               // machinecode096
+LOAD                                   // machinecode097
+ADDR 0 6                               // machinecode098
+LOAD                                   // machinecode099
+ADDR 0 4                               // machinecode100
+LOAD                                   // machinecode101
+PUSH MACHINE_FALSE                     // machinecode102
+EQ                                     // machinecode103
+MUL                                    // machinecode104
+OR                                     // machinecode105
+PUSH machinecode120                    // machinecode106
+BF                                     // machinecode107
+// b not = 10 ...is this even correct?
+ADDR 0 1                               // machinecode108
+LOAD                                   // machinecode109
+PUSH 10                                // machinecode110
+EQ                                     // machinecode111
+PUSH MACHINE_FALSE                     // machinecode112
+EQ                                     // machinecode113
+// when b not = 10
+PUSH MACHINE_FALSE                     // machinecode114
+EQ                                     // machinecode115
+PUSH machinecode120                    // machinecode116
+BF                                     // machinecode117
+PUSH machinecode096                    // machinecode118
+BR                                     // machinecode119
+
+// 2-13
+
+
+
+
 
                         
 
