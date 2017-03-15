@@ -36,4 +36,33 @@ STORE
 // <close major scope>
 
 // 3-12
+// <declare function> TODO
+
+// 3-13
+// <open major scope>
+
+// 3-14
+ADDR 1 1 // n
+LOAD
+BF <addr 3-15>
+ADDR 1 0 // m
+LOAD
+ADDR 0 1 // b
+LOAD
+ADD
+// <return from function> TODO
+BR <addr 3-16>
+
+// 3-15
+ADDR 0 2 // c
+LOAD
+ADDR 1 0 // m
+LOAD
+SUB
+// <return from function> TODO
+
+// 3-16
+// <close major scope>
+
+// 3-17
 

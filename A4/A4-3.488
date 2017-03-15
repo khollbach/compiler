@@ -12,16 +12,16 @@
     function F(m : Integer, n : Boolean) : Integer      % 3-12
     {                                                   % 3-13
         if n then return with m + b                     % 3-14
-        else return with c - m                          % 3-14
-    }                                                   % 3-15
-    procedure Q(m : Boolean, n : Integer, p : Boolean)  % 3-16
-    {                                                   % 3-17
-        var t, u, v : Integer                           % 3-18
-        function G : Integer                            % 3-19
-        {                                               % 3-20
-            var w, x : Integer                          % 3-21
-            return with                                 % 3-22
-                (m or p ? v + n : u - b)                % 3-23
+        else return with c - m                          % 3-15
+    }                                                   % 3-16
+    procedure Q(m : Boolean, n : Integer, p : Boolean)  % 3-17
+    {                                                   % 3-18
+        var t, u, v : Integer                           % 3-19
+        function G : Integer                            % 3-20
+        {                                               % 3-21
+            var w, x : Integer                          % 3-22
+            return with                                 % 3-23
+                (m or p ? v + n : u - b)                % 3-24
         }                                               % 3-25
         if G < 7 then return                            % 3-26
         if F(t, not r) = 17 then return                 % 3-27
