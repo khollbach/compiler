@@ -167,6 +167,123 @@ PUSH machinecode096                    // machinecode118
 BR                                     // machinecode119
 
 // 2-13
+// write "Value is ", a / b, "or not ", newline
+PUSH "V"
+PRINTC
+PUSH "a"
+PRINTC
+PUSH "l"
+PRINTC
+PUSH "u"
+PRINTC
+PUSH "e"
+PRINTC
+PUSH " "
+PRINTC
+PUSH "i"
+PRINTC
+PUSH "s"
+PRINTC
+PUSH " "
+PRINTC
+// a / b
+ADDR 0 0
+LOAD
+ADDR 0 1
+LOAD
+DIV
+PRINTI
+// or not
+PUSH " "
+PRINTC
+PUSH "o"
+PRINTC
+PUSH "r"
+PRINTC
+PUSH " "
+PRINTC
+PUSH "n"
+PRINTC
+PUSH "o"
+PRINTC
+PUSH "t"
+PRINTC
+PUSH " "
+PRINTC
+PUSH "\n"
+PRINTC
+
+// 2-14
+// read a, c, b
+ADDR 0 0
+READI
+STORE
+ADDR 0 2
+READI
+STORE
+ADDR 0 1
+READI
+STORE
+
+// 2-15
+// open scope TODO
+
+// 2-16
+// var a, b, c : Boolean
+PUSH MACHINE_FALSE
+PUSH MACHINE_FALSE
+PUSH MACHINE_FALSE
+
+// 2-17
+// a := not p or q
+ADDR 1 0
+ADDR 0 4
+LOAD
+PUSH MACHINE_FALSE
+EQ
+ADDR 0 5
+LOAD
+OR
+STORE
+
+// 2-18
+// open scope TODO
+
+// 2-19
+// var p, q, r : INTEGER
+PUSH 0 
+PUSH 0
+PUSH 0
+
+// 2-20
+// p := (b ? q : r)
+ADDR 2 0
+ADDR 1 1
+LOAD
+PUSH thisaddr+6    // address for next ADDR 2 2
+BF
+ADDR 2 1
+LOAD
+PUSH thisaddr+4    // address for next STORE
+BR
+ADDR 2 2
+LOAD
+STORE
+
+// 2-21
+// close scope TODO
+
+// 2-22
+// close scope TODO
+
+// 2-23
+
+
+
+
+
+
+
 
 
 
