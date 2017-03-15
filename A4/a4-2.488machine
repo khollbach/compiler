@@ -168,23 +168,23 @@ BR                                     // machinecode119
 
 // 2-13
 // write "Value is ", a / b, "or not ", newline
-PUSH "V"
+PUSH 'V'
 PRINTC
-PUSH "a"
+PUSH 'a'
 PRINTC
-PUSH "l"
+PUSH 'l'
 PRINTC
-PUSH "u"
+PUSH 'u'
 PRINTC
-PUSH "e"
+PUSH 'e'
 PRINTC
-PUSH " "
+PUSH ' '
 PRINTC
-PUSH "i"
+PUSH 'i'
 PRINTC
-PUSH "s"
+PUSH 's'
 PRINTC
-PUSH " "
+PUSH ' '
 PRINTC
 // a / b
 ADDR 0 0
@@ -194,23 +194,23 @@ LOAD
 DIV
 PRINTI
 // or not
-PUSH " "
+PUSH ' '
 PRINTC
-PUSH "o"
+PUSH 'o'
 PRINTC
-PUSH "r"
+PUSH 'r'
 PRINTC
-PUSH " "
+PUSH ' '
 PRINTC
-PUSH "n"
+PUSH 'n'
 PRINTC
-PUSH "o"
+PUSH 'o'
 PRINTC
-PUSH "t"
+PUSH 't'
 PRINTC
-PUSH " "
+PUSH ' '
 PRINTC
-PUSH "\n"
+PUSH '\n'
 PRINTC
 
 // 2-14
@@ -277,6 +277,120 @@ STORE
 // close scope TODO
 
 // 2-23
+PUSH MACHINE_TRUE
+PUSH someaddr
+BF
+// open scope, perhaps
+
+// 2-24
+ADDR 0 4
+LOAD
+ADDR 0 6
+LOAD
+OR
+PUSH continue_loop_addr
+BF
+// <close scope maybe>
+PUSH end_loop_addr
+BR
+
+// 2-25
+// <open scope maybe>, <declare variables maybe>
+
+// 2-26
+
+// 2-27
+// w
+ADDR 2 0
+LOAD
+// a
+ADDR 0 0
+LOAD
+// w <= a <==> not (a < w)
+SWAP
+LT
+PUSH MACHINE_FALSE
+EQ
+PUSH continue_loop_addr_2
+BF
+// <close scope maybe>
+PUSH end_loop_addr_2
+BR
+//continue_loop_addr2
+
+// 2-28
+// p or q or r
+ADDR 0 4 // THIS ADDRESS REFERENCED BY 2-33 code 
+LOAD
+ADDR 0 5
+LOAD
+OR
+ADDR 0 6
+LOAD
+OR
+// end while if ^ false
+PUSH end_loop_addr_3
+BF
+
+// 2-29
+// <open scope maybe>, <declare variables maybe>
+// 2-30
+
+// 2-31
+// p := not q
+ADDR 0 4
+ADDR 0 5
+PUSH MACHINE_FALSE
+EQ
+STORE
+
+// 2-32
+// t := (p or q ? t + 1 : t - 1)
+ADDR 3 0
+// p or q
+ADDR 0 4
+LOAD
+ADDR 0 5
+LOAD
+OR
+PUSH someaddr
+BF
+ADDR 3 0
+LOAD
+PUSH 1
+ADD
+PUSH endaddr
+BR
+ADDR 3 0 // someaddr is here
+LOAD
+PUSH 1
+SUB
+STORE // endaddr is here
+
+// 2-33
+// exit 3 when t > 12
+ADDR 3 0
+LOAD
+PUSH 12
+SWAP
+LT
+PUSH continueloop // REFERENCES top of 2-28 code
+BF
+// exit 3 code. close some scopes. TODO
+PUSH lastlineaddress
+BR
+
+// 2-34
+// perhaps close scopes
+
+// 2-35
+// exit 2
+
+
+
+
+
+
 
 
 
