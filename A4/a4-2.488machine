@@ -1,0 +1,72 @@
+// 2-3
+PUSH 0
+PUSH 0
+PUSH 0
+PUSH 0
+
+// 2-4
+PUSH MACHINE_FALSE
+PUSH MACHINE_FALSE
+PUSH MACHINE_FALSE
+
+// 2-5
+ADDR 0 0 // a
+// b
+ADDR 0 1
+LOAD
+// c
+ADDR 0 2
+LOAD
+ADD      // b + c
+// d
+ADDR 0 3
+LOAD
+// c
+ADDR 0 2
+LOAD
+MUL      // d * c
+SUB      // b + c - d * c
+// b
+ADDR 0 1
+LOAD
+// c
+ADDR 0 0
+LOAD
+DIV      // b / c
+ADD      // b + c - d * c + b / c
+STORE    // a = b + c - d * c + b / c
+
+// 2-6
+ADDR 0 4 // p
+PUSH MACHINE_FALSE // false
+// not false
+PUSH MACHINE_FALSE
+EQ
+// q
+ADDR 0 4
+LOAD
+// r
+ADDR 0 5
+LOAD
+MUL      // q and r
+// not q and r
+PUSH MACHINE_FALSE
+EQ
+OR       // not false or not q and r
+STORE    // p = not false or not q and r
+
+// 2-7
+
+PUSH 2-34
+
+
+
+
+          
+
+
+
+
+
+
+
