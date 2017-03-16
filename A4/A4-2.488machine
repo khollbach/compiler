@@ -155,7 +155,7 @@ MUL
 OR
 PUSH <2-13_start>
 BF
-// b not = 10 ...is this even correct?
+// b not = 10
 ADDR 0 1
 LOAD
 PUSH 10
@@ -170,6 +170,7 @@ BR
 
 // 2-13
 // write "Value is ", a / b, "or not ", newline
+
 PUSH 'V'                                // <2-13_start>
 PRINTC
 PUSH 'a'
@@ -228,19 +229,18 @@ READI
 STORE
 
 // 2-15
-// minor scope
 
 // 2-16
 // see 2-2
 
 // 2-17
 // a := not p or q
-ADDR 1 0
-ADDR 1 4
+ADDR 0 7
+ADDR 0 4
 LOAD
 PUSH MACHINE_FALSE
 EQ
-ADDR 1 5
+ADDR 0 5
 LOAD
 OR
 STORE
@@ -253,53 +253,49 @@ STORE
 
 // 2-20
 // p := (b ? q : r)
-ADDR 2 0
-ADDR 1 1
+ADDR 0 10
+ADDR 0 8
 LOAD
 PUSH <2-20_false-case>
 BF
-ADDR 2 1
+ADDR 0 11
 LOAD
 PUSH <2-21_start>
 BR
-ADDR 2 2                                // <2-20_false-case>
+ADDR 0 12                               // <2-20_false-case>
 LOAD
 STORE                                   // <2-21_start>
 
-// 2-21                                 
-// close scope TODO
+// 2-21                                  
 
 // 2-22
-// close scope TODO
 
 // 2-23
-PUSH MACHINE_TRUE
+PUSH MACHINE_TRUE                       <2-23_start>
 PUSH <2-37_start>
 BF
-// open scope, perhaps
 
 // 2-24
+// exit when p or r
 ADDR 0 4
 LOAD
 ADDR 0 6
 LOAD
 OR
-PUSH <continue_loop_addr>
+PUSH <2-27_start>
 BF
-// <close scope maybe>
 PUSH <2-37_start>
 BR
 
-// 2-25                                  // <continue_loop_addr>
-// <open scope maybe>, <declare variables maybe>
+// 2-25                                  
 
 // 2-26
-PUSH 0 // w                                 
-PUSH 0 // x
+// see 2-2
 
 // 2-27
+// if w <= a then exit
 // w
-ADDR 2 0
+ADDR 0 7                                // <2-27_start>
 LOAD
 // a
 ADDR 0 0
@@ -309,16 +305,14 @@ SWAP
 LT
 PUSH MACHINE_FALSE
 EQ
-PUSH continue_loop_addr_2
+PUSH <2-28_start> // continue
 BF
-// <close scope maybe>
-PUSH end_loop_addr_2
+PUSH <2-37_start> // exit
 BR
-//continue_loop_addr2
 
 // 2-28
 // p or q or r
-ADDR 0 4 // THIS ADDRESS REFERENCED BY 2-33 code
+ADDR 0 4                                // <2-28_start>
 LOAD
 ADDR 0 5
 LOAD
@@ -326,13 +320,13 @@ OR
 ADDR 0 6
 LOAD
 OR
-// end while if ^ false
-PUSH end_loop_addr_3
+PUSH <2-35_start>
 BF
 
 // 2-29
-// <open scope maybe>, <declare variables maybe>
+
 // 2-30
+// see 2-2
 
 // 2-31
 // p := not q
@@ -344,46 +338,63 @@ STORE
 
 // 2-32
 // t := (p or q ? t + 1 : t - 1)
-ADDR 3 0
+ADDR 0 9
 // p or q
 ADDR 0 4
 LOAD
 ADDR 0 5
 LOAD
 OR
-PUSH someaddr
+PUSH <2-32_else>
 BF
-ADDR 3 0
+ADDR 0 9
 LOAD
 PUSH 1
 ADD
-PUSH endaddr
+PUSH <2-32_end>
 BR
-ADDR 3 0 // someaddr is here
+ADDR 0 9                                // <2-32_else>
 LOAD
 PUSH 1
 SUB
-STORE // endaddr is here
+STORE                                   // <2-32_end>
 
 // 2-33
 // exit 3 when t > 12
-ADDR 3 0
+ADDR 0 9
 LOAD
 PUSH 12
 SWAP
 LT
-PUSH continueloop // REFERENCES top of 2-28 code
+PUSH <2-28_start>
 BF
-// exit 3 code. close some scopes. TODO
-PUSH lastlineaddress
+// exit 3
+PUSH <2-38_start>
 BR
 
 // 2-34
-// perhaps close scopes
+PUSH <2-28_start>
+BR
 
 // 2-35
 // exit 2
+PUSH <2-38_start>                       // <2-35_start>
+BR
 
 // 2-36
+// until p and r
+ADDR 0 4
+LOAD
+ADDR 0 6
+LOAD
+MUL
+PUSH <2-27_start>
+BF
+PUSH <2-38_start>
+BR
 
-// 2-37                                 <2-37_start>
+// 2-37
+PUSH <2-23_start>                       // <2-37_start>
+                      
+// 2-38
+HALT                                    // <2-38_start>
