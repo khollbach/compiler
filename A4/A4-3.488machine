@@ -13,7 +13,8 @@ PUSH MACHINE_FALSE
 PUSH MACHINE_FALSE
 
 // 3-5
-// <declare procedure> TODO
+PUSH <addr-3-12>
+BR
 
 // 3-7
 // <declare variables>
@@ -25,7 +26,9 @@ ADDR 0 5 // q
 LOAD
 PUSH <addr 3-9>
 BF
-// <return from procedure> TODO
+// <return from procedure>
+PUSH <addr-3-11>
+BR
 
 // 3-9
 ADDR 1 0 // e
@@ -34,66 +37,92 @@ LOAD
 STORE
 
 // 3-10
-// <return from procedure> TODO
+// <return from procedure>
+// return address has already been pushed on stack by caller
+BR
 
 // 3-11
 // <close major scope>
+PUSH 2
+POPN
 
 // 3-12
-// <declare function> TODO
+PUSH <addr-3-17>
+BR
 
 // 3-13
 // <open major scope>
+// arguments will already be on stack
 
 // 3-14
-ADDR 1 1 // n
+ADDR 1 1 // n                   // <func-F-addr> (first instruction of F)
 LOAD
 PUSH <addr 3-15>
 BF
+PUSH 8191 // constant space at top of stack
 ADDR 1 0 // m
 LOAD
 ADDR 0 1 // b
 LOAD
 ADD
-// <return from function> TODO
-PUSH <addr 3-16>
+
+STORE // return value stored at 8191
+// return address has already been pushed on stack by caller
+PUSH 2 
+POPN
+BR
+PUSH <addr-3-16>
 BR
 
 // 3-15
+PUSH 8191 // constant space at top of stack
 ADDR 0 2 // c
 LOAD
 ADDR 1 0 // m
 LOAD
 SUB
-// <return from function> TODO
+
+STORE // stored at 8191
 
 // 3-16
 // <close major scope>
+PUSH 2 
+POPN
+
+// <return from function> TODO
+// return address has already been pushed on stack by caller
+BR
 
 // 3-17
 // <declare procedure> TODO
+PUSH <addr-3-30>
+BR
 
 // 3-18
 // <open major scope>
+// arguments already on stack
 
 // 3-19
 // <declare variables maybe>
-PUSH 0
+PUSH 0                              // <func-Q-addr> (first instruction of Q) 
 PUSH 0
 PUSH 0
 
 // 3-20
-// <declare function> TODO
+PUSH <addr-3-26>
+BR
 
 // 3-21
 // <open major scope>
+// args on stack
 
 // 3-22
-// <declare variables maybe>
-PUSH 0
+// <declare variables>
+PUSH 0                          // <func-G-addr>
 PUSH 0
 
 // 3-23, 3-24
+PUSH 8191   // return space
 ADDR 1 0 // m
 LOAD
 ADDR 1 2 // p
@@ -107,44 +136,83 @@ LOAD
 ADDR 1 1 // n
 LOAD
 ADD
-PUSH <addr 3-25>
+PUSH <store-addr>
 BR
-// 3-24-else-expr:
+// <3-24-else-expr>
 ADDR 1 4 // u
 LOAD
 ADDR 0 1 // b
 LOAD
 SUB
 
+STORE // <store-addr> stores return value in 8191  
+
 // 3-25
 // <close scope>
+PUSH 2
+POPN
+
+// return address on stack already
+BR
 
 // 3-26
-// <function call> TODO
-PUSH 7
+// <function call> 
+PUSH <G-return-addr>
+ADDR 2 0
+PUSHMT
+SETD 2
+PUSH <func-G-addr>
+BR
+PUSH 7                                   // <G-return-addr>
 LT
-PUSH <addr 3-27>
+
+PUSH <addr-3-27>
 BF
-// <return from procedure> TODO
+
+PUSH 2
+POPN
+// return address has already been pushed on stack by caller
+BR
 
 // 3-27
+
 ADDR 1 3 // t
 LOAD
 ADDR 0 6 // r
+LOAD
 PUSH MACHINE_FALSE
 EQ
-// <function call> TODO
-PUSH 17
+// <function call>
+PUSH <F-return-addr>
+ADDR 1 0
+PUSHMT
+SETD 1
+PUSH <func-F-addr>
+BR
+
+PUSH 17                                 // <F-return-addr>
 EQ
-PUSH <addr 3-28>
+PUSH <addr-3-28>
 BF
-// <return from procedure> TODO
+// return address has already been pushed on stack by caller
+PUSH 6
+POPN
+BR
+// <return from procedure>
 
 // 3-28
-// <procedure call> TODO
+// <procedure call> 
+ADDR 1 0
+PUSHMT
+SETD 1
+PUSH <func-P-addr>
+BR
 
 // 3-29
 // <close major scope>
+PUSH 6
+POPN
+BR
 
 // 3-30
 ADDR 0 4 // p
@@ -166,8 +234,18 @@ LOAD
 EQ
 PUSH MACHINE_FALSE
 EQ
-// <procedure call> TODO
+
+// <procedure call>
+ADDR 1 0
+PUSHMT
+SETD 1
+PUSH <func-Q-addr>
+BR
+
 
 // 3-31
 // <close major scope>
+PUSH 8
+POPN
+
 HALT
