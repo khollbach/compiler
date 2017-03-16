@@ -235,11 +235,11 @@ PUSH MACHINE_FALSE
 // 2-17
 // a := not p or q
 ADDR 1 0
-ADDR 0 4
+ADDR 1 4
 LOAD
 PUSH MACHINE_FALSE
 EQ
-ADDR 0 5
+ADDR 1 5
 LOAD
 OR
 STORE
@@ -258,17 +258,17 @@ PUSH 0
 ADDR 2 0
 ADDR 1 1
 LOAD
-PUSH thisaddr+6    // address for next ADDR 2 2
+PUSH <2-20_false-case>
 BF
 ADDR 2 1
 LOAD
-PUSH thisaddr+4    // address for next STORE
+PUSH <2-21_start>
 BR
-ADDR 2 2
+ADDR 2 2                                // <2-20_false-case>
 LOAD
-STORE
+STORE                                   // <2-21_start>
 
-// 2-21
+// 2-21                                 
 // close scope TODO
 
 // 2-22
@@ -276,7 +276,7 @@ STORE
 
 // 2-23
 PUSH MACHINE_TRUE
-PUSH someaddr
+PUSH <2-37_start>
 BF
 // open scope, perhaps
 
@@ -286,16 +286,18 @@ LOAD
 ADDR 0 6
 LOAD
 OR
-PUSH continue_loop_addr
+PUSH <continue_loop_addr>
 BF
 // <close scope maybe>
-PUSH end_loop_addr
+PUSH <2-37_start>
 BR
 
-// 2-25
+// 2-25                                  // <continue_loop_addr>
 // <open scope maybe>, <declare variables maybe>
 
 // 2-26
+PUSH 0 // w                                 
+PUSH 0 // x
 
 // 2-27
 // w
@@ -383,3 +385,7 @@ BR
 
 // 2-35
 // exit 2
+
+// 2-36
+
+// 2-37                                 <2-37_start>
