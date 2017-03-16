@@ -1,20 +1,24 @@
 // 3-2
 // <open major scope>
-
 // 3-3
-// <declare variables maybe>
+// <declare variables>
+PUSH 0
+PUSH 0
+PUSH 0
+PUSH 0
 
-// 3-4
-// <declare variables maybe>
+PUSH MACHINE_FALSE
+PUSH MACHINE_FALSE
+PUSH MACHINE_FALSE
+PUSH MACHINE_FALSE
 
 // 3-5
 // <declare procedure> TODO
 
-// 3-6
-// <open major scope>
-
 // 3-7
-// <declare variables maybe>
+// <declare variables>
+PUSH 0
+PUSH 0
 
 // 3-8
 ADDR 0 5 // q
