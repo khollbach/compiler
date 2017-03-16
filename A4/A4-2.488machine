@@ -1,13 +1,17 @@
+// 2-1
+PUSHMT
+SETD 0
+
+// 2-2, 2-3, 2-4 2-16, 2-19, 2-26, 2-30
+PUSH 0                                  // allocate room for
+PUSH 13                                 // a,b,c,d,p,q,r and
+DUPN                                    // minor scopes
+
 // 2-3
-PUSH 0
-PUSH 0
-PUSH 0
-PUSH 0
+// see 2-2
 
 // 2-4
-PUSH MACHINE_FALSE
-PUSH MACHINE_FALSE
-PUSH MACHINE_FALSE
+// see 2-2
 
 // 2-5
 ADDR 0 0 // a
@@ -224,13 +228,10 @@ READI
 STORE
 
 // 2-15
-// open scope TODO
+// minor scope
 
 // 2-16
-// var a, b, c : Boolean
-PUSH MACHINE_FALSE
-PUSH MACHINE_FALSE
-PUSH MACHINE_FALSE
+// see 2-2
 
 // 2-17
 // a := not p or q
@@ -245,13 +246,10 @@ OR
 STORE
 
 // 2-18
-// open scope TODO
+// minor scope
 
 // 2-19
-// var p, q, r : INTEGER
-PUSH 0
-PUSH 0
-PUSH 0
+// see 2-2
 
 // 2-20
 // p := (b ? q : r)
