@@ -78,6 +78,9 @@ SUB
 
 // 3-19
 // <declare variables maybe>
+PUSH 0
+PUSH 0
+PUSH 0
 
 // 3-20
 // <declare function> TODO
@@ -87,6 +90,8 @@ SUB
 
 // 3-22
 // <declare variables maybe>
+PUSH 0
+PUSH 0
 
 // 3-23, 3-24
 ADDR 1 0 // m
