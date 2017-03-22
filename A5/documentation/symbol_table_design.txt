@@ -1,0 +1,8 @@
+Symbol Table Design - George Gianacopoulos, Tarang Marathe
+
+The way we implemented the symbol table was as a hash map of id strings (symbol identifiers) to a stack of SymbolAttributes objects.
+While traversing the AST, every time a new symbol is encounters, we check if its identifier string is in the hash map. If it is not, we create a new entry with an empty stack, and push the corresponding SymbolAttributes object onto the stack.
+If the symbol identifier is already in the hash map, this means that a variable using this identifier string was initialized in some upper scope. In this case we simply push the current symbol's SymbolAttribute object onto the stack. Therefore, the top of the stack always corresponds to the the most local symbol with a given identifier.
+Simultaneously, we maintain a scope stack, which contains lists of string identifiers of the variables declared in a given scope. The top of the scope stack corresponds to the most local scope, while the bottom corresponds to the main program scope.
+As the AST is traversed, string identifiers are added to the hash map and the current top list of the scope stack when encountered, and their SymbolAttribute objects are pushed onto the SymbolAttribute stack. As we get to the end of a scope, the top list of the scope stack is popped, and all the string identifiers in this list have the top element of their SymbolAttribute stack in the hash map popped as well. This is how we close a scope.
+

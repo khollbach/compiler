@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# View diffs of the AST dumps of the passing tests.
+
+tmpdir=tmp-test-output
+testdir=tests/passing
+
+for f in `ls "$tmpdir"`; do
+    vimdiff "$testdir/$f" "$tmpdir/$f"
+done

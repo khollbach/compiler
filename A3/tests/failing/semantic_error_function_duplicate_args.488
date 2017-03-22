@@ -1,0 +1,14 @@
+{
+var x : Boolean
+
+% semantic error since a is declared twice in same scope
+function f ( a : Integer, a : Integer) : Boolean
+    { if a > = a then
+        return with true
+      else
+        return with false
+    }
+
+x := f ( 5, 6 )
+
+}

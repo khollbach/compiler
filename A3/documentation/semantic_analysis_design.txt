@@ -1,0 +1,25 @@
+
+Semantic Analysis Design:
+
+Semantic analysis of the AST was implemented using the Visitor pattern (as described in the textbook).
+
+The SemanticVisitor class implements visit methods for each node type in the AST.
+Semantic errors are recorded in a list internal to the SemanticVisitor object.
+The code in each visit method corresponds to the semantic analysis operations that need to be performed.
+For example:
+    - a visit to a node 'n' that subclasses Expn will involve:
+        - setting the the node's "evalType": the scalar type of the value that the node's corresponding
+            expression evaluates to (e.g. for a call of function f, the type would be set to f's return type)
+        - performing visits on any sub-expressions, then type-checking n based on the type information for the
+            sub-expressions
+        - recording any semantic errors corresponding to type errors or arity mismatch in function parameters
+    - a visit to a MultiDeclaration involves:
+        - making an entry for each declaration in the symbol table
+        - recording any semantic errors corresponding to redeclaration of variables already declared in
+            the most local scope
+    - a visit to a scope involves:
+        - opening a scope in the symbol table
+        - visiting all declarations and statements
+        - closing a scope in the symbol table
+
+All semantic errors are reported after analysis of the entire AST has completed.

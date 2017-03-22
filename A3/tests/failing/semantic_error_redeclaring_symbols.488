@@ -1,0 +1,4 @@
+{
+	var a, a: Integer
+	a := 1
+}

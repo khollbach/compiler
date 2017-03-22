@@ -1,0 +1,1216 @@
+// Date: 2017/02/01 21:56:02
+// Package and import specifications section.
+
+package compiler488.parser;
+
+import java_cup.runtime.*; // Must always import this.
+
+import compiler488.ast.*;
+import compiler488.ast.decl.*;
+import compiler488.ast.expn.*;
+import compiler488.ast.stmt.*;
+import compiler488.ast.type.*;
+
+import compiler488.ast.Readable;
+
+/* User code components 1: action code components.
+ * Code to be used inside the actions triggered when productions are matched.
+ * If any common code is needed for more than one action , put it here.
+ */
+action code {:
+:};
+
+/* User code components 2: parser code components.
+ * Modifications to the default generated parser
+ */
+parser code {:
+
+    String lastError;
+
+    /** Override the report_error method so it will display the line and
+     * column of where the error occurred in the input as well as the
+     * reason for the error which is passed into the method in the
+     * String 'message'.
+     * @param message error message to print
+     * @param info symbol containing line/column numbers
+     */
+    public void report_error(String message, Object info)
+    {
+    String st = "Error";
+
+        if (info instanceof java_cup.runtime.Symbol)
+        {
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+
+        /* s.left is supposed to hold the line number of the error.
+         * s.right is supposed to hold the column number.
+             * If either is < 0 the parser may have run off the end of the program
+             * and a Syntax Error message without line number may be printed.
+         */
+
+            if (s.left >= 0) // Check line number.
+        {
+                st += " in line " + s.left;
+                if (s.right >= 0) // Check column number.
+                    st += ", column " + s.right;
+        }
+            else
+               st += " at end of input ";
+           }
+        st += ": " + message;
+        System.err.println (st);
+        lastError = st;
+    }
+
+    /** Override the report_fatal_error method to use the report_error method. */
+    /** @throws SyntaxErrorException */
+    public void report_fatal_error (String message, Object info) throws SyntaxErrorException
+    {
+        report_error (message, info);
+        throw new SyntaxErrorException (lastError);
+    }
+
+   /** version string for printing version in Main */
+   public static final String version =
+     " $Revision: 1.7 $ $Date: 2012/02/08 21:56:02 $Author: dw $";
+
+:};
+
+/* User code components 3: initialization code.
+ * If you want some code to be executed before the parser asks for the first
+ * token, add it here.
+ */
+init with {:
+:};
+
+/* User code components 4: scanner specification code.
+ * If you need to override the way the parser asks the scanner for the
+ * next token, put your preferred method here. Uncomment the line following
+ * this comment, replace the line after that with your code, and uncomment
+ * the line after that.
+ */
+// scan with {:
+// your code goes here
+// :};
+
+/* Symbol lists section.
+ * The names of terminals and non-terminals are not allowed to be CUP
+ * reserved words. These include "code", "action", "parser", "terminal",
+ * "non", "nonterminal", "init", "scan", "with", "start", "precedence",
+ * "left", "right", "nonassoc", "import", and "package".
+ */
+
+// DEFINITIONS for CSC488S Source Language Winter 2011/2012
+
+// Terminals returned by the scanner with no value attached.
+terminal AND, OR, NOT, TRUE, FALSE;
+terminal BOOLEAN,INTEGER,FUNCTION,PROCEDURE;
+terminal DO, ELSE, EXIT, IF;
+terminal READ, REPEAT, RETURN, NEWLINE,THEN, UNTIL;
+terminal VAR, WHEN, WHILE, WITHX, WRITE;
+
+// Special-character terminals, no value attached
+terminal L_PAREN ,R_PAREN,L_SQUARE, R_SQUARE, L_CURLEY, R_CURLEY;
+terminal EQUAL, GREATER,LESS, COMMA, DOT, QUESTION, COLON;
+terminal PLUS, MINUS, TIMES, DIVIDE;
+
+// Terminals returned by the scanner with a value.
+terminal String IDENT;
+terminal Integer INTCONST;
+terminal String TEXTCONST;
+
+// Non-terminals that have no value.
+// nonterminal xxx
+
+nonterminal program, statement, declaration, scope;
+nonterminal statements, declarations, matchedStatement, unmatchedStatement;
+nonterminal variablenames, output;
+nonterminal type, arguments, parameters, variable;
+nonterminal expression, variablename;
+
+nonterminal inputs, outputs, bound;
+nonterminal procedureCall, parameter, conjunction, negation, compareExpn;
+nonterminal arithExpn, term, factor, primary, constant;
+
+// Non-terminals that have a value.
+// nonterminal type nameList;
+
+// PLEASE NOTE: your grammar can not use the 'precedence'
+// feature of java-cup. The lines below should remain
+// commented.
+//
+//precedence left PLUS, MINUS;
+//precedence left TIMES, DIVIDE; // Higher precedence.
+precedence left ELSE;
+
+// The grammar section.
+
+// This specifies the initial symbol of the grammar.
+start with program;
+
+/* Notice that sometimes the action must be inside the production rule,
+ * not after it. This is a subtle yet significant difference from YACC.
+ * This is because the CUP parser is looking ahead one token. It ALWAYS
+ * reads one more token before it will act on the production.
+ */
+
+// the main program
+program ::=
+    scope:scope_
+    {:
+        Scope scope = (Scope) scope_;
+
+        Program prog = new Program();
+        prog.setDeclarations(scope.getDeclarations());
+        prog.setStatements(scope.getStatements());
+
+        prog.setSourceCoordinateLine(scope_left);
+        prog.setSourceCoordinateColumn(scope_right);
+        RESULT = prog;
+    :}
+;
+
+scope ::=
+    // scope with declarations and statements
+    L_CURLEY:x declarations:decls_ statements:stmts_ R_CURLEY
+    {:
+        ASTList<Declaration> decls = (ASTList<Declaration>) decls_;
+        ASTList<Stmt> stmts = (ASTList<Stmt>) stmts_;
+
+        Scope scope = new Scope();
+        scope.setDeclarations(decls);
+        scope.setStatements(stmts);
+
+        scope.setSourceCoordinateLine(xleft);
+        scope.setSourceCoordinateColumn(xright);
+        RESULT = scope;
+    :}
+
+    | L_CURLEY:x statements:stmts_ R_CURLEY // scope with statments only
+    {:
+        ASTList<Stmt> stmts = (ASTList<Stmt>) stmts_;
+
+        Scope scope = new Scope();
+        scope.setStatements(stmts);
+
+        scope.setSourceCoordinateLine(xleft);
+        scope.setSourceCoordinateColumn(xright);
+        RESULT = scope;
+    :}
+
+    | L_CURLEY:x R_CURLEY // empty scope
+    {:
+        Scope scope = new Scope();
+
+        scope.setSourceCoordinateLine(xleft);
+        scope.setSourceCoordinateColumn(xright);
+        RESULT = scope;
+    :}
+;
+
+// sequence of statements
+statements ::=
+    statement:stmt_
+    {:
+        Stmt stmt = (Stmt) stmt_;
+
+        ASTList<Stmt> list = new ASTList<Stmt>(stmt);
+
+        list.setSourceCoordinateLine(stmt_left);
+        list.setSourceCoordinateColumn(stmt_right);
+        RESULT = list;
+    :}
+
+    | statements:list_ statement:stmt_
+    {:
+        ASTList<Stmt> list = (ASTList<Stmt>) list_;
+        Stmt stmt = (Stmt) stmt_;
+
+        list.addLast(stmt);
+        RESULT = list;
+    :}
+;
+
+// sequence of declarations
+declarations ::=
+    declaration:decl_
+    {:
+        Declaration decl = (Declaration) decl_;
+
+        ASTList<Declaration> list = new ASTList<Declaration>(decl);
+
+        list.setSourceCoordinateLine(decl_left);
+        list.setSourceCoordinateColumn(decl_right);
+        RESULT = list;
+    :}
+
+    | declarations:list_ declaration:decl_
+    {:
+        ASTList<Declaration> list = (ASTList<Declaration>) list_;
+        Declaration decl = (Declaration) decl_;
+
+        list.addLast(decl);
+        RESULT = list;
+    :}
+;
+
+statement ::=
+    matchedStatement:stmt_
+    {:
+        RESULT = stmt_;
+    :}
+
+    | unmatchedStatement:stmt_
+    {:
+        RESULT = stmt_;
+    :}
+;
+
+matchedStatement ::=
+    // assignment statement
+    variable:var_ COLON EQUAL expression:e1_
+    {:
+        Expn var = (Expn) var_;
+        Expn e1 = (Expn) e1_;
+
+        AssignStmt stmt = new AssignStmt();
+        stmt.setLval(var);
+        stmt.setRval(e1);
+
+        stmt.setSourceCoordinateLine(var_left);
+        stmt.setSourceCoordinateColumn(var_right);
+        RESULT = stmt;
+    :}
+
+    // if statements
+    | IF:x expression:e1_ THEN matchedStatement:s1_ ELSE matchedStatement:s2_
+    {:
+        Expn e1 = (Expn) e1_;
+        Stmt s1 = (Stmt) s1_;
+        Stmt s2 = (Stmt) s2_;
+
+        IfStmt stmt = new IfStmt();
+        stmt.setCondition(e1);
+        stmt.setWhenTrue(s1);
+        stmt.setWhenFalse(s2);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    // while statement
+    | WHILE:x expression:e1_ DO statement:s1_
+    {:
+        Expn e1 = (Expn) e1_;
+        Stmt s1 = (Stmt) s1_;
+
+        WhileDoStmt stmt = new WhileDoStmt();
+        stmt.setExpn(e1);
+        stmt.setBody(s1);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    // repeat statement
+    | REPEAT:x statement:s1_ UNTIL expression:e1_
+    {:
+        Stmt s1 = (Stmt) s1_;
+        Expn e1 = (Expn) e1_;
+
+        RepeatUntilStmt stmt = new RepeatUntilStmt();
+        stmt.setExpn(e1);
+        stmt.setBody(s1);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    // exit statements
+    | EXIT:x
+    {:
+        ExitStmt stmt = new ExitStmt();
+        stmt.setLevel(1);
+        stmt.setExpn(null);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    | EXIT:x INTCONST:i
+    {:
+        ExitStmt stmt = new ExitStmt();
+        stmt.setLevel(i);
+        stmt.setExpn(null);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    | EXIT:x WHEN expression:e1_
+    {:
+        Expn e1 = (Expn) e1_;
+
+        ExitStmt stmt = new ExitStmt();
+        stmt.setLevel(1);
+        stmt.setExpn(e1);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    | EXIT:x INTCONST:i WHEN expression:e1_
+    {:
+        Expn e1 = (Expn) e1_;
+
+        ExitStmt stmt = new ExitStmt();
+        stmt.setLevel(i);
+        stmt.setExpn(e1);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    | RETURN:x WITHX expression:e1_
+    {:
+        Expn e1 = (Expn) e1_;
+
+        ReturnStmt stmt = new ReturnStmt();
+        stmt.setValue(e1);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    // return statements
+    | RETURN:x
+    {:
+        ReturnStmt stmt = new ReturnStmt();
+        stmt.setValue(null);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    // input/output statments
+    | WRITE:x outputs:outputs_
+    {:
+        ASTList<Printable> outputs = (ASTList<Printable>) outputs_;
+
+        WriteStmt stmt = new WriteStmt();
+        stmt.setOutputs(outputs);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    | READ:x inputs:inputs_
+    {:
+        ASTList<Readable> inputs = (ASTList<Readable>) inputs_;
+
+        ReadStmt stmt = new ReadStmt();
+        stmt.setInputs(inputs);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    // procedure call
+    | procedureCall:stmt_
+    {:
+        RESULT = stmt_;
+    :}
+
+    | scope:scope_ // embedded scope
+    {:
+        RESULT = scope_;
+    :}
+;
+
+unmatchedStatement ::=
+    IF:x expression:e1_ THEN statement:s1_
+    {:
+        Expn e1 = (Expn) e1_;
+        Stmt s1 = (Stmt) s1_;
+
+        IfStmt stmt = new IfStmt();
+        stmt.setCondition(e1);
+        stmt.setWhenTrue(s1);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+
+    | IF:x expression:e1_ THEN matchedStatement:s1_ ELSE unmatchedStatement:s2_
+    {:
+        Expn e1 = (Expn) e1_;
+        Stmt s1 = (Stmt) s1_;
+        Stmt s2 = (Stmt) s2_;
+
+        IfStmt stmt = new IfStmt();
+        stmt.setCondition(e1);
+        stmt.setWhenTrue(s1);
+        stmt.setWhenFalse(s2);
+
+        stmt.setSourceCoordinateLine(xleft);
+        stmt.setSourceCoordinateColumn(xright);
+        RESULT = stmt;
+    :}
+;
+
+procedureCall ::=
+    IDENT:id // call procedure with no parameters
+    {:
+        ASTList<Expn> args = new ASTList<Expn>();
+        args.setSourceCoordinateLine(idleft);
+        args.setSourceCoordinateColumn(idright);
+
+        ProcedureCallStmt s = new ProcedureCallStmt();
+        s.setName(id);
+        s.setArguments(args);
+
+        s.setSourceCoordinateLine(idleft);
+        s.setSourceCoordinateColumn(idright);
+        RESULT = s;
+    :}
+
+    | IDENT:id L_PAREN arguments:args_ R_PAREN // call procedure with parameters
+    {:
+        ASTList<Expn> args = (ASTList<Expn>) args_;
+
+        ProcedureCallStmt s = new ProcedureCallStmt();
+        s.setName(id);
+        s.setArguments(args);
+
+        s.setSourceCoordinateLine(idleft);
+        s.setSourceCoordinateColumn(idright);
+        RESULT = s;
+    :}
+;
+
+declaration ::=
+    VAR:x variablenames:varnames_ COLON type:type_ // declare scalar/array variables
+    {:
+        ASTList<DeclarationPart> varnames = (ASTList<DeclarationPart>) varnames_;
+        Type type = (Type) type_;
+
+        MultiDeclarations multiDecl = new MultiDeclarations();
+        multiDecl.setElements(varnames);
+        multiDecl.setType(type);
+
+        multiDecl.setSourceCoordinateLine(xleft);
+        multiDecl.setSourceCoordinateColumn(xright);
+        RESULT = multiDecl;
+    :}
+
+    | FUNCTION:x IDENT:ident COLON:y type:type_ scope:scope_ // declare function
+    {:
+        Scope scope = (Scope) scope_;
+        Type type = (Type) type_;
+
+        ASTList<ScalarDecl> params = new ASTList<ScalarDecl>();
+        params.setSourceCoordinateLine(yleft);
+        params.setSourceCoordinateColumn(yright);
+
+        RoutineBody routineBody = new RoutineBody();
+        routineBody.setParameters(params);
+        routineBody.setBody(scope);
+        routineBody.setSourceCoordinateLine(scope_left);
+        routineBody.setSourceCoordinateColumn(scope_right);
+
+        RoutineDecl routineDeclaration = new RoutineDecl();
+        routineDeclaration.setName(ident);
+        routineDeclaration.setType(type);
+        routineDeclaration.setRoutineBody(routineBody);
+
+        routineDeclaration.setSourceCoordinateLine(xleft);
+        routineDeclaration.setSourceCoordinateColumn(xright);
+        RESULT = routineDeclaration;
+    :}
+
+    | FUNCTION:x IDENT:ident L_PAREN parameters:params_ R_PAREN COLON type:type_ scope:scope_
+    {:
+        Scope scope = (Scope) scope_;
+        ASTList<ScalarDecl> params = (ASTList<ScalarDecl>) params_;
+        Type type = (Type) type_;
+
+        RoutineBody routineBody = new RoutineBody();
+        routineBody.setParameters(params);
+        routineBody.setBody(scope);
+        routineBody.setSourceCoordinateLine(scope_left);
+        routineBody.setSourceCoordinateColumn(scope_right);
+
+        RoutineDecl routineDeclaration = new RoutineDecl();
+        routineDeclaration.setName(ident);
+        routineDeclaration.setType(type);
+        routineDeclaration.setRoutineBody(routineBody);
+
+        routineDeclaration.setSourceCoordinateLine(xleft);
+        routineDeclaration.setSourceCoordinateColumn(xright);
+        RESULT = routineDeclaration;
+    :}
+
+    | PROCEDURE IDENT:ident scope:scope_ // declare procedure
+    {:
+        Scope scope = (Scope) scope_;
+
+        ASTList<ScalarDecl> params = new ASTList<ScalarDecl>();
+        params.setSourceCoordinateLine(scope_left);
+        params.setSourceCoordinateColumn(scope_right);
+
+        RoutineBody routineBody = new RoutineBody();
+        routineBody.setParameters(params);
+        routineBody.setBody(scope);
+
+        RoutineDecl routineDeclaration = new RoutineDecl();
+        routineDeclaration.setName(ident);
+        routineDeclaration.setType(null);
+        routineDeclaration.setRoutineBody(routineBody);
+
+        routineDeclaration.setSourceCoordinateLine(identleft);
+        routineDeclaration.setSourceCoordinateColumn(identright);
+        RESULT = routineDeclaration;
+     :}
+
+    | PROCEDURE:x IDENT:ident L_PAREN parameters:params_ R_PAREN scope:scope_
+    {:
+        Scope scope = (Scope) scope_;
+        ASTList<ScalarDecl> params = (ASTList<ScalarDecl>) params_;
+
+        RoutineBody routineBody = new RoutineBody();
+        routineBody.setParameters(params);
+        routineBody.setBody(scope);
+        routineBody.setSourceCoordinateLine(scope_left);
+        routineBody.setSourceCoordinateColumn(scope_right);
+
+        RoutineDecl routineDeclaration = new RoutineDecl();
+        routineDeclaration.setName(ident);
+        routineDeclaration.setType(null);
+        routineDeclaration.setRoutineBody(routineBody);
+
+        routineDeclaration.setSourceCoordinateLine(xleft);
+        routineDeclaration.setSourceCoordinateColumn(xright);
+        RESULT = routineDeclaration;
+    :}
+;
+
+// list of variables being declared
+variablenames ::=
+    variablename:varname_
+    {:
+        DeclarationPart varname = (DeclarationPart) varname_;
+
+        ASTList<DeclarationPart> list = new ASTList(varname);
+
+        list.setSourceCoordinateLine(varname_left);
+        list.setSourceCoordinateColumn(varname_right);
+        RESULT = list;
+    :}
+
+    | variablenames:list_ COMMA variablename:varname_
+    {:
+        ASTList<DeclarationPart> list = (ASTList<DeclarationPart>) list_;
+        DeclarationPart varname = (DeclarationPart) varname_;
+
+        list.addLast(varname);
+        RESULT = list;
+    :}
+;
+
+variablename ::=
+    IDENT:id // scalar variable
+    {:
+        ScalarDeclPart p = new ScalarDeclPart();
+        p.setName(id);
+
+        p.setSourceCoordinateLine(idleft);
+        p.setSourceCoordinateColumn(idright);
+        RESULT = p;
+    :}
+
+    | IDENT:id L_SQUARE INTCONST:i R_SQUARE // array variable with upper bound
+    {:
+        ArrayDeclPart p = new ArrayDeclPart();
+        p.setName(id);
+        p.setLowerBoundary(new Integer(1));
+        p.setUpperBoundary(i);
+        p.setSize(i);
+
+        p.setSourceCoordinateLine(idleft);
+        p.setSourceCoordinateColumn(idright);
+        RESULT = p;
+    :}
+
+    | IDENT:id L_SQUARE bound:lb_ DOT DOT bound:ub_ R_SQUARE // array variable with upper/lower bounds
+    {:
+        Integer lb = (Integer) lb_;
+        Integer ub = (Integer) ub_;
+
+        ArrayDeclPart p = new ArrayDeclPart();
+        p.setName(id);
+        p.setLowerBoundary(lb);
+        p.setUpperBoundary(ub);
+        p.setSize(new Integer(ub.intValue() - lb.intValue() + 1));
+
+        p.setSourceCoordinateLine(idleft);
+        p.setSourceCoordinateColumn(idright);
+        RESULT = p;
+    :}
+;
+
+bound ::=
+    INTCONST:i // positive array bound
+    {:
+        RESULT = i;
+    :}
+
+    | MINUS INTCONST:i // negative array bound
+    {:
+        RESULT = new Integer(i.intValue() * -1);
+    :}
+;
+
+type ::=
+    INTEGER:x // integer type
+    {:
+        IntegerType t = new IntegerType();
+
+        t.setSourceCoordinateLine(xleft);
+        t.setSourceCoordinateColumn(xright);
+        RESULT = t;
+    :}
+
+    | BOOLEAN:x // boolean type
+    {:
+        BooleanType t = new BooleanType();
+
+        t.setSourceCoordinateLine(xleft);
+        t.setSourceCoordinateColumn(xright);
+        RESULT = t;
+    :}
+;
+
+// list of output expressions
+outputs ::=
+    output:e1_
+    {:
+        Expn e1 = (Expn) e1_;
+
+        ASTList<Expn> list = new ASTList<Expn>(e1);
+
+        list.setSourceCoordinateLine(e1_left);
+        list.setSourceCoordinateColumn(e1_right);
+        RESULT = list;
+    :}
+
+    | outputs:list_ COMMA output:e1_
+    {:
+        ASTList<Expn> list = (ASTList<Expn>) list_;
+        Expn e1 = (Expn) e1_;
+
+        list.addLast(e1);
+        RESULT = list;
+    :}
+;
+
+output ::=
+    // integer expression
+    expression:e1_
+    {:
+        RESULT = e1_;
+    :}
+
+    // text constant
+    | TEXTCONST:s
+    {:
+        TextConstExpn e = new TextConstExpn();
+        e.setValue(s);
+
+        e.setSourceCoordinateLine(sleft);
+        e.setSourceCoordinateColumn(sright);
+        RESULT = e;
+    :}
+
+    // newline constant
+    | NEWLINE:x
+    {:
+        SkipConstExpn e = new SkipConstExpn();
+
+        e.setSourceCoordinateLine(xleft);
+        e.setSourceCoordinateColumn(xright);
+        RESULT = e;
+    :}
+;
+
+// list of variables being read into
+inputs ::=
+    variable:var_
+    {:
+        Readable var = (Readable) var_;
+
+        ASTList<Readable> list = new ASTList<Readable>(var);
+
+        list.setSourceCoordinateLine(var_left);
+        list.setSourceCoordinateColumn(var_right);
+        RESULT = list;
+    :}
+
+    | inputs:list_ COMMA variable:var_
+    {:
+        ASTList<Readable> list = (ASTList<Readable>) list_;
+        Readable var = (Readable) var_;
+
+        list.addLast(var);
+        RESULT = list;
+    :}
+;
+
+// list of function/procedure arguments
+arguments ::=
+    expression:e1_
+    {:
+        Expn e1 = (Expn) e1_;
+
+        ASTList<Expn> list = new ASTList<Expn>(e1);
+
+        list.setSourceCoordinateLine(e1_left);
+        list.setSourceCoordinateColumn(e1_right);
+        RESULT = list;
+    :}
+
+    | arguments:list_ COMMA expression:e1_
+    {:
+        ASTList<Expn> list = (ASTList<Expn>) list_;
+        Expn e1 = (Expn) e1_;
+
+        list.addLast(e1);
+        RESULT = list;
+    :}
+;
+
+// list of function/procedure formal parameters
+parameters ::=
+    parameter:param_
+    {:
+        ScalarDecl param = (ScalarDecl) param_;
+
+        ASTList<ScalarDecl> list = new ASTList<ScalarDecl>(param);
+
+        list.setSourceCoordinateLine(param_left);
+        list.setSourceCoordinateColumn(param_right);
+        RESULT = list;
+    :}
+
+    | parameters:list_ COMMA parameter:param_
+    {:
+        ScalarDecl param = (ScalarDecl) param_;
+        ASTList<ScalarDecl> list = (ASTList<ScalarDecl>) list_;
+
+        list.addLast(param);
+        RESULT = list;
+    :}
+;
+
+// declare one parameter
+parameter ::=
+    IDENT:ident COLON type:type_
+    {:
+        Type type = (Type) type_;
+
+        ScalarDecl sd = new ScalarDecl();
+        sd.setName(ident);
+        sd.setType(type);
+
+        sd.setSourceCoordinateLine(identleft);
+        sd.setSourceCoordinateColumn(identright);
+        RESULT = sd;
+    :}
+;
+
+// disjunctions, associate left-to-right
+expression ::=
+    conjunction:e1_
+    {:
+        RESULT = e1_;
+    :}
+
+    | expression:e1_ OR conjunction:e2_
+    {:
+        Expn e1 = (Expn) e1_;
+        Expn e2 = (Expn) e2_;
+
+        BoolExpn e = new BoolExpn();
+        e.setOpSymbol("or");
+        e.setLeft(e1);
+        e.setRight(e2);
+
+        e.setSourceCoordinateLine(e1_left);
+        e.setSourceCoordinateColumn(e1_right);
+        RESULT = e;
+    :}
+;
+
+// conjunctions, associate left-to-right
+conjunction ::=
+    negation:e1_
+    {:
+        RESULT = e1_;
+    :}
+
+    | conjunction:e1_ AND negation:e2_
+    {:
+        Expn e1 = (Expn) e1_;
+        Expn e2 = (Expn) e2_;
+
+        BoolExpn e = new BoolExpn();
+        e.setOpSymbol("and");
+        e.setLeft(e1);
+        e.setRight(e2);
+
+        e.setSourceCoordinateLine(e1_left);
+        e.setSourceCoordinateColumn(e1_right);
+        RESULT = e;
+    :}
+;
+
+// negations
+negation ::=
+    compareExpn:e1_
+    {:
+        RESULT = e1_;
+    :}
+
+    | NOT negation:e1_
+    {:
+        Expn e1 = (Expn) e1_;
+
+        NotExpn e = new NotExpn();
+        e.setOpSymbol("not");
+        e.setOperand(e1);
+
+        e.setSourceCoordinateLine(e1_left);
+        e.setSourceCoordinateColumn(e1_right);
+        RESULT = e;
+    :}
+;
+
+// comparisons, do not associate
+compareExpn ::=
+    arithExpn:e1_
+    {:
+        RESULT = e1_;
+    :}
+
+    | arithExpn:e1_ EQUAL arithExpn:e2_
+    {:
+        Expn e1 = (Expn) e1_;
+        Expn e2 = (Expn) e2_;
+
+        EqualsExpn e = new EqualsExpn();
+        e.setOpSymbol("=");
+        e.setLeft(e1);
+        e.setRight(e2);
+
+        e.setSourceCoordinateLine(e1_left);
+        e.setSourceCoordinateColumn(e1_right);
+        RESULT = e;
+    :}
+
+    | arithExpn:e1_ NOT EQUAL arithExpn:e2_
+    {:
+        Expn e1 = (Expn) e1_;
+        Expn e2 = (Expn) e2_;
+
+        EqualsExpn equalsExpn = new EqualsExpn();
+        equalsExpn.setOpSymbol("=");
+        equalsExpn.setLeft(e1);
+        equalsExpn.setRight(e2);
+        equalsExpn.setSourceCoordinateLine(e1_left);
+        equalsExpn.setSourceCoordinateColumn(e1_right);
+
+        NotExpn notExpn = new NotExpn();
+        notExpn.setOpSymbol("not");
+        notExpn.setOperand(equalsExpn);
+
+        notExpn.setSourceCoordinateLine(e1_left);
+        notExpn.setSourceCoordinateColumn(e1_right);
+        RESULT = notExpn;
+    :}
+
+    | arithExpn:e1_ LESS arithExpn:e2_
+    {:
+        Expn e1 = (Expn) e1_;
+        Expn e2 = (Expn) e2_;
+
+        CompareExpn e = new CompareExpn();
+        e.setOpSymbol("<");
+        e.setLeft(e1);
+        e.setRight(e2);
+
+        e.setSourceCoordinateLine(e1_left);
+        e.setSourceCoordinateColumn(e1_right);
+        RESULT = e;
+    :}
+
+    | arithExpn:e1_ LESS EQUAL arithExpn:e2_
+    {:
+        Expn e1 = (Expn) e1_;
+        Expn e2 = (Expn) e2_;
+
+        CompareExpn e = new CompareExpn();
+        e.setOpSymbol("<=");
+        e.setLeft(e1);
+        e.setRight(e2);
+
+        e.setSourceCoordinateLine(e1_left);
+        e.setSourceCoordinateColumn(e1_right);
+        RESULT = e;
+    :}
+
+    | arithExpn:e1_ GREATER arithExpn:e2_
+    {:
+        Expn e1 = (Expn) e1_;
+        Expn e2 = (Expn) e2_;
+
+        CompareExpn e = new CompareExpn();
+        e.setOpSymbol(">");
+        e.setLeft(e1);
+        e.setRight(e2);
+
+        e.setSourceCoordinateLine(e1_left);
+        e.setSourceCoordinateColumn(e1_right);
+        RESULT = e;
+    :}
+
+    | arithExpn:e1_ GREATER EQUAL arithExpn:e2_
+    {:
+        Expn e1 = (Expn) e1_;
+        Expn e2 = (Expn) e2_;
+
+        CompareExpn e = new CompareExpn();
+        e.setOpSymbol(">=");
+        e.setLeft(e1);
+        e.setRight(e2);
+
+        e.setSourceCoordinateLine(e1_left);
+        e.setSourceCoordinateColumn(e1_right);
+        RESULT = e;
+    :}
+;
+
+// expressions, associate + , - left-to-right
+arithExpn ::=
+    term:e1_
+    {:
+        RESULT = e1_;
+    :}
+
+    | arithExpn:e1_ PLUS term:e2_
+    {:
+        Expn e1 = (Expn) e1_;
+        Expn e2 = (Expn) e2_;
+
+        ArithExpn e = new ArithExpn();
+        e.setOpSymbol("+");
+        e.setLeft(e1);
+        e.setRight(e2);
+
+        e.setSourceCoordinateLine(e1_left);
+        e.setSourceCoordinateColumn(e1_right);
+        RESULT = e;
+    :}
+
+    | arithExpn:e1_ MINUS term:e2_
+    {:
+        Expn e1 = (Expn) e1_;
+        Expn e2 = (Expn) e2_;
+
+        ArithExpn e = new ArithExpn();
+        e.setOpSymbol("-");
+        e.setLeft(e1);
+        e.setRight(e2);
+
+        e.setSourceCoordinateLine(e1_left);
+        e.setSourceCoordinateColumn(e1_right);
+        RESULT = e;
+    :}
+;
+
+// terms, associate * , / left-to-right
+term ::=
+    factor:e1_
+    {:
+        RESULT = e1_;
+    :}
+
+    | term:e1_ TIMES factor:e2_
+    {:
+        Expn e1 = (Expn) e1_;
+        Expn e2 = (Expn) e2_;
+
+        ArithExpn e = new ArithExpn();
+        e.setOpSymbol("*");
+        e.setLeft(e1);
+        e.setRight(e2);
+
+        e.setSourceCoordinateLine(e1_left);
+        e.setSourceCoordinateColumn(e1_right);
+        RESULT = e;
+    :}
+
+    | term:e1_ DIVIDE factor:e2_
+    {:
+        Expn e1 = (Expn) e1_;
+        Expn e2 = (Expn) e2_;
+
+        ArithExpn e = new ArithExpn();
+        e.setOpSymbol("/");
+        e.setLeft(e1);
+        e.setRight(e2);
+
+        e.setSourceCoordinateLine(e1_left);
+        e.setSourceCoordinateColumn(e1_right);
+        RESULT = e;
+    :}
+;
+
+// unary minus
+factor ::=
+    primary:e1_
+    {:
+        RESULT = e1_;
+    :}
+
+    | MINUS factor:e1_
+    {:
+        Expn e1 = (Expn) e1_;
+
+        UnaryMinusExpn e = new UnaryMinusExpn();
+        e.setOpSymbol("-");
+        e.setOperand(e1);
+
+        e.setSourceCoordinateLine(e1_left);
+        e.setSourceCoordinateColumn(e1_right);
+        RESULT = e;
+    :}
+;
+
+primary ::=
+    // integer or boolean constant
+    constant:e1_
+    {:
+        RESULT = e1_;
+    :}
+
+    // scalar, array variable or function call
+    | variable:e1_
+    {:
+        RESULT = e1_;
+    :}
+
+    | IDENT:ident L_PAREN arguments:args_ R_PAREN // function call
+    {:
+        ASTList<Expn> args = (ASTList<Expn>) args_;
+
+        FunctionCallExpn e = new FunctionCallExpn();
+        e.setIdent(ident);
+        e.setArguments(args);
+
+        e.setSourceCoordinateLine(identleft);
+        e.setSourceCoordinateColumn(identright);
+        RESULT = e;
+
+     :}
+
+    // parenthesized expression
+    | L_PAREN expression:e1_ R_PAREN
+    {:
+        RESULT = e1_;
+    :}
+
+    | L_PAREN expression:e1_ QUESTION expression:e2_ COLON expression:e3_ R_PAREN
+    {:
+        Expn e1 = (Expn) e1_;
+        Expn e2 = (Expn) e2_;
+        Expn e3 = (Expn) e3_;
+
+        ConditionalExpn e = new ConditionalExpn();
+        e.setCondition(e1);
+        e.setTrueValue(e2);
+        e.setFalseValue(e3);
+
+        e.setSourceCoordinateLine(e1_left);
+        e.setSourceCoordinateColumn(e1_right);
+        RESULT = e;
+    :}
+;
+
+constant ::=
+    INTCONST:i // integer constant
+    {:
+        IntConstExpn e = new IntConstExpn();
+        e.setValue(i);
+
+        e.setSourceCoordinateLine(ileft);
+        e.setSourceCoordinateColumn(iright);
+        RESULT = e;
+    :}
+
+    | TRUE:x // constant true
+    {:
+        BoolConstExpn e = new BoolConstExpn();
+        e.setValue(true);
+
+        e.setSourceCoordinateLine(xleft);
+        e.setSourceCoordinateColumn(xright);
+        RESULT = e;
+    :}
+
+    | FALSE:x // constant false
+    {:
+        BoolConstExpn e = new BoolConstExpn();
+        e.setValue(false);
+
+        e.setSourceCoordinateLine(xleft);
+        e.setSourceCoordinateColumn(xright);
+        RESULT = e;
+    :}
+;
+
+variable ::=
+    IDENT:id // scalar variable or function call
+    {:
+        IdentExpn e = new IdentExpn();
+        e.setIdent(id);
+
+        e.setSourceCoordinateLine(idleft);
+        e.setSourceCoordinateColumn(idright);
+        RESULT = e;
+    :}
+
+    | IDENT:id L_SQUARE expression:e1_ R_SQUARE // element of an array
+    {:
+        Expn e1 = (Expn) e1_;
+
+        SubsExpn e = new SubsExpn();
+        e.setVariable(id);
+        e.setOpSymbol(id);
+        e.setOperand(e1);
+
+        e.setSourceCoordinateLine(idleft);
+        e.setSourceCoordinateColumn(idright);
+        RESULT = e;
+    :}
+;

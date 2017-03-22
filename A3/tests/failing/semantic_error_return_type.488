@@ -1,0 +1,15 @@
+{
+
+var x : Integer
+
+function f ( a : Integer, b : Integer) : Boolean
+    { if a > = b then
+        return with true
+      else
+        return with false
+    }
+
+% semantic error should be caught here - x should be an integer, but f returns a boolean
+x := f ( 5, 6 )
+
+}

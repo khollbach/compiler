@@ -1,0 +1,11 @@
+{
+var a : Integer
+function foo ( a : Boolean ) : Integer
+    { if a then
+        return with 0
+      else
+        return with 1
+    }
+
+a:= foo ( 5 )
+}
