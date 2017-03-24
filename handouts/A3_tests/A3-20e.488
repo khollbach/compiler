@@ -1,0 +1,12 @@
+% A3-20e.488   
+% test assignment  errors
+{
+   var  A[100] , B[ -100 .. 0 ] , i , j : Integer
+   var  P[100] , Q[ -10 .. 10 ] , R , S : Boolean
+   function F( A : Integer ) : Integer { return with A + 1 }
+   A := i
+   i := A
+   P := Q or R
+   R := P
+   F := 7
+}

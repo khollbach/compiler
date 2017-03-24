@@ -1,0 +1,7 @@
+% A3-11c.488   ===========================================
+% test statement checks
+{
+    var i : Integer
+    function F : Integer {  return  }
+    i := F
+}

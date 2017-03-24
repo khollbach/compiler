@@ -1,0 +1,10 @@
+% A3-02.488
+% test correct declarations
+{
+   function F : Integer  {  var i : Integer var  p : Boolean  i := 2 } 
+   function G ( q  : Boolean, j : Integer ) : Boolean { var k : Integer var  r : Boolean  k := 3 }
+   procedure P {var  i : Integer var  p : Boolean  i := 2 } 
+   procedure Q ( m : Integer , s : Boolean, n : Integer )
+       {  var t  : Boolean var x , y  : Integer   t := false }
+   G( false, 3 )
+}

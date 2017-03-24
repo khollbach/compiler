@@ -1,0 +1,8 @@
+% A3-12.488   
+% test read, write restrictions
+{
+	var i, j[10] : Integer
+        var p, q[10] : Boolean
+        read  i, j , p
+        write "Goodbye Cruel World", i , j , q[3], p, newline
+}

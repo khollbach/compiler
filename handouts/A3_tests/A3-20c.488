@@ -1,0 +1,8 @@
+% A3-20c.488   
+% test expressions
+{
+   var p , q , r : Boolean
+   p := p and ( q ? not p : r )
+   p := ( p ? q not= r  : ( r ? i = j : j >= i ))
+   p := q < r
+}

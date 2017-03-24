@@ -1,0 +1,6 @@
+% A3-03c.488
+% test detection of multiple declaration
+{
+   procedure P { var i,j,k,i : Integer   var  p,q, p[10] : Boolean  j := 7  }
+   P
+}

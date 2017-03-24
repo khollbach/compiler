@@ -1,0 +1,18 @@
+% A3-05a.488   
+% test nesting in declarations
+{
+{      var i : Integer i := 1  
+{      var i : Integer i := 1  
+{      var i : Integer i := 1  
+{      var i : Integer i := 1  
+{      var i : Integer i := 1  
+{      var i : Integer i := 1  
+{      var i : Integer i := 1  
+{      var i : Integer i := 1  
+{      var i : Integer i := 1  
+{      var i : Integer i := 1  
+{      var i : Integer i := 1  
+{      var i : Integer i := 1  
+{      var i : Integer i := 1  
+} }  }  }  }  }  }  }  }  }  }  }  }   
+}

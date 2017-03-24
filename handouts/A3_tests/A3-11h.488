@@ -1,0 +1,17 @@
+% A3-11h.488   
+% test statement checks
+{
+    var p, q : Boolean
+    var i : Integer
+    while p and q do {
+        while ( p ? false : q ) do {
+                      exit 32767
+            while i not = 3 do { 
+		      if q then
+                         exit 4 when i > 7
+                      else
+                         exit 3 when i < 7
+                      while i = 3 do {
+                         exit 7 when p or q
+               } } } }
+}

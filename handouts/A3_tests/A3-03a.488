@@ -1,0 +1,6 @@
+% A3-03a.488
+% test detection of multiple declaration
+{
+   function F : Boolean  {  var i : Integer  var i : Boolean  i := 3 } 
+   F
+}

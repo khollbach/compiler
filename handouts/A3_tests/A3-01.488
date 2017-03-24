@@ -1,0 +1,12 @@
+% A3-01.488
+% test correct declarations
+{
+   var  i , j : Integer
+   var  p , q : Boolean
+   var  a1[ 20 ] , a2[ -100 .. -50 ], a3[ -20 .. 21 ]: Integer
+   var  p1[ 19 ] , p2[ -97 .. -47 ] , p3[ -19 .. 25 ] : Boolean
+   % try some really long identifiers
+   var  Supercalifragilisticexpialidocious, Antidisestablishmentarianism :  Boolean 
+   var  pneumonoultramicroscopicsilicovolcanoconiosis, Floccinaucinihilipilification : Integer
+   Supercalifragilisticexpialidocious := 42
+}

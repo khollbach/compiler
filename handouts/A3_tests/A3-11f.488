@@ -1,0 +1,11 @@
+% A3-11f.488   
+% test statement checks
+{
+    var p, q : Boolean
+    var i : Integer
+    while p and q do
+        if p then 
+             return with  p 
+        else
+             return with i 
+}

@@ -1,0 +1,38 @@
+Test		Errors 		Test Description
+
+A3-00.488	0		Empty program
+A3-01.488	1		Correct declarations
+A3-02.488	0		Correct declarations
+A3-03a.488	1		Multiple declaration errors
+A3-03b.488	2		Multiple declaration errors
+A3-03c.488	2		Multiple declaration errors
+A3-03d.488	2		Multiple declaration errors
+A3-03e.488	4		Multiple declaration errors
+A3-04a.488	2		Array declaration errors
+A3-04b.488	1		Array declaration errors
+A3-04d.488	0		Array declaration
+A3-04e.488	1		Array declaration errors
+A3-05a.488	0		Nested declarations
+A3-05b.488	0		Nested declarations
+A3-05c.488	13		Undeclared variable errors
+A3-06a.488	0		Nested functions/procedures
+A3-06b.488	3		Nested functions/procedures
+A3-10.488	0		Exit statement usage
+A3-11a.488	1		Exit statement usage
+A3-11b.488	2		Exit statement usage
+A3-11c.488	1		Return statement usage
+A3-11d.488	1		Return statement usage
+A3-11e.488	1		Return statement usage
+A3-11f.488	2		Return statement usage
+A3-11g.488	0		Exit statement usage
+A3-11h.488	4		Exit statement usage
+A3-12.488	5		read/write usage
+A3-20a.488	0		Expressions
+A3-20b.488	5		type mismatch in expressions
+A3-20c.488	2		type mismatch in expressions
+A3-20d.488	0		Subscript expressions
+A3-20e.488	5		Assignment type mismatch
+A3-31a.488	1		Function/procedure parameters
+A3-31b.488	1		Function/procedure parameters
+A3-31c.488	1		Function/procedure parameters
+A3-31d.488	1		Function/procedure parameters

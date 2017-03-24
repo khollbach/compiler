@@ -1,0 +1,19 @@
+% A3-05c.488   
+% test undeclared identifiers
+{
+       var X : Integer
+{      var A : Integer X := a  
+{      var B : Integer X := a+b  
+{      var C : Integer X := a+b+c  
+{      var D : Integer X := a+b+c+d
+{      var E : Integer X := a+b+c+d+e
+{      var F : Integer X := a+b+c+d+e+f
+{      var G : Integer X := a+b+c+d+e+f+g
+{      var H : Integer X := a+b+c+d+e+f+g+h
+{      var I : Integer X := a+b+c+d+e+f+g+h+i
+{      var J : Integer X := a+b+c+d+e+f+g+h+i+j
+{      var K : Integer X := a+b+c+d+e+f+g+h+i+j+k
+{      var L : Integer X := a+b+c+d+e+f+g+h+i+j+k+l
+{      var M : Integer X := a+b+c+d+e+f+g+h+i+j+k+l+m
+} }  }  }  }  }  }  }  }  }  }  }  }   
+}

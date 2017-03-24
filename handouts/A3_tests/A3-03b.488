@@ -1,0 +1,7 @@
+% A3-03b.488
+% test detection of multiple declaration
+{
+   function G ( q  : Boolean , j : Integer  ) : Integer  { var q : Integer  var j : Boolean j := true }
+   var i : Integer
+   i := G( false, 3 )
+}

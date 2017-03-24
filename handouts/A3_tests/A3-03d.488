@@ -1,0 +1,7 @@
+% A3-03d.488
+% test detection of multiple declaration
+{
+   procedure Q ( m : Integer  , s : Boolean , n : Integer  )
+       {  var m[ -10 .. 10 ] : Boolean  var s , s : Integer  var m, n  : Boolean   m := false }
+   Q( 1, false, 2 )
+}

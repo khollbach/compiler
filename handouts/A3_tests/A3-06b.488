@@ -1,0 +1,36 @@
+% A3-06b.488   
+% test nested function/procedure declarations
+{
+    procedure P  {
+        function Q : Integer {
+           procedure P  {
+              function Q : Boolean{
+		P
+		return with 7
+              }
+              var I : Integer
+              I := Q
+              return
+           }
+	   P
+           return with 9
+       }
+       var T : Integer
+        function R : Boolean {
+           procedure P  {
+              function Q : Boolean{
+                  P
+		  return with false
+              }
+	      var R : Boolean
+              R := Q
+              return
+           }  
+	   T := R
+           return with true
+       }
+       var S : Boolean
+       S := R or Q
+    }  % P
+    P
+}

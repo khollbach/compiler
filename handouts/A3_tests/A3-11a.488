@@ -1,0 +1,7 @@
+% A3-11a.488   
+% test statement checks
+{
+    var p, q : Boolean
+    var i , j : Integer
+    exit when p
+}

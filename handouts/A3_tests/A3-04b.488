@@ -1,0 +1,8 @@
+% A3-04b.488  
+% test errors in declarations
+{
+   var  a3[ -32767 .. 32767 ] : Integer
+   var  p3[ 32767 .. -32767 ] : Boolean
+   a3[ 0 ] : = 0
+   p3[ 0 ] := false
+}

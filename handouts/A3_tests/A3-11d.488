@@ -1,0 +1,6 @@
+% A3-11d.488   
+% test statement checks
+{
+    procedure G  { return with  i  }
+    G
+}

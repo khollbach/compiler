@@ -1,0 +1,6 @@
+% A3-04d.488  
+% test declarations
+{
+   var  a3[ -32767 .. 32767 ] : Integer
+   a3[ 0 ] : = 0
+}

@@ -1,0 +1,13 @@
+% A3-31d.488   
+% test parameters
+{
+    function F : Integer  { return with  7  }
+    function G ( P : Boolean , K  : Integer ) : Boolean
+       {  return with  not P and  K < 7   }
+    procedure P  { return }
+    procedure Q ( P : Integer  , K : Boolean )  
+       {  while K do  while K do  while K do   if K or P < 6 then return     }
+    var  i  : Integer
+    var s : Boolean
+    Q( i )
+}

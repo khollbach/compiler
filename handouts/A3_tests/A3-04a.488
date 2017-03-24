@@ -1,0 +1,8 @@
+%A3-04a.488   
+% test errors in array declarations
+{
+   var  a1[ 0 ]  : Integer
+   var   a2[ -50 .. -100 ] : Integer
+   a1[0] := 0 
+   a2[ -75 ] := 0
+}

@@ -1,0 +1,11 @@
+% A3-20b.488   
+% test invalid expressions
+{
+   var  i , j , k : Integer
+   var  p , q , r : Boolean
+   i := j + p
+   i := p * q
+   i := ( p ? q : k )
+   i := ( p ? k : r )
+   i := ( i ? j : k )
+}

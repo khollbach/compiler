@@ -1,0 +1,25 @@
+% A3-10.488   
+% test statement checks
+{
+    var p, q : Boolean
+    var i , j : Integer
+    function F : Integer{  return with  i  }
+    procedure G  { return }
+    repeat {
+       exit when p
+       {
+          exit when q
+       }
+       exit 
+    } until true
+    while p and q do {
+        exit when p or q
+        { { {
+           exit
+        } } }
+        if p then 
+             exit
+        else
+             exit
+        }
+}

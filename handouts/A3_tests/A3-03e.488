@@ -1,0 +1,11 @@
+% A3-03e.488
+% test detection of multiple declaration
+{
+   function F : Boolean  {  var i : Integer  i  := 1 }
+   function G ( q: Boolean  , j: Integer  ) : Integer  { var p : Boolean  p := q }
+   procedure P { var i,j,k: Integer   var q, p[10] : Boolean  q := true  }
+   procedure Q ( m: Integer  , s: Boolean , n: Integer  )
+       {  }
+   var F, G, P, Q : Integer
+   F := 3 
+}
