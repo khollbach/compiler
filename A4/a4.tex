@@ -226,35 +226,29 @@ BR
 
 \subsection{Activation records}
 
-We assume for function or procedure \texttt{f} that:
-    \begin{itemize}
-    \item \texttt{f}'s scope has lexical depth \texttt{x}
-    \item \texttt{f} takes \texttt{n} parameters
-    \end{itemize}
-
-The following is a diagram of \texttt{f}'s activation record, relative to the pseudo-machine's memory:
+The following is a diagram of routine \texttt{f}'s activation record, relative
+to the pseudo-machine's memory:
 
     \begin{tabular}{|c|}
-    \hline
-    Return Value \\
-    \textit{(in misc. data pool)}\\
     \hline
     \cellcolor{gray!15}
     $\uparrow$\\
     \cellcolor{gray!15}
     \textit{Free Space} \\
-    \cellcolor{gray!15}
-    $\downarrow$\\
     \hline
-    Local Variables \\
+    Variable \texttt{m}\\
+    $\vdots$\\
+    Variable \texttt{1}\\
     \hline
     Parameter \texttt{n}\\
     $\vdots$\\
     Parameter \texttt{1}\\
     \hline
-    Saved \texttt{display[x]} \\
+    Saved Display \\
     \hline
     Return Address\\
+    \hline
+    Return Value (for functions only) \\
     \hline
     \cellcolor{gray!15}
     \textit{Rest of Stack} \\
@@ -265,132 +259,83 @@ The following is a diagram of \texttt{f}'s activation record, relative to the ps
 
 \subsection{Routine entrance code}
 
-We assume for function or procedure \texttt{f} that:
-    \begin{itemize}
-    \item \texttt{f} has return address \texttt{A}
-    \item \texttt{f} takes \texttt{N} parameters
-    \item \texttt{f}'s local allocation is \texttt{M} words in size
-    \item  \texttt{f}'s declaration is nested within \texttt{X-1} function/procedure declarations
-    \end{itemize}
-
-Entrance code for \texttt{f} is generated as follows:
+Entrance code for routine \texttt{f} is generated as follows:
 
 \begin{verbatim}
-PUSH A          // push return address
-PUSH 0          // allocate space to save display[X]
-...pass arguments to f... // See 3. (d) for details.
-...call f...              // See 3. (e) for details.
-
-PUSHMT          // calculate pointer to the pointer to first parameter
-PUSH N
-SUB
-DUP             // calculate address to store display[X]
-PUSH 1
-SUB
-ADDR X 0        // push display[X]
-STORE           // store display[X] in the allocated space
-SETD X          // store pointer to the first parameter in display[X]
-
-PUSH 0          // allocate M words of space for local variables
-PUSH M
-DUPN
+// start_f:
+    // Allocate space for vars
+    PUSH 0
+    PUSH num_vars_f
+    DUPN
 \end{verbatim}
-
-Note that:
-\begin{enumerate}[label=(\arabic*)]
-\item saving the return address, allocating space to save a display register, and pushing parameters for \texttt{f} are taken care of by the caller, while
-\item saving and updating the appropriate display register, as well as allocating space for locals are taken care of by the callee.
-\end{enumerate}
 
 \subsection{Routine exit code}
 
-We assume for function or procedure \texttt{f} that:
-    \begin{itemize}
-    \item   \texttt{f}'s declaration is nested within \texttt{X-1} function/procedure declarations
-    \item The return value has been temporarily stored at address \texttt{Y}
-    \item \texttt{f}'s return value (if applicable) is at the top of the stack. Directly beneath f's return value (or at the top of the stack if there is no return value) is \texttt{f}'s local variable allocation.
-    \end{itemize}
+Cleanup code for routine \texttt{f} is generated as follows:
 
 \begin{verbatim}
-...store the return value (if applicable)...
-PUSHMT          // pop all locals & params
-ADDR X 0
-SUB
-POPN
-SETD X          // restore the saved value for display[X]
-...load return value and place under return address (if applicable)...
-BR              // return
+// end_f:
+    // Pop vars and params
+    PUSHMT
+    ADDR LL_f 0
+    SUB
+    POPN
+    // Restore display
+    SETD LL_f
+    // Go to return address
+    BR
 \end{verbatim}
 
 \subsection{Parameter passing}
 
-We assume for function or procedure \texttt{f} that:
-    \begin{itemize}
-    \item \texttt{f} takes \texttt{n} parameters
-    \item Each of the parameters passed to \texttt{f} are expressions, denoted by: \texttt{<E\_1>, <E\_2>, $\ldots$ , <E\_n>}
-    \end{itemize}
-
-Parameters are pushed on to the stack by evaluating each in the following way:
+Parameters are passed to routine \texttt{f} in the following way.
+Assume \texttt{f} takes \texttt{n} parameters.
 
 \begin{verbatim}
-...code to evaluate <E_1>...    // each expression is pushed onto the stack
-...code to evaluate <E_2>...
-            .
-            .
-            .
-...code to evaluate <E_n>...
+    ...eval arg_1...
+        ...
+    ...eval arg_n...
 \end{verbatim}
 
 \subsection{Function call and value return}
 
-We assume for function \texttt{f} that:
-    \begin{itemize}
-    \item \texttt{f}'s code begins at address \texttt{X} in memory
-    \item A word in memory reserved for temporarily storing return values has address \texttt{Y}
-    \item When describing how the return value is stored, the return value is already at the top of the stack.
-    \end{itemize}
+Function \texttt{f} is called in the following way.  The caller saves the
+display, and preallocates space for the return value on the stack.  The return
+value is stored to this location by the ``return'' statement (see 4.(e) for
+return values).
 
-\texttt{f} is called in the following way:
 \begin{verbatim}
-...push return address...
-...allocate space to save display value...
-...push parameters...
-PUSH X
-BR
-\end{verbatim}
-
-\texttt{f}'s return value is stored in the following way:
-\begin{verbatim}
-PUSH Y          // temporarily store the return value
-SWAP
-STORE
-...clean up locals & params...
-...restore saved display register...
-PUSH Y          // restore return value to top of stack
-LOAD
-SWAP            // swap return value and return address
-...return...
+// Calling code
+    PUSH 0          // Allocate space for return value
+    PUSH ret_addr   // Save return address.
+    ADDR LL_f 0     // Save display
+    ...eval args...
+    PUSH start_f
+    BR              // Go to function.
+// ret_addr:
+    ...etc...
 \end{verbatim}
 
 \subsection{Procedure call}
 
-We assume for procedure \texttt{f} that:
-    \begin{itemize}
-    \item \texttt{f}'s code begins at address \texttt{X} in memory
-    \end{itemize}
+Procedure \texttt{f} is called in the following way.  The caller saves the
+display.
 
-\texttt{f} is called in the following way:
 \begin{verbatim}
-...push return address...
-...allocate space to save display value...
-...push parameters...
-PUSH X
-BR
+// Calling code
+    PUSH ret_addr   // Save return address.
+    ADDR LL_f 0     // Save display
+    ...eval args...
+    PUSH start_f
+    BR              // Go to procedure.
+// ret_addr:
+    ...etc...
 \end{verbatim}
 
 \subsection{Display management}
 
-When a a function/procedure \texttt{f} that uses \texttt{display[X]} is called, \texttt{f} saves \texttt{display[X]} in its prologue, and restores \texttt{display[X]} in its epilogue. More consisely: display registers are \textbf{callee-saved}.
+The display is saved by the caller, and restored by the routine's cleanup code.
+See 3.(c) and 3.(e)-(f).
 
 \section{Statements}
 
@@ -483,18 +428,23 @@ exit when <expression>                <evaluate <expression>>
 
 \subsection{Return statements}
 
-In order to access the return value from a function, we assign a block of the constant memory at the top of the memory space where the function's return value is written before branching out of the function. Let this location be memorySize-1 (i.e. 8191). The value at this address is then immediately retrieved and placed at the top of the stack.
+Procedures simply go to their cleanup code, which branches to the return
+address. Functions store their return value in the space allocated by the
+caller and then go to their cleanup code.
 
 \begin{verbatim}
-function statement                      machine code
-==================                      ============
+// Procedure return
+    PUSH end_f
+    BR          // Go to cleanup
 
-function f(<params>) : <type>           PUSH 8191 \\ address of top of memory
-    { <statements>                      <evaluate <expr>>
-      return with <expr> }              STORE
-                                        <function exit and cleanup code>
-                                        PUSH 8191
-                                        LOAD
+// Function return
+    ADDR LL_f 0
+    PUSH 3
+    SUB             // Calculate location of return value
+    ...eval expr... // Evaluate return expression
+    STORE           // Store return value
+    PUSH end_f
+    BR              // Go to cleanup
 \end{verbatim}
 
 \subsection{Read and write statments}
