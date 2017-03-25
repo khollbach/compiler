@@ -1,9 +1,0 @@
-#!/bin/bash
-
-testdir=tests/passing
-
-for f in `ls "$testdir"`; do
-    echo "$f"
-    java -jar dist/compiler488.jar -X "$testdir/$f"
-    echo
-done

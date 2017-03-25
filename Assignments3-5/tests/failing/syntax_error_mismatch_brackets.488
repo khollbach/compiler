@@ -1,4 +1,0 @@
-{
-    var i : Int
-    i := 1
-    while True do write i

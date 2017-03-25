@@ -1,8 +1,0 @@
-{
-    if True then
-        write "Hello world" 
-        write "Another Hello world" 
-    else
-        write "Not true" 
-    write "Syntax error" 
-}
