@@ -1,8 +1,10 @@
 package compiler488.compiler;
 
+import compiler488.parser.*;
 import compiler488.ast.AST;
 import compiler488.ast.stmt.Program;
 import compiler488.codegen.CodeGen;
+import compiler488.codegen.CodegenVisitor;
 import compiler488.parser.SyntaxErrorException;
 import compiler488.runtime.ExecutionException;
 import compiler488.runtime.Machine;
@@ -564,11 +566,8 @@ public class Main {
         }
 
         try {
-            // INSERT CODE HERE TO DO CODE GENERATION
-            // e.g.
-            // programAST.doCodeGen() ;
-            // or
-            // codeGen.doIt( programAST );
+            CodegenVisitor codegenVisitor = new CodegenVisitor();
+            codegenVisitor.doCodeGen(programAST);
         } catch (Exception e) {
             System.err.println("Exception during Code Generation");
             System.err.println(e.getClass().getName() + ": " + e.getMessage());

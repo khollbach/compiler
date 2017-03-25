@@ -6,6 +6,7 @@ import compiler488.ast.expn.*;
  * Created by gg on 01/03/17.
  */
 public interface ExpressionVisitor {
+    void visit(Expn expn);
 
     void visit(ArithExpn arithExpn);
 

@@ -11,6 +11,7 @@ package compiler488.testing;
  * This simple minded driver does not read from standard input
  */
 
+import compiler488.parser.*;
 import compiler488.ast.stmt.Scope;
 
 import java.io.File;

@@ -59,6 +59,11 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     /* *********** */
 
     @Override
+    public void visit(Expn expn) {
+        throw new RuntimeException("Invalid AST");
+    }
+
+    @Override
     public void visit(ArithExpn arithExpn) {
         arithExpn.getLeft().accept(this);
         arithExpn.getRight().accept(this);
@@ -266,6 +271,11 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     /* ********** */
 
     @Override
+    public void visit(Stmt stmt) {
+        throw new RuntimeException("Invalid AST");
+    }
+
+    @Override
     public void visit(AssignStmt assignStmt) {
         assignStmt.getLval().accept(this);
         assignStmt.getRval().accept(this);
@@ -461,6 +471,11 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
                 }
             }
         }
+    }
+
+    @Override
+    public void visit(Declaration decl) {
+        throw new RuntimeException("Invalid AST");
     }
 
     @Override
