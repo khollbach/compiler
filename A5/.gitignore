@@ -10,7 +10,7 @@ tests/passing/basic.488
 .idea/workspace.xml
 out/
 
-Assignments3-5.iml
+*.iml
 
 tmp-test-output/
 tmp-test-output.txt

@@ -1,0 +1,580 @@
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{fullpage}
+\usepackage{enumitem}
+\usepackage{verbatim}
+\usepackage[table]{xcolor}
+
+\setlist[enumerate]{leftmargin=*}
+\setlist[itemize]{leftmargin=*}
+
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+
+\title{CSC488 Assignment 4 \\ Code Generation Design Document}
+\author{Kevan Hollbach, Tarang Marathe, \\ George Gianacopoulos, Arturo Mena Cruz, \\ Andrew Trotter}
+\date{15 March, 2017}
+
+\begin{document}
+
+\maketitle
+
+\section{Storage}
+
+\subsection{Variables in the main program}
+
+At the beginning of the program, enough space is allocated for all variables in the main program scope. The main program scope's allocation also includes enough space for all variables in any minor scopes that are descendants of the main program scope (see \S 1-\textbf{(c)} for more details). 
+
+Variables are addressed relative to the beginning of the allocation. The address of the beginning of the main program scope's allocation is stored in \texttt{display[0]}.
+
+Assuming that that a total of \texttt{N} words of space must be allocated for the main program scope, the following code will be generated to do the allocation:
+
+\begin{verbatim}
+PUSHMT          // set display[0] to point to the beginning of the allocation
+SETD 0
+PUSH 0          // allocate N words of space 
+PUSH N
+DUPN
+\end{verbatim}
+
+\subsection{Variables in procedures and functions}
+
+Similar to how space is allocated in the main program scope, enough space is allocated for all variables in a function/procedure \texttt{f} in \texttt{f}'s prologue. \texttt{f}'s allocation also includes enough space for all variables in any minor scopes that are descendants of \texttt{f}'s scope (see \S 1-\textbf{(c)} for more details). \texttt{f}'s allocation occurs immediately above f's parameters (if any exist).
+
+Variables are addressed relative to the address of \texttt{f}'s first parameter. Assuming, the address of \texttt{f}'s first parameter is stored in \texttt{display[X+1]}. Consequentially, \textbf{programs with function/procedure declaration nesting depth greater than \underline{\texttt{displaySize - 1}} will not compile}.
+
+The code generated to do \texttt{f}'s allocation is similar to the code in \S 1-\textbf{(a)}. Full specification of code generated for function/procedure allocations can be found as part of the template in \S 3-\textbf{(b)}.
+
+\subsection{Variables in minor scopes}
+
+We define a minor scope $s$ to be a \textbf{descendant} of a major scope $S$ if and only if:
+	\begin{enumerate}[label=(\arabic*)]
+	\item $s$ is a direct child of $S$ in the program AST, or
+    \item $s$ is the direct child of a descendant of $S$ in the program AST.
+	\end{enumerate}
+    
+For any minor scope $s$, $s$ will be a descendant of some major scope $S$. Any space that needs to be allocated for $s$ will be allocated as part of $S$'s allocation.
+
+\subsection{Integer and boolean constants}
+
+There will be no explicit storage for integer and boolean constants, they will be appear as arguments to \texttt{PUSH} instructions. See \S 2-\textbf{(a)} for details.
+
+\subsection{Text constants}
+
+Text constants are stored in the constant pool. Addressing of text constans is embedded in the program code at compile-time. Text constants are printed using a procedure specified in \S 4-\textbf{(f)}.
+
+\section{Expressions}
+
+\subsection{Constant values (including text constants)}
+
+Only strings (text constants) will appear in the constant pool (see 1.\ (e) for the details on how strings are handled). Integer and boolean constants will be pushed onto the stack when encountered, as follows:
+
+\begin{verbatim}
+constant expression                        machine code
+===================                        ============
+false                                      PUSH MACHINE_FALSE
+
+true                                       PUSH MACHINE_TRUE
+
+72                                         PUSH 72
+
+-105                                       PUSH -105
+\end{verbatim}
+
+\subsection{Scalar variables}
+
+To access a scalar variable, we need to load a value onto the stack from the correct location in memory. This is done using the display registers, and the \texttt{(LL, ON)} addressing method described in the Assignment 3 handout.
+
+Assume that \texttt{x} is declared as a scalar variable in some major or minor scope, \texttt{LL} is the lexical level (depth) of this scope, and \texttt{ON} is the order number (offset) of the variable among all the variables declared in that scope.
+
+\begin{verbatim}
+variable reference                         machine code
+==================                         ============
+x                                          ADDR LL ON
+                                           LOAD
+\end{verbatim}
+
+\subsection{Array elements}
+
+We assume that:
+\begin{itemize}
+    \item \texttt{a[x..y]} is an array
+    \item \texttt{a} has address $(i, j)$ in the symbol table
+\end{itemize}
+
+The following code will be generated for the expression \texttt{a[<EXPN>]} (where \texttt{<EXPN>} is some arbitrary expression that evaluates to an integer):
+
+\begin{verbatim}
+ADDR i j
+...code to evaluate <EXPN>...
+PUSH x
+SUB     // normalize the value of <EXPN>
+ADD     // calculate the address of a[<EXPN>]
+LOAD
+\end{verbatim}
+
+\subsection{Arithmetic operators}
+
+To evaluate binary arithmetic expressions, the child expressions need to be evaluated first. Assuming they are properly evaluated, their values will be on top of the stack. Then the appropriate machine instruction is executed, leaving the resulting value of the binary expression on the stack.
+
+\begin{verbatim}
+arithmetic expression           machine code
+=====================           ============
+   <expr1> + <expr2>            ...code to evaluate <expr1>...
+                                ...code to evaluate <expr2>...
+                                ADD
+                                
+   <expr1> - <expr2>            ...code to evaluate <expr1>...
+                                ...code to evaluate <expr2>...
+                                SUB
+
+   <expr1> * <expr2>            ...code to evaluate <expr1>...
+                                ...code to evaluate <expr2>...
+                                MUL
+
+   <expr1> / <expr2>            ...code to evaluate <expr1>...
+                                ...code to evaluate <expr2>...
+                                DIV
+\end{verbatim}
+
+\subsection{Comparison operators}
+
+Similarly, for comparison operators: 
+
+\begin{verbatim}
+comparison expression           machine code
+=====================           ============
+   <expr1> = <expr2>            ...code to evaluate <expr1>...
+                                ...code to evaluate <expr2>...
+                                EQ
+                                
+<expr1> not = <expr2>           ...code to evaluate <expr1>...
+                                ...code to evaluate <expr2>...
+                                EQ
+                                PUSH MACHINE_FALSE
+                                EQ
+                                
+   <expr1> < <expr2>            ...code to evaluate <expr1>...
+                                ...code to evaluate <expr2>...
+                                LT
+                                
+   <expr1> > <expr2>            ...code to evaluate <expr2>...
+                                ...code to evaluate <expr1>...
+                                LT
+                                
+   <expr1> <= <expr2>           ...code to evaluate <expr2>...
+                                ...code to evaluate <expr1>...
+                                LT
+                                PUSH MACHINE_FALSE  // boolean NOT
+                                EQ
+                                
+   <expr1> >= <expr2>           ...code to evaluate <expr1>...
+                                ...code to evaluate <expr2>...
+                                LT
+                                PUSH MACHINE_FALSE  // boolean NOT
+                                EQ
+\end{verbatim}
+
+\subsection{Boolean operators}
+
+\begin{verbatim}
+boolean expression              machine code
+====================            ============
+ <expr1> or <expr2>             ...code to evaluate <expr1>...
+                                ...code to evaluate <expr2>...
+                                OR
+                                  
+ <expr1> and <expr2>            ...code to evaluate <expr1>...
+                                ...code to evaluate <expr2>...
+                                MUL
+                                  
+       not <expr>               ...code to evaluate <expr>...
+                                PUSH MACHINE_FALSE
+                                EQ
+\end{verbatim}
+
+\subsection{Conditional expressions}
+
+For conditional expression \texttt{(<EXPN1>?<EXPN2>:<EXPN3>)}, we assume that:
+\begin{itemize}
+    \item The code to evaluate \texttt{<EXPN3>} begins at address \texttt{x}
+    \item The beginning of the code after the conditional expression begins at address \texttt{y}
+\end{itemize}
+
+The following code will be generated to evaluate the conditonal expression:
+
+\begin{verbatim}
+...code to evaluate <EXPN1>...
+PUSH x
+BF
+...code to evaluate <EXPN2>...
+PUSH y
+BR
+...code to evaluate <EXPN3>...    // address x points here
+...continue execution...          // address y points here
+\end{verbatim}
+
+\section{Functions and Procedures}
+
+\subsection{Activation records}
+
+We assume for function or procedure \texttt{f} that:
+    \begin{itemize}
+    \item \texttt{f}'s scope has lexical depth \texttt{x}
+    \item \texttt{f} takes \texttt{n} parameters
+    \end{itemize}
+
+The following is a diagram of \texttt{f}'s activation record, relative to the pseudo-machine's memory:
+
+    \begin{tabular}{|c|}
+    \hline
+    Return Value \\
+    \textit{(in misc. data pool)}\\
+    \hline
+    \cellcolor{gray!15}
+    $\uparrow$\\
+    \cellcolor{gray!15}
+    \textit{Free Space} \\
+    \cellcolor{gray!15}
+    $\downarrow$\\
+    \hline
+    Local Variables \\
+    \hline
+    Parameter \texttt{n}\\
+    $\vdots$\\
+    Parameter \texttt{1}\\
+    \hline
+    Saved \texttt{display[x]} \\
+    \hline
+    Return Address\\
+    \hline
+    \cellcolor{gray!15}
+    \textit{Rest of Stack} \\
+    \cellcolor{gray!15}
+    $\downarrow$\\
+    \hline
+    \end{tabular}
+
+\subsection{Routine entrance code}
+
+We assume for function or procedure \texttt{f} that:
+    \begin{itemize}
+    \item \texttt{f} has return address \texttt{A}
+    \item \texttt{f} takes \texttt{N} parameters
+    \item \texttt{f}'s local allocation is \texttt{M} words in size
+    \item  \texttt{f}'s declaration is nested within \texttt{X-1} function/procedure declarations
+    \end{itemize}
+
+Entrance code for \texttt{f} is generated as follows:
+
+\begin{verbatim}
+PUSH A          // push return address
+PUSH 0          // allocate space to save display[X]
+...pass arguments to f... // See 3. (d) for details.
+...call f...              // See 3. (e) for details.
+
+PUSHMT          // calculate pointer to the pointer to first parameter
+PUSH N
+SUB
+DUP             // calculate address to store display[X]
+PUSH 1
+SUB
+ADDR X 0        // push display[X]
+STORE           // store display[X] in the allocated space
+SETD X          // store pointer to the first parameter in display[X]
+
+PUSH 0          // allocate M words of space for local variables
+PUSH M
+DUPN
+\end{verbatim}
+
+Note that:
+\begin{enumerate}[label=(\arabic*)]
+\item saving the return address, allocating space to save a display register, and pushing parameters for \texttt{f} are taken care of by the caller, while
+\item saving and updating the appropriate display register, as well as allocating space for locals are taken care of by the callee.
+\end{enumerate} 
+
+\subsection{Routine exit code}
+
+We assume for function or procedure \texttt{f} that:
+    \begin{itemize}
+    \item   \texttt{f}'s declaration is nested within \texttt{X-1} function/procedure declarations
+    \item The return value has been temporarily stored at address \texttt{Y}
+    \item \texttt{f}'s return value (if applicable) is at the top of the stack. Directly beneath f's return value (or at the top of the stack if there is no return value) is \texttt{f}'s local variable allocation.
+    \end{itemize}
+    
+\begin{verbatim}
+...store the return value (if applicable)...
+PUSHMT          // pop all locals & params
+ADDR X 0
+SUB
+POPN
+SETD X          // restore the saved value for display[X]
+...load return value and place under return address (if applicable)...
+BR              // return
+\end{verbatim}
+
+\subsection{Parameter passing}
+
+We assume for function or procedure \texttt{f} that:
+    \begin{itemize}
+    \item \texttt{f} takes \texttt{n} parameters
+    \item Each of the parameters passed to \texttt{f} are expressions, denoted by: \texttt{<E\_1>, <E\_2>, $\ldots$ , <E\_n>}
+    \end{itemize}
+
+Parameters are pushed on to the stack by evaluating each in the following way:
+
+\begin{verbatim}
+...code to evaluate <E_1>...    // each expression is pushed onto the stack
+...code to evaluate <E_2>...
+            .
+            .
+            .
+...code to evaluate <E_n>...
+\end{verbatim}
+
+\subsection{Function call and value return}
+
+We assume for function \texttt{f} that:
+    \begin{itemize}
+    \item \texttt{f}'s code begins at address \texttt{X} in memory
+    \item A word in memory reserved for temporarily storing return values has address \texttt{Y}
+    \item When describing how the return value is stored, the return value is already at the top of the stack.
+    \end{itemize}
+    
+\texttt{f} is called in the following way:
+\begin{verbatim}
+...push return address...
+...allocate space to save display value...
+...push parameters...
+PUSH X
+BR
+\end{verbatim}
+
+\texttt{f}'s return value is stored in the following way:
+\begin{verbatim}
+PUSH Y          // temporarily store the return value
+SWAP
+STORE
+...clean up locals & params...
+...restore saved display register...
+PUSH Y          // restore return value to top of stack
+LOAD
+SWAP            // swap return value and return address
+...return...
+\end{verbatim}
+
+\subsection{Procedure call}
+
+We assume for procedure \texttt{f} that:
+    \begin{itemize}
+    \item \texttt{f}'s code begins at address \texttt{X} in memory
+    \end{itemize}
+    
+\texttt{f} is called in the following way:
+\begin{verbatim}
+...push return address...
+...allocate space to save display value...
+...push parameters...
+PUSH X
+BR
+\end{verbatim}
+
+\subsection{Display management}
+
+When a a function/procedure \texttt{f} that uses \texttt{display[X]} is called, \texttt{f} saves \texttt{display[X]} in its prologue, and restores \texttt{display[X]} in its epilogue. More consisely: display registers are \textbf{callee-saved}.
+
+\section{Statements}
+
+\subsection{Assignment statements}
+
+Assign statements in our language will have the form \texttt{a := <expr>}, where \texttt{a} is an already declared variable, and \texttt{<expr>} is either a valid expression that evaluates to an integer or boolean, or an atomic integer or boolean. Therefore, in order to assign the value of the expression to the variable, we will first push the the address of the variable onto the stack using \texttt{ADDR LL\_a ON\_a}, then evaluate the expression so that its return value is on the top of the stack, and then call \texttt{STORE} to store that value at the variable's address. For example:
+
+\begin{verbatim}
+assign statement          machine code
+================          ============
+	a := true                 ADDR LL_a ON_a
+                          PUSH MACHINE_TRUE
+                          STORE
+                          
+a := (3 + 6) / 3          ADDR LL_a ON_a
+                          <code to evaluate (3 + 6) / 3>
+                          STORE
+\end{verbatim}
+
+\subsection{If statements}
+
+The first thing that needs to be done is to evaluate the conditional and push it to the top of the stack, then we can push the address of the ``else'' block. With these two values at the top of the stack the command BF can use this to branch when the conditional is false. In addition to this we have to add an unconditional branch command at the end of ``then'' block of the if-statement making it branch to after the else-block. Other than that, the code to execute the statement(s) in the ``then'' and ``else'' blocks is just generated recursively and placed in the instruction space one afer the other.
+
+\begin{verbatim}
+ if statement                  machine code
+===============                ============
+
+if <expr> then                 <evaluate <expr>>
+    <statement1>               PUSH else_start_addr
+else                           BF
+    <statement2>               <evaluate statement1>
+                               PUSH else_end_addr
+                               BR
+                               <evaluate <statement 2>>  // else_start_addr
+                               // else_end_addr
+\end{verbatim}
+
+\subsection{While and repeat statements}
+
+While statements in the language have the form \texttt{while <boolean expr> do <statement 1> ... <statement N>}. Therefore \texttt{<boolean expr>} has to be checked at the beginning of each loop, and if it is false we branch to the next instruction. Similarly, at the end of each loop (when each statement has been evaluated), we branch back to the beginning (unconditionally). Therefore the corresponding machine code is:
+
+\begin{verbatim}
+   statement                         machine code
+===============                      ============
+
+while <bool expression> do           <evaluate <bool expression>>  // start_loop_address
+    <statement 1>                    PUSH end_loop_address
+    ...                              BF
+    <statement N>                    <evaluate <statement 1> ... <statement N>>
+                                     PUSH start_loop_address
+                                     BR
+                                     // end_loop_address
+\end{verbatim}
+
+Note: \texttt{end\_loop\_expression} is the address of the next instruction after the while-loop. Therefore the \texttt{BF} (branch-false) instruction will go to that instruction if the \texttt{<bool expression>} evaluates to false. Similarly, \texttt{start\_address} is the address of the first instruction of the while loop, so at the end of each loop the \texttt{BR} (unconditional branch) takes execution back to the beginning of the loop.
+
+Repeat statements have the form \texttt{repeat \{ <statement 1> ... <statement N> \} until <bool expression>}. Therefore, the \texttt{<bool expression>} is checked at the end of each loop through the statements, and we only move on to the next instruction when it is set to true (unless there is an \texttt{exit} instruction among the statements - this case is dealt with later).
+
+\begin{verbatim}
+    statement                         machine code
+================                      ============
+
+repeat <statement>                    <evaluate <statement>>      // start_address
+    until <bool expression>           <evaluate <bool_expression>>
+                                      PUSH start_address
+                                      BF
+    
+
+\end{verbatim}
+
+\texttt{start\_address} is the address of the first instruction of the repeat-loop machine code to be evaluated. If \texttt{bool\_expression} is false, the \texttt{BF} instruction ensures that the repeat-loop statements are executed once again by going back to \texttt{start\_address}. If not, we move on to the next line of execution. 
+ 
+\subsection{Exit statements}
+
+\begin{verbatim}
+    statement                         machine code
+================                      ============
+
+exit when <expression>                <evaluate <expression>>      
+                                      PUSH MACHINE_FALSE
+                                      EQ
+                                      PUSH end_loop_address
+                                      BF
+                                      // ...other loop code...
+                                      // end_loop_address
+           
+    
+
+\end{verbatim}
+
+\subsection{Return statements}
+
+In order to access the return value from a function, we assign a block of the constant memory at the top of the memory space where the function's return value is written before branching out of the function. Let this location be memorySize-1 (i.e. 8191). The value at this address is then immediately retrieved and placed at the top of the stack.
+
+\begin{verbatim}
+function statement                      machine code
+==================                      ============
+
+function f(<params>) : <type>           PUSH 8191 \\ address of top of memory         
+    { <statements>                      <evaluate <expr>>
+      return with <expr> }              STORE
+                                        <function exit and cleanup code>
+                                        PUSH 8191
+                                        LOAD
+\end{verbatim}
+
+\subsection{Read and write statments}
+
+Read statements have the form \texttt{read a, b, c} where \texttt{a, b, c} are integer variables that have already been initialized, and take their values from standard input. Therefore the machine code is similar to assign statements, except the value is retreived from standard input usin \texttt{READI} and placed at the top of the stack.
+
+\begin{verbatim}
+read statements             machine code
+===============             ============
+
+read a, ..., b              ADDR LL_a ON_a
+                            READI
+                            STORE
+                            ...
+                            ADDR LL_b ON_b
+                            READI
+                            STORE
+\end{verbatim}
+
+Write statements have the form \texttt{write <string>} or \texttt{write <arithmetic expr>}, or a combination of the two (e.g. \texttt{write <string> <arith expr> <string>}). Arithmetic expressions need to be evaluated first, and their result can be written using \texttt{PRINTI}:
+
+\begin{verbatim}
+write statements             machine code
+================             ============
+write <arithmetic exrp>      <evaluate <arithmetic expr>>   
+                             PRINTI
+\end{verbatim}
+
+Text constants are printed with a procedure that loops through the characters and prints each. The following code implements the afformentioned procedure. It takes the address of the string to print as its first parameter, and the length of the string as its second parameter. It is called (and set up) like any other procedure. It uses display register 0 (an arbitrary choice) for stack addressing.
+
+\begin{verbatim}
+/* Set Up */
+PUSHMT          // calculate pointer to the address of the string to print
+PUSH 2
+SUB
+DUP             // calculate address to store display[0] in
+PUSH 1
+SUB
+ADDR 0 0        // push display[0]
+STORE           // store display[0] in the space allocated by the caller
+SETD 0          // store pointer to the string address in display[0]
+
+PUSH 0           // initialize counter
+
+/* Main Loop - check if all characters have been printed */
+DUP             // <&Main Loop> 
+ADDR 0 1
+LOAD
+LT
+PUSH <&Cleanup> // exit loop if all characters have been printed
+BF
+
+DUP             // calculate address of next character to print
+ADDR 0 0
+LOAD
+ADD
+LOAD            // load and print character
+PRINTC
+
+PUSH 1          // increment counter
+ADD
+BR <&Main Loop>
+
+/* Cleanup - pop counter, length, string address */
+PUSH 3          // <&Cleanup> 
+POPN
+SETD 0          // restore display[0]
+BR              // return
+\end{verbatim}
+
+\subsection{Minor scopes}
+
+Code for a minor scope $s$ is incorporated into the code generated for the major scope that $s$ is a descendant of. The details of allocating minor scope variables can be found in \S 1-\textbf{(c)}.
+
+\section{Everything Else}
+
+\subsection{Main program initialization and termination}
+
+To initialize the main program, we have to point the program counter to the first instruction in the program, \texttt{startPC}. The stack pointer is set to the first free word in the memory, \texttt{startMSP}.
+
+To terminate the program, we exit the final program scope, and then call \texttt{HALT} so that the program counter stops.
+
+\subsection{Handling of scopes not described above}
+
+n/a.
+
+\subsection{Other relevant information}
+
+n/a.
+
+\end{document}
