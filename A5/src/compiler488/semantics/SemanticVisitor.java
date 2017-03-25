@@ -1,7 +1,6 @@
 package compiler488.semantics;
 
 import compiler488.ast.ASTList;
-import compiler488.ast.InvalidASTException;
 import compiler488.ast.Printable;
 import compiler488.ast.Readable;
 import compiler488.ast.decl.*;
@@ -58,11 +57,6 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     /* *********** */
     /* EXPRESSIONS */
     /* *********** */
-
-    @Override
-    public void visit(Expn expn) {
-        throw new InvalidASTException();
-    }
 
     @Override
     public void visit(ArithExpn arithExpn) {
@@ -144,7 +138,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     @Override
     public void visit(FunctionCallExpn funcExpn) {
         List<ScalarTypeDescriptor> paramTypes = null;
-        
+
         try {
             SymbolAttributes attrs = symbolTable.retrieveSymbol(funcExpn.getIdent());
             if (attrs.typeDescriptor instanceof FunctionTypeDescriptor) {
@@ -157,7 +151,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
                 } else {
                     funcExpn.setEvalType(ExpnEvalType.BOOLEAN);
                 }
-                
+
                 verifyParamTypes(paramTypes, evalTypes);
             }
         } catch (SymbolTable.SymbolNotFoundException e) {
@@ -210,11 +204,9 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     @Override
     public void visit(NotExpn notExpn) {
         notExpn.getOperand().accept(this);
-        if (notExpn.getOperand().evalType().equals(ExpnEvalType.BOOLEAN)){
+        if (notExpn.getOperand().evalType().equals(ExpnEvalType.BOOLEAN)) {
             notExpn.setEvalType(ExpnEvalType.BOOLEAN);
-        }
-        else
-        {
+        } else {
             semanticErrors.add(new TypeError(notExpn));
             notExpn.setEvalType(ExpnEvalType.BOOLEAN);
         }
@@ -274,11 +266,6 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     /* ********** */
 
     @Override
-    public void visit(Stmt stmt) {
-        throw new InvalidASTException();
-    }
-
-    @Override
     public void visit(AssignStmt assignStmt) {
         assignStmt.getLval().accept(this);
         assignStmt.getRval().accept(this);
@@ -321,8 +308,8 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     public void visit(IfStmt ifStmt) {
         ifStmt.getCondition().accept(this);
         ifStmt.getWhenTrue().accept(this);
-        if (ifStmt.getWhenFalse() != null){
-        	ifStmt.getWhenFalse().accept(this);
+        if (ifStmt.getWhenFalse() != null) {
+            ifStmt.getWhenFalse().accept(this);
         }
 
         if (ifStmt.getCondition().evalType() != ExpnEvalType.BOOLEAN) {
@@ -400,17 +387,17 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
 
         if ((returnStmt.getValue() == null) &&
                 (majorScopeInfoStack.peek().getScopeType() == MajorScopeInfo.ScopeType.FUNCTION)) {
-                semanticErrors.add(new ReturnError(returnStmt));
+            semanticErrors.add(new ReturnError(returnStmt));
         }
 
-        if (returnStmt.getValue() != null){
+        if (returnStmt.getValue() != null) {
             returnStmt.getValue().accept(this);
 
             if (majorScopeInfoStack.peek().getScopeType() == MajorScopeInfo.ScopeType.PROCEDURE) {
                 semanticErrors.add(new ReturnError(returnStmt, returnStmt.getValue()));
             }
 
-            if ( majorScopeInfoStack.peek().getScopeType() == MajorScopeInfo.ScopeType.FUNCTION
+            if (majorScopeInfoStack.peek().getScopeType() == MajorScopeInfo.ScopeType.FUNCTION
                     && returnStmt.getValue().evalType() != majorScopeInfoStack.peek().getReturnType()) {
                 semanticErrors.add(new TypeError(returnStmt,
                         majorScopeInfoStack.peek().getReturnType(), returnStmt.getValue().evalType()));
@@ -474,11 +461,6 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
                 }
             }
         }
-    }
-
-    @Override
-    public void visit(Declaration decl) {
-        throw new InvalidASTException();
     }
 
     @Override
@@ -579,7 +561,7 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
     }
 
     private List<ExpnEvalType> processArgs(ASTList<Expn> expns) {
-        for (Expn e : expns){
+        for (Expn e : expns) {
             e.accept(this);
         }
         return expns.stream()

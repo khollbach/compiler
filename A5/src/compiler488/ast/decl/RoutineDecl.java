@@ -1,9 +1,9 @@
 package compiler488.ast.decl;
 
-import java.io.PrintStream;
-
 import compiler488.ast.Indentable;
 import compiler488.visitor.DeclarationVisitor;
+
+import java.io.PrintStream;
 
 /**
  * Represents the declaration of a function or procedure.

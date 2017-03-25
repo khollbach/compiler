@@ -12,9 +12,9 @@ package compiler488.testing;
  */
 
 import compiler488.ast.stmt.Scope;
-import compiler488.parser.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
 
 
 /**
@@ -31,7 +31,7 @@ class TestAST {
             PrintAST(new File(argv[0]));
             System.out.println("End parsing");
         } catch (Exception e) {
-			/* do cleanup here -- possibly rethrow e */
+            /* do cleanup here -- possibly rethrow e */
             System.out.println("Exception during Parsing");
             e.printStackTrace();
         }

@@ -1,11 +1,10 @@
 package compiler488.ast.decl;
 
-import java.io.PrintStream;
-
 import compiler488.ast.ASTList;
 import compiler488.ast.Indentable;
-
 import compiler488.visitor.DeclarationVisitor;
+
+import java.io.PrintStream;
 
 /**
  * Holds the declaration of multiple elements.

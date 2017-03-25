@@ -1,8 +1,8 @@
 package compiler488.semantics;
 
-import java.io.*;
-
-import compiler488.symbol.SymbolTable;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * Implement semantic analysis for compiler 488
@@ -37,7 +37,7 @@ public class Semantics {
      */
     /*                        start of  compilation                 */
     void Initialize() {
-	
+
 	   /*   Initialize the symbol table             */
 
         // Symbol.Initialize();

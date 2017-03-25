@@ -1,6 +1,7 @@
 package compiler488.runtime;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Provides a simple interface for standard text reading operations

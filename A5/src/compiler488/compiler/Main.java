@@ -1,16 +1,17 @@
 package compiler488.compiler;
 
-import java.io.*;
-
-import compiler488.parser.*;
 import compiler488.ast.AST;
 import compiler488.ast.stmt.Program;
+import compiler488.codegen.CodeGen;
+import compiler488.parser.SyntaxErrorException;
+import compiler488.runtime.ExecutionException;
+import compiler488.runtime.Machine;
 import compiler488.semantics.SemanticError;
 import compiler488.semantics.SemanticVisitor;
 import compiler488.semantics.Semantics;
 import compiler488.symbol.SymbolTable;
-import compiler488.codegen.CodeGen;
-import compiler488.runtime.*;
+
+import java.io.*;
 
 /**
  * This class serves as the main driver for the CSC488S compiler.<BR>
@@ -371,7 +372,7 @@ public class Main {
      * @param fileName name of the error file
      */
     private static void setErrorSink(String fileName) {
-	/* set System.err to point at specifed file */
+    /* set System.err to point at specifed file */
         try {
             errorFile = new File(fileName);
         } catch (Exception e) {
@@ -517,8 +518,8 @@ public class Main {
             SemanticVisitor semanticVisitor = new SemanticVisitor();
             programAST.accept(semanticVisitor);
             for (SemanticError se : semanticVisitor.getSemanticErrors()) {
-            	System.out.println(se);
-            	errorOccurred = true;
+                System.out.println(se);
+                errorOccurred = true;
             }
         } catch (Exception e) {
             System.err.println("Exception during Semantic Analysis");

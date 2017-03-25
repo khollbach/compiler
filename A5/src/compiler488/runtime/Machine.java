@@ -1,8 +1,8 @@
 package compiler488.runtime;
 
-import java.io.*;
-
 import compiler488.compiler.Main;
+
+import java.io.PrintStream;
 
 /**
  * Machine - a pseduo machine interpreter for CSC488S Course Project <BR>
@@ -713,7 +713,7 @@ public final class Machine {
                     break;
 
 		/* ADD, SUB, MUL, DIV, EQ, LT, OR: arithmetic and logical
-		* operations.  If the top of the stack is y, and the next item
+        * operations.  If the top of the stack is y, and the next item
 		* down is x, then OP (where OP=ADD, SUB, ... , OR)
 		* performs x OP y.  Some meager overflow checking is done.
 		*/

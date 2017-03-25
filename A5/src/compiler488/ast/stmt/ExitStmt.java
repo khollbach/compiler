@@ -1,6 +1,6 @@
 package compiler488.ast.stmt;
 
-import compiler488.ast.expn.*;
+import compiler488.ast.expn.Expn;
 import compiler488.visitor.StatementVisitor;
 
 /**

@@ -1,6 +1,5 @@
 package compiler488.visitor;
 
-import compiler488.ast.decl.RoutineBody;
 import compiler488.ast.stmt.*;
 
 /**
@@ -9,8 +8,6 @@ import compiler488.ast.stmt.*;
  * Created by gg on 01/03/17.
  */
 public interface StatementVisitor {
-    void visit(Stmt stmt);
-
     void visit(AssignStmt assignStmt);
 
     void visit(ExitStmt exitStmt);

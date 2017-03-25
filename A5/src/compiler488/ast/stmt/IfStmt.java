@@ -1,10 +1,10 @@
 package compiler488.ast.stmt;
 
-import java.io.PrintStream;
-
 import compiler488.ast.Indentable;
 import compiler488.ast.expn.Expn;
 import compiler488.visitor.StatementVisitor;
+
+import java.io.PrintStream;
 
 /**
  * Represents an if-then or an if-then-else construct.

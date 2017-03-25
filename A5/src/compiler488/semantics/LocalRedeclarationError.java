@@ -1,8 +1,6 @@
 package compiler488.semantics;
 
-import compiler488.ast.AST;
 import compiler488.ast.decl.DeclarationPart;
-import compiler488.ast.decl.MultiDeclarations;
 import compiler488.ast.decl.RoutineDecl;
 import compiler488.ast.decl.ScalarDecl;
 

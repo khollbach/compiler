@@ -1,7 +1,7 @@
 package compiler488.codegen;
 
-import compiler488.ast.InvalidASTException;
-import compiler488.ast.decl.*;
+import compiler488.ast.decl.MultiDeclarations;
+import compiler488.ast.decl.RoutineDecl;
 import compiler488.ast.expn.*;
 import compiler488.ast.stmt.*;
 import compiler488.visitor.DeclarationVisitor;
@@ -9,6 +9,11 @@ import compiler488.visitor.ExpressionVisitor;
 import compiler488.visitor.StatementVisitor;
 
 public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, StatementVisitor {
+
+    /*
+     *  INSTANCE VARIABLES:
+     *  This SemanticVisitor's members.
+     */
 
     /*
      *  CONSTRUCTORS:
@@ -25,11 +30,6 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
     /* *********** */
     /* EXPRESSIONS */
     /* *********** */
-
-    @Override
-    public void visit(Expn expn) {
-        throw new InvalidASTException();
-    }
 
     @Override
     public void visit(ArithExpn arithExpn) {
@@ -96,11 +96,6 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
     /* ********** */
 
     @Override
-    public void visit(Stmt stmt) {
-        throw new InvalidASTException();
-    }
-
-    @Override
     public void visit(AssignStmt assignStmt) {
         throw new RuntimeException("NYI");
     }
@@ -155,10 +150,9 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         throw new RuntimeException("NYI");
     }
 
-    @Override
-    public void visit(Declaration decl) {
-        throw new InvalidASTException();
-    }
+    /* *********** */
+    /* DECLARATIONS */
+    /* *********** */
 
     @Override
     public void visit(MultiDeclarations multiDecl) {

@@ -2,9 +2,6 @@ package compiler488.semantics;
 
 import compiler488.ast.expn.*;
 import compiler488.ast.stmt.*;
-import compiler488.symbol.td.ScalarTypeDescriptor;
-
-import java.util.List;
 
 /**
  * Created by tarang on 2017-03-02.

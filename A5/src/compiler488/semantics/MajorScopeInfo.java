@@ -1,7 +1,5 @@
 package compiler488.semantics;
 
-import compiler488.ast.stmt.Scope;
-
 /**
  * Created by hollbac1 on 3/3/17.
  */
