@@ -23,7 +23,7 @@
 
 \subsection{Variables in the main program}
 
-At the beginning of the program, enough space is allocated for all variables in the main program scope. The main program scope's allocation also includes enough space for all variables in any minor scopes that are descendants of the main program scope (see \S 1-\textbf{(c)} for more details). 
+At the beginning of the program, enough space is allocated for all variables in the main program scope. The main program scope's allocation also includes enough space for all variables in any minor scopes that are descendants of the main program scope (see \S 1-\textbf{(c)} for more details).
 
 Variables are addressed relative to the beginning of the allocation. The address of the beginning of the main program scope's allocation is stored in \texttt{display[0]}.
 
@@ -32,7 +32,7 @@ Assuming that that a total of \texttt{N} words of space must be allocated for th
 \begin{verbatim}
 PUSHMT          // set display[0] to point to the beginning of the allocation
 SETD 0
-PUSH 0          // allocate N words of space 
+PUSH 0          // allocate N words of space
 PUSH N
 DUPN
 \end{verbatim}
@@ -48,11 +48,11 @@ The code generated to do \texttt{f}'s allocation is similar to the code in \S 1-
 \subsection{Variables in minor scopes}
 
 We define a minor scope $s$ to be a \textbf{descendant} of a major scope $S$ if and only if:
-	\begin{enumerate}[label=(\arabic*)]
-	\item $s$ is a direct child of $S$ in the program AST, or
+    \begin{enumerate}[label=(\arabic*)]
+    \item $s$ is a direct child of $S$ in the program AST, or
     \item $s$ is the direct child of a descendant of $S$ in the program AST.
-	\end{enumerate}
-    
+    \end{enumerate}
+
 For any minor scope $s$, $s$ will be a descendant of some major scope $S$. Any space that needs to be allocated for $s$ will be allocated as part of $S$'s allocation.
 
 \subsection{Integer and boolean constants}
@@ -123,7 +123,7 @@ arithmetic expression           machine code
    <expr1> + <expr2>            ...code to evaluate <expr1>...
                                 ...code to evaluate <expr2>...
                                 ADD
-                                
+
    <expr1> - <expr2>            ...code to evaluate <expr1>...
                                 ...code to evaluate <expr2>...
                                 SUB
@@ -139,7 +139,7 @@ arithmetic expression           machine code
 
 \subsection{Comparison operators}
 
-Similarly, for comparison operators: 
+Similarly, for comparison operators:
 
 \begin{verbatim}
 comparison expression           machine code
@@ -147,29 +147,29 @@ comparison expression           machine code
    <expr1> = <expr2>            ...code to evaluate <expr1>...
                                 ...code to evaluate <expr2>...
                                 EQ
-                                
+
 <expr1> not = <expr2>           ...code to evaluate <expr1>...
                                 ...code to evaluate <expr2>...
                                 EQ
                                 PUSH MACHINE_FALSE
                                 EQ
-                                
+
    <expr1> < <expr2>            ...code to evaluate <expr1>...
                                 ...code to evaluate <expr2>...
                                 LT
-                                
+
    <expr1> > <expr2>            ...code to evaluate <expr1>...
                                 ...code to evaluate <expr2>...
                                 SWAP
                                 LT
-                                
+
    <expr1> <= <expr2>           ...code to evaluate <expr1>...
                                 ...code to evaluate <expr2>...
                                 SWAP
                                 LT
                                 PUSH MACHINE_FALSE  // boolean NOT
                                 EQ
-                                
+
    <expr1> >= <expr2>           ...code to evaluate <expr1>...
                                 ...code to evaluate <expr2>...
                                 LT
@@ -185,11 +185,17 @@ boolean expression              machine code
  <expr1> or <expr2>             ...code to evaluate <expr1>...
                                 ...code to evaluate <expr2>...
                                 OR
-                                  
+
  <expr1> and <expr2>            ...code to evaluate <expr1>...
+                                PUSH MACHINE_FALSE  // boolean NOT
+                                EQ
                                 ...code to evaluate <expr2>...
-                                MUL
-                                  
+                                PUSH MACHINE_FALSE  // boolean NOT
+                                EQ
+                                OR
+                                PUSH MACHINE_FALSE  // boolean NOT
+                                EQ
+
        not <expr>               ...code to evaluate <expr>...
                                 PUSH MACHINE_FALSE
                                 EQ
@@ -294,7 +300,7 @@ Note that:
 \begin{enumerate}[label=(\arabic*)]
 \item saving the return address, allocating space to save a display register, and pushing parameters for \texttt{f} are taken care of by the caller, while
 \item saving and updating the appropriate display register, as well as allocating space for locals are taken care of by the callee.
-\end{enumerate} 
+\end{enumerate}
 
 \subsection{Routine exit code}
 
@@ -304,7 +310,7 @@ We assume for function or procedure \texttt{f} that:
     \item The return value has been temporarily stored at address \texttt{Y}
     \item \texttt{f}'s return value (if applicable) is at the top of the stack. Directly beneath f's return value (or at the top of the stack if there is no return value) is \texttt{f}'s local variable allocation.
     \end{itemize}
-    
+
 \begin{verbatim}
 ...store the return value (if applicable)...
 PUSHMT          // pop all locals & params
@@ -343,7 +349,7 @@ We assume for function \texttt{f} that:
     \item A word in memory reserved for temporarily storing return values has address \texttt{Y}
     \item When describing how the return value is stored, the return value is already at the top of the stack.
     \end{itemize}
-    
+
 \texttt{f} is called in the following way:
 \begin{verbatim}
 ...push return address...
@@ -372,7 +378,7 @@ We assume for procedure \texttt{f} that:
     \begin{itemize}
     \item \texttt{f}'s code begins at address \texttt{X} in memory
     \end{itemize}
-    
+
 \texttt{f} is called in the following way:
 \begin{verbatim}
 ...push return address...
@@ -395,10 +401,10 @@ Assign statements in our language will have the form \texttt{a := <expr>}, where
 \begin{verbatim}
 assign statement          machine code
 ================          ============
-	a := true                 ADDR LL_a ON_a
+    a := true                 ADDR LL_a ON_a
                           PUSH MACHINE_TRUE
                           STORE
-                          
+
 a := (3 + 6) / 3          ADDR LL_a ON_a
                           <code to evaluate (3 + 6) / 3>
                           STORE
@@ -451,27 +457,27 @@ repeat <statement>                    <evaluate <statement>>      // start_addre
     until <bool expression>           <evaluate <bool_expression>>
                                       PUSH start_address
                                       BF
-    
+
 
 \end{verbatim}
 
-\texttt{start\_address} is the address of the first instruction of the repeat-loop machine code to be evaluated. If \texttt{bool\_expression} is false, the \texttt{BF} instruction ensures that the repeat-loop statements are executed once again by going back to \texttt{start\_address}. If not, we move on to the next line of execution. 
- 
+\texttt{start\_address} is the address of the first instruction of the repeat-loop machine code to be evaluated. If \texttt{bool\_expression} is false, the \texttt{BF} instruction ensures that the repeat-loop statements are executed once again by going back to \texttt{start\_address}. If not, we move on to the next line of execution.
+
 \subsection{Exit statements}
 
 \begin{verbatim}
     statement                         machine code
 ================                      ============
 
-exit when <expression>                <evaluate <expression>>      
+exit when <expression>                <evaluate <expression>>
                                       PUSH MACHINE_FALSE
                                       EQ
                                       PUSH end_loop_address
                                       BF
                                       // ...other loop code...
                                       // end_loop_address
-           
-    
+
+
 
 \end{verbatim}
 
@@ -483,7 +489,7 @@ In order to access the return value from a function, we assign a block of the co
 function statement                      machine code
 ==================                      ============
 
-function f(<params>) : <type>           PUSH 8191 \\ address of top of memory         
+function f(<params>) : <type>           PUSH 8191 \\ address of top of memory
     { <statements>                      <evaluate <expr>>
       return with <expr> }              STORE
                                         <function exit and cleanup code>
@@ -513,7 +519,7 @@ Write statements have the form \texttt{write <string>} or \texttt{write <arithme
 \begin{verbatim}
 write statements             machine code
 ================             ============
-write <arithmetic exrp>      <evaluate <arithmetic expr>>   
+write <arithmetic exrp>      <evaluate <arithmetic expr>>
                              PRINTI
 \end{verbatim}
 
@@ -534,7 +540,7 @@ SETD 0          // store pointer to the string address in display[0]
 PUSH 0           // initialize counter
 
 /* Main Loop - check if all characters have been printed */
-DUP             // <&Main Loop> 
+DUP             // <&Main Loop>
 ADDR 0 1
 LOAD
 LT
@@ -553,7 +559,7 @@ ADD
 BR <&Main Loop>
 
 /* Cleanup - pop counter, length, string address */
-PUSH 3          // <&Cleanup> 
+PUSH 3          // <&Cleanup>
 POPN
 SETD 0          // restore display[0]
 BR              // return
