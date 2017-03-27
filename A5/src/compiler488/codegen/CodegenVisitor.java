@@ -1,5 +1,6 @@
 package compiler488.codegen;
 
+import compiler488.ast.InvalidASTException;
 import compiler488.ast.decl.Declaration;
 import compiler488.ast.decl.MultiDeclarations;
 import compiler488.ast.decl.RoutineDecl;
@@ -83,22 +84,64 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(Expn expn) {
-        throw new RuntimeException("Invalid AST");
+        throw new InvalidASTException("Raw Expn type in AST");
     }
 
     @Override
     public void visit(ArithExpn arithExpn) {
-        throw new RuntimeException("NYI");
+        short opcode;
+        switch (arithExpn.getOpSymbol()) {
+            case "+":
+                opcode = Machine.ADD;
+                break;
+            case "-":
+                opcode = Machine.SUB;
+                break;
+            case "*":
+                opcode = Machine.MUL;
+                break;
+            case "/":
+                opcode = Machine.DIV;
+                break;
+            default:
+                throw new InvalidASTException("Invalid arithmetic operation symbol: " + arithExpn.getOpSymbol());
+        }
+
+        visit(arithExpn.getLeft());
+        visit(arithExpn.getRight());
+        writeMemory(next_instruction_addr++, opcode);
     }
 
     @Override
     public void visit(BoolConstExpn boolConst) {
-        throw new RuntimeException("NYI");
+        short constVal = boolConst.getValue() ? Machine.MACHINE_TRUE : Machine.MACHINE_FALSE;
+        writeMemory(next_instruction_addr++, Machine.PUSH);
+        writeMemory(next_instruction_addr++, constVal);
     }
 
     @Override
     public void visit(BoolExpn boolExpn) {
-        throw new RuntimeException("NYI");
+        String opSymbol = boolExpn.getOpSymbol();
+        if (opSymbol.equals("or")) {
+            visit(boolExpn.getLeft());
+            visit(boolExpn.getRight());
+            writeMemory(next_instruction_addr++, Machine.OR);
+        } else if (opSymbol.equals("and")) {
+            visit(boolExpn.getLeft());
+            writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
+            writeMemory(next_instruction_addr++, Machine.EQ);
+
+            visit(boolExpn.getRight());
+            writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
+            writeMemory(next_instruction_addr++, Machine.EQ);
+
+            writeMemory(next_instruction_addr++, Machine.OR);
+
+            writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
+            writeMemory(next_instruction_addr++, Machine.EQ);
+        } else {
+            throw new InvalidASTException("Invalid boolean operation symbol: " + boolExpn.getOpSymbol());
+        }
     }
 
     @Override
@@ -128,7 +171,14 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(IntConstExpn intConstExpn) {
-        throw new RuntimeException("NYI");
+        int intValue = intConstExpn.getValue().intValue();
+        if (intValue < Machine.MIN_INTEGER || intValue > Machine.MAX_INTEGER) {
+            System.err.println("Integer constant value out of range for machine word.");
+            System.err.println("Exiting now.");
+            System.exit(1);
+        }
+        writeMemory(next_instruction_addr++, Machine.PUSH);
+        writeMemory(next_instruction_addr++, (short) intValue);
     }
 
     @Override
@@ -152,7 +202,7 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(Stmt stmt) {
-        throw new RuntimeException("Invalid AST");
+        throw new InvalidASTException("Raw Stmt type in AST");
     }
 
     @Override
@@ -206,7 +256,7 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(Declaration decl) {
-        throw new RuntimeException("Invalid AST");
+        throw new InvalidASTException("Raw Declaration type in AST");
     }
 
     @Override
@@ -230,8 +280,8 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         try {
             Machine.writeMemory(addr, val);
         } catch (MemoryAddressException e) {
-            System.out.println("Generated code won't fit in machine memory. Exiting now.");
-            throw new RuntimeException("machine memory exhausted", e);
+            System.err.println("Generated code won't fit in machine memory. Exiting now.");
+            System.exit(1);
         }
     }
 
