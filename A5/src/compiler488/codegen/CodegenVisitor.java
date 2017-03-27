@@ -146,12 +146,68 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(CompareExpn compareExpn) {
-        throw new RuntimeException("NYI");
+        visit(compareExpn.getLeft());
+        visit(compareExpn.getRight());
+
+        switch (compareExpn.getOpSymbol()) {
+            case "=":
+                writeMemory(next_instruction_addr++, Machine.EQ);
+                break;
+            case "not =":
+                writeMemory(next_instruction_addr++, Machine.EQ);
+                writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
+                writeMemory(next_instruction_addr++, Machine.EQ);
+                break;
+            case "<":
+                writeMemory(next_instruction_addr++, Machine.LT);
+                break;
+            case ">":
+                writeMemory(next_instruction_addr++, Machine.SWAP);
+                writeMemory(next_instruction_addr++, Machine.LT);
+                break;
+            case "<=":
+                writeMemory(next_instruction_addr++, Machine.SWAP);
+                writeMemory(next_instruction_addr++, Machine.LT);
+                writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
+                writeMemory(next_instruction_addr++, Machine.EQ);
+                break;
+            case ">=":
+                writeMemory(next_instruction_addr++, Machine.LT);
+                writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
+                writeMemory(next_instruction_addr++, Machine.EQ);
+                break;
+            default:
+                throw new InvalidASTException("Invalid comparison operation symbol: " + compareExpn.getOpSymbol());
+        }
     }
 
     @Override
     public void visit(ConditionalExpn conditionalExpn) {
-        throw new RuntimeException("NYI");
+        visit(conditionalExpn.getCondition());
+
+        writeMemory(next_instruction_addr++, Machine.PUSH);
+
+        short patch_false_addr = next_instruction_addr;
+        writeMemory(next_instruction_addr++, Machine.UNDEFINED);
+
+        writeMemory(next_instruction_addr++, Machine.BF);
+
+        visit(conditionalExpn.getTrueValue());
+
+        writeMemory(next_instruction_addr++, Machine.PUSH);
+
+        short patch_end_addr = next_instruction_addr;
+        writeMemory(next_instruction_addr++, Machine.UNDEFINED);
+
+        writeMemory(next_instruction_addr++, Machine.BR);
+
+        // Patch
+        writeMemory(patch_false_addr, next_instruction_addr);
+
+        visit(conditionalExpn.getFalseValue());
+
+        // Patch
+        writeMemory(patch_end_addr, next_instruction_addr);
     }
 
     @Override
