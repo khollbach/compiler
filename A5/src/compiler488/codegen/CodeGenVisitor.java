@@ -83,14 +83,30 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
      * PROGRAM AND SCOPE
      * *********************/
 
+    private void openScope(boolean isMajor){
+        varTable.openScope(isMajor);
+        // functionTable.openScope(isMajor);
+    }
+
+    private void closeScope(){}
+
     @Override
     public void visit(Program programScope) {
-        throw new RuntimeException("NYI");
+        // prologue
+        openScope(programScope.isMajor());
+        visit((Scope) programScope);
+        // epilogue
     }
 
     @Override
     public void visit(Scope scope) {
-        throw new RuntimeException("NYI");
+        openScope(scope.isMajor());
+        for (Declaration d : scope.getDeclarations()) {
+            visit(d);
+        }
+        for(Stmt s : scope.getStatements()){
+            visit(s);
+        }
     }
 
     /* *********** */
