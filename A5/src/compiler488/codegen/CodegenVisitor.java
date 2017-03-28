@@ -40,7 +40,7 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     public CodegenVisitor() {
         next_instruction_addr = 0;
-        print_string_procedure_addr = 0;
+        print_string_procedure_addr = -1;
         most_recent_textconst_addr = Machine.memorySize;
     }
 
