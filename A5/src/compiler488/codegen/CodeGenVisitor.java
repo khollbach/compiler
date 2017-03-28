@@ -7,6 +7,7 @@ import compiler488.ast.decl.MultiDeclarations;
 import compiler488.ast.decl.RoutineDecl;
 import compiler488.ast.expn.*;
 import compiler488.ast.stmt.*;
+import compiler488.codegen.table.VariableTable;
 import compiler488.runtime.Machine;
 import compiler488.runtime.MemoryAddressException;
 import compiler488.visitor.DeclarationVisitor;
@@ -37,6 +38,8 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
      */
     private short print_string_procedure_addr;
 
+    private VariableTable varTable;
+
     /*
      *  CONSTRUCTORS:
      */
@@ -45,6 +48,7 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         next_instruction_addr = 0;
         print_string_procedure_addr = -1;
         most_recent_textconst_addr = Machine.memorySize;
+        varTable = new VariableTable();
     }
 
     /*
