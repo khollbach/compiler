@@ -1,5 +1,7 @@
 package compiler488.codegen;
 
+import static compiler488.runtime.Machine.*;
+
 import compiler488.ast.InvalidASTException;
 import compiler488.ast.Printable;
 import compiler488.ast.Readable;
@@ -12,8 +14,6 @@ import compiler488.ast.expn.*;
 import compiler488.ast.stmt.*;
 import compiler488.codegen.table.VariableTable;
 import compiler488.runtime.Machine;
-import compiler488.runtime.MemoryAddressException;
-import compiler488.semantics.SemanticVisitor.OnVisitScopeListener;
 import compiler488.visitor.DeclarationVisitor;
 import compiler488.visitor.ExpressionVisitor;
 import compiler488.visitor.StatementVisitor;
@@ -27,20 +27,22 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
      *  INSTANCE VARIABLES:
      */
 
-    /**
-     * The index (machine memory address) of the next instruction to be generated.
-     */
-    private short next_instruction_addr;
+//    /**
+//     * The index (machine memory address) of the next instruction to be generated.
+//     */
+//    private short next_instruction_addr;
+//
+//    /**
+//     * The index (machine memory address) of the most recently allocated text constant.
+//     */
+//    private short most_recent_textconst_addr;
+//
+//    /**
+//     * The location of the print-string procedure in machine memory.
+//     */
+//    private short print_string_procedure_addr;
 
-    /**
-     * The index (machine memory address) of the most recently allocated text constant.
-     */
-    private short most_recent_textconst_addr;
-
-    /**
-     * The location of the print-string procedure in machine memory.
-     */
-    private short print_string_procedure_addr;
+    private CodeGenerator codeGen;
     
     private OnVisitScopeListener visitScopeListener;
 
@@ -51,9 +53,10 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
      */
 
     public CodeGenVisitor() {
-        next_instruction_addr = 0;
-        print_string_procedure_addr = -1;
-        most_recent_textconst_addr = Machine.memorySize;
+//        next_instruction_addr = 0;
+//        print_string_procedure_addr = -1;
+//        most_recent_textconst_addr = Machine.memorySize;
+        codeGen = new CodeGenerator();
         varTable = new VariableTable();
     }
 
@@ -125,34 +128,37 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(ArithExpn arithExpn) {
-        short opcode;
+        short OPCODE;
         switch (arithExpn.getOpSymbol()) {
             case "+":
-                opcode = Machine.ADD;
+                OPCODE = ADD;
                 break;
             case "-":
-                opcode = Machine.SUB;
+                OPCODE = SUB;
                 break;
             case "*":
-                opcode = Machine.MUL;
+                OPCODE = MUL;
                 break;
             case "/":
-                opcode = Machine.DIV;
+                OPCODE = DIV;
                 break;
             default:
                 throw new InvalidASTException("Invalid arithmetic operation symbol: " + arithExpn.getOpSymbol());
         }
 
-        visit(arithExpn.getLeft());
-        visit(arithExpn.getRight());
-        writeMemory(next_instruction_addr++, opcode);
+        arithExpn.getLeft().accept(this);
+        arithExpn.getRight().accept(this);
+        codeGen.genCode(
+                OPCODE
+        );
     }
 
     @Override
     public void visit(BoolConstExpn boolConst) {
-        short constVal = boolConst.getValue() ? Machine.MACHINE_TRUE : Machine.MACHINE_FALSE;
-        writeMemory(next_instruction_addr++, Machine.PUSH);
-        writeMemory(next_instruction_addr++, constVal);
+        short BOOL_CONST = boolConst.getValue() ? Machine.MACHINE_TRUE : Machine.MACHINE_FALSE;
+        codeGen.genCode(
+                PUSH, BOOL_CONST
+        );
     }
 
     @Override
@@ -160,23 +166,32 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         String opSymbol = boolExpn.getOpSymbol();
         switch (opSymbol) {
             case "or":
-                visit(boolExpn.getLeft());
-                visit(boolExpn.getRight());
-                writeMemory(next_instruction_addr++, Machine.OR);
+                boolExpn.getLeft().accept(this);
+                boolExpn.getRight().accept(this);
+                codeGen.genCode(
+                        OR
+                );
                 break;
             case "and":
-                visit(boolExpn.getLeft());
-                writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
-                writeMemory(next_instruction_addr++, Machine.EQ);
+                // DeMorgan's Law implementation of "and"
+                // i.e. A && B = !(!A || !B)
 
-                visit(boolExpn.getRight());
-                writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
-                writeMemory(next_instruction_addr++, Machine.EQ);
-
-                writeMemory(next_instruction_addr++, Machine.OR);
-
-                writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
-                writeMemory(next_instruction_addr++, Machine.EQ);
+                // eval & negate first expn
+                boolExpn.getLeft().accept(this);
+                codeGen.genCode(
+                        PUSH, MACHINE_FALSE,
+                        EQ
+                );
+                // eval & negate second expression,
+                // then or & negate the results
+                boolExpn.getRight().accept(this);
+                codeGen.genCode(
+                        PUSH, MACHINE_FALSE,
+                        EQ,
+                        OR,
+                        PUSH, MACHINE_FALSE,
+                        EQ
+                );
                 break;
             default:
                 throw new InvalidASTException("Invalid boolean operation symbol: " + boolExpn.getOpSymbol());
@@ -185,27 +200,35 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(CompareExpn compareExpn) {
-        visit(compareExpn.getLeft());
-        visit(compareExpn.getRight());
+        compareExpn.getLeft().accept(this);
+        compareExpn.getRight().accept(this);
 
         switch (compareExpn.getOpSymbol()) {
             case "<":
-                writeMemory(next_instruction_addr++, Machine.LT);
+                codeGen.genCode(
+                        LT
+                );
                 break;
             case ">":
-                writeMemory(next_instruction_addr++, Machine.SWAP);
-                writeMemory(next_instruction_addr++, Machine.LT);
+                codeGen.genCode(
+                        SWAP,
+                        LT
+                );
                 break;
             case "<=":
-                writeMemory(next_instruction_addr++, Machine.SWAP);
-                writeMemory(next_instruction_addr++, Machine.LT);
-                writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
-                writeMemory(next_instruction_addr++, Machine.EQ);
+                codeGen.genCode(
+                        SWAP,
+                        LT,
+                        PUSH, MACHINE_FALSE,
+                        EQ
+                );
                 break;
             case ">=":
-                writeMemory(next_instruction_addr++, Machine.LT);
-                writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
-                writeMemory(next_instruction_addr++, Machine.EQ);
+                codeGen.genCode(
+                        LT,
+                        PUSH, MACHINE_FALSE,
+                        EQ
+                );
                 break;
             default:
                 throw new InvalidASTException("Invalid comparison operation symbol: " + compareExpn.getOpSymbol());
@@ -214,46 +237,52 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(ConditionalExpn conditionalExpn) {
-        visit(conditionalExpn.getCondition());
+        conditionalExpn.getCondition().accept(this);
 
-        writeMemory(next_instruction_addr++, Machine.PUSH);
+        // store the address of the "UNDEFINED" word to
+        // define later
+        short addrBF = codeGen.genCode(
+                PUSH, UNDEFINED,
+                BF
+        );
+        addrBF -= 2;
 
-        short patch_false_addr = next_instruction_addr;
-        writeMemory(next_instruction_addr++, Machine.UNDEFINED);
+        conditionalExpn.getTrueValue().accept(this);
 
-        writeMemory(next_instruction_addr++, Machine.BF);
+        // store the address of the "UNDEFINED" word to
+        // define later
+        short addrBR = codeGen.genCode(
+                PUSH, UNDEFINED,
+                BR
+        );
+        addrBR -= 2;
 
-        visit(conditionalExpn.getTrueValue());
+        // define the address at addrBF
+        codeGen.patchCode(addrBF, codeGen.getNextProgramAddr());
 
-        writeMemory(next_instruction_addr++, Machine.PUSH);
+        conditionalExpn.getFalseValue().accept(this);
 
-        short patch_end_addr = next_instruction_addr;
-        writeMemory(next_instruction_addr++, Machine.UNDEFINED);
-
-        writeMemory(next_instruction_addr++, Machine.BR);
-
-        // Patch
-        writeMemory(patch_false_addr, next_instruction_addr);
-
-        visit(conditionalExpn.getFalseValue());
-
-        // Patch
-        writeMemory(patch_end_addr, next_instruction_addr);
+        // define the address at addrBR
+        codeGen.patchCode(addrBR, codeGen.getNextProgramAddr());
     }
 
     @Override
     public void visit(EqualsExpn equalsExpn) {
-        visit(equalsExpn.getLeft());
-        visit(equalsExpn.getRight());
+        equalsExpn.getLeft().accept(this);
+        equalsExpn.getRight().accept(this);
 
         switch (equalsExpn.getOpSymbol()) {
             case "=":
-                writeMemory(next_instruction_addr++, Machine.EQ);
+                codeGen.genCode(
+                        EQ
+                );
                 break;
             case "not =":
-                writeMemory(next_instruction_addr++, Machine.EQ);
-                writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
-                writeMemory(next_instruction_addr++, Machine.EQ);
+                codeGen.genCode(
+                        EQ,
+                        PUSH, MACHINE_FALSE,
+                        EQ
+                );
                 break;
             default:
                 throw new InvalidASTException("Invalid equality operation symbol: " + equalsExpn.getOpSymbol());
@@ -267,31 +296,34 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(IdentExpn identExpn) {
-        VariableTable.Address variable = varTable.getAddress(identExpn.getIdent());
-        writeMemory(next_instruction_addr++, Machine.ADDR);
-        writeMemory(next_instruction_addr++, variable.lexicalLevel);
-        writeMemory(next_instruction_addr++, variable.offset);
-        writeMemory(next_instruction_addr++, Machine.LOAD);
+        VariableTable.Address var = varTable.getAddress(identExpn.getIdent());
+        codeGen.genCode(
+                ADDR, var.LL, var.ON,
+                LOAD
+        );
     }
 
     @Override
     public void visit(IntConstExpn intConstExpn) {
-        int intValue = intConstExpn.getValue();
-        if (intValue < Machine.MIN_INTEGER || intValue > Machine.MAX_INTEGER) {
+        Integer iVal = intConstExpn.getValue();
+        if (iVal < Machine.MIN_INTEGER || iVal > Machine.MAX_INTEGER) {
             System.err.println("Integer constant value out of range for machine word.");
             System.err.println("Exiting now.");
             System.exit(1);
         }
-        writeMemory(next_instruction_addr++, Machine.PUSH);
-        writeMemory(next_instruction_addr++, (short) intValue);
+
+        codeGen.genCode(
+                PUSH, iVal.shortValue()
+        );
     }
 
     @Override
     public void visit(NotExpn notExpn) {
-        visit(notExpn.getOperand());
-
-        writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
-        writeMemory(next_instruction_addr++, Machine.EQ);
+        notExpn.getOperand().accept(this);
+        codeGen.genCode(
+                PUSH,MACHINE_FALSE,
+                EQ
+        );
     }
 
     @Override
@@ -299,10 +331,10 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         VariableTable.Address array = varTable.getAddress(subsExpn.getVariable());
 
         writeMemory(next_instruction_addr++, Machine.ADDR);
-        writeMemory(next_instruction_addr++, array.lexicalLevel);
-        writeMemory(next_instruction_addr++, array.offset);
+        writeMemory(next_instruction_addr++, array.LL);
+        writeMemory(next_instruction_addr++, array.ON);
 
-        visit(subsExpn.getOperand());
+        subsExpn.getOperand().accept(this);
 
         writeMemory(next_instruction_addr++, Machine.PUSH);
         // TODO: push array's lower bound instead.
@@ -316,9 +348,10 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(UnaryMinusExpn unaryMinusExpn) {
-        visit(unaryMinusExpn.getOperand());
-
-        writeMemory(next_instruction_addr++, Machine.NEG);
+        unaryMinusExpn.getOperand().accept(this);
+        codeGen.genCode(
+                NEG
+        );
     }
 
     /* ********** */
@@ -339,15 +372,15 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
             VariableTable.Address variable = varTable.getAddress(identExpn.getIdent());
 
             writeMemory(next_instruction_addr++, Machine.ADDR);
-            writeMemory(next_instruction_addr++, variable.lexicalLevel);
-            writeMemory(next_instruction_addr++, variable.offset);
+            writeMemory(next_instruction_addr++, variable.LL);
+            writeMemory(next_instruction_addr++, variable.ON);
         } else if (lval instanceof SubsExpn) {
             SubsExpn subsExpn = (SubsExpn) lval;
             VariableTable.Address array = varTable.getAddress(subsExpn.getVariable());
 
             writeMemory(next_instruction_addr++, Machine.ADDR);
-            writeMemory(next_instruction_addr++, array.lexicalLevel);
-            writeMemory(next_instruction_addr++, array.offset);
+            writeMemory(next_instruction_addr++, array.LL);
+            writeMemory(next_instruction_addr++, array.ON);
 
             visit(subsExpn.getOperand());
 
@@ -411,8 +444,8 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
                 VariableTable.Address variable = varTable.getAddress(identExpn.getIdent());
 
                 writeMemory(next_instruction_addr++, Machine.ADDR);
-                writeMemory(next_instruction_addr++, variable.lexicalLevel);
-                writeMemory(next_instruction_addr++, variable.offset);
+                writeMemory(next_instruction_addr++, variable.LL);
+                writeMemory(next_instruction_addr++, variable.ON);
                 writeMemory(next_instruction_addr++, Machine.READI);
                 writeMemory(next_instruction_addr++, Machine.STORE);
             } else if (input instanceof SubsExpn) {
@@ -420,8 +453,8 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
                 VariableTable.Address array = varTable.getAddress(subsExpn.getVariable());
 
                 writeMemory(next_instruction_addr++, Machine.ADDR);
-                writeMemory(next_instruction_addr++, array.lexicalLevel);
-                writeMemory(next_instruction_addr++, array.offset);
+                writeMemory(next_instruction_addr++, array.LL);
+                writeMemory(next_instruction_addr++, array.ON);
 
                 visit(subsExpn.getOperand());
 
@@ -566,23 +599,23 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
      * PRIVATE METHODS:
      */
 
-    /**
-     * Wrapper method to call Machine.writeMemory and die if we're OOM.
-     */
-    private void writeMemory(short addr, short val) {
-        try {
-            // If the instructions and the constants are about to overlap, we're all out of space.
-            if (next_instruction_addr >= most_recent_textconst_addr) {
-                throw new MemoryAddressException("OOM");
-            }
-
-            // This can throw MemoryAddressException too, but our above check should catch any issues first.
-            Machine.writeMemory(addr, val);
-        } catch (MemoryAddressException e) {
-            System.err.println("Generated code won't fit in machine memory. Exiting now.");
-            System.exit(1);
-        }
-    }
+//    /**
+//     * Wrapper method to call Machine.writeMemory and die if we're OOM.
+//     */
+//    private void writeMemory(short addr, short val) {
+//        try {
+//            // If the instructions and the constants are about to overlap, we're all out of space.
+//            if (next_instruction_addr >= most_recent_textconst_addr) {
+//                throw new MemoryAddressException("OOM");
+//            }
+//
+//            // This can throw MemoryAddressException too, but our above check should catch any issues first.
+//            Machine.writeMemory(addr, val);
+//        } catch (MemoryAddressException e) {
+//            System.err.println("Generated code won't fit in machine memory. Exiting now.");
+//            System.exit(1);
+//        }
+//    }
 
     /**
      * Generate code for the print-string procedure.
@@ -624,16 +657,16 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         writeMemory(patch_end_of_def, next_instruction_addr);
     }
 
-    /**
-     * Allocate some space in the constant pool at the top of machine memory and store the given text there.
-     */
-    private void allocateTextConst(String text) {
-        most_recent_textconst_addr -= text.length() + 1;
-
-        short addr = most_recent_textconst_addr;
-        for (char c : text.toCharArray()) {
-            writeMemory(addr++, (short) c);
-        }
-        writeMemory(addr, (short) '\0');
-    }
+//    /**
+//     * Allocate some space in the constant pool at the top of machine memory and store the given text there.
+//     */
+//    private void allocateTextConst(String text) {
+//        most_recent_textconst_addr -= text.length() + 1;
+//
+//        short addr = most_recent_textconst_addr;
+//        for (char c : text.toCharArray()) {
+//            writeMemory(addr++, (short) c);
+//        }
+//        writeMemory(addr, (short) '\0');
+//    }
 }

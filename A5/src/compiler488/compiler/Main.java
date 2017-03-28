@@ -1,9 +1,7 @@
 package compiler488.compiler;
 
-import compiler488.parser.*;
 import compiler488.ast.AST;
 import compiler488.ast.stmt.Program;
-import compiler488.codegen.CodeGen;
 import compiler488.codegen.CodeGenVisitor;
 import compiler488.parser.SyntaxErrorException;
 import compiler488.runtime.ExecutionException;
@@ -204,9 +202,9 @@ public class Main {
         System.out.println("  AST:" + AST.version);
         System.out.println("  Lexer:" + Lexer.version);
         System.out.println("  Parser:" + Parser.version);
-        System.out.println("  Semantics:" + Semantics.version);
+        // System.out.println("  Semantics:" + SemanticVisitor.version);
         System.out.println("  SymbolTable:" + SymbolTable.version);
-        System.out.println("  CodeGen:" + CodeGen.version);
+        // System.out.println("  CodeGen:" + CodeGenVisitor.version);
         System.out.println("  Machine:" + Machine.version);
     }
 

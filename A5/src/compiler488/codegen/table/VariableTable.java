@@ -71,13 +71,13 @@ public class VariableTable implements AddressLookup<VariableTable.Address> {
      */
     public static class Address {
 
-        public final short lexicalLevel;
+        public final short LL;
 
-        public final short offset;
+        public final short ON;
 
         Address(short lexicalLevel, short offset) {
-            this.lexicalLevel = lexicalLevel;
-            this.offset = offset;
+            this.LL = lexicalLevel;
+            this.ON = offset;
         }
     }
 
