@@ -13,7 +13,10 @@ import compiler488.visitor.DeclarationVisitor;
 import compiler488.visitor.ExpressionVisitor;
 import compiler488.visitor.StatementVisitor;
 
-public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, StatementVisitor {
+/**
+ * Class to perform code generation on the AST after it passes semantic checks.
+ */
+public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, StatementVisitor {
 
     /*
      *  INSTANCE VARIABLES:
@@ -38,7 +41,7 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
      *  CONSTRUCTORS:
      */
 
-    public CodegenVisitor() {
+    public CodeGenVisitor() {
         next_instruction_addr = 0;
         print_string_procedure_addr = -1;
         most_recent_textconst_addr = Machine.memorySize;
