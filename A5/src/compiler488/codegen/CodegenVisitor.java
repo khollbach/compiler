@@ -160,14 +160,6 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         visit(compareExpn.getRight());
 
         switch (compareExpn.getOpSymbol()) {
-            case "=":
-                writeMemory(next_instruction_addr++, Machine.EQ);
-                break;
-            case "not =":
-                writeMemory(next_instruction_addr++, Machine.EQ);
-                writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
-                writeMemory(next_instruction_addr++, Machine.EQ);
-                break;
             case "<":
                 writeMemory(next_instruction_addr++, Machine.LT);
                 break;
@@ -222,7 +214,21 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(EqualsExpn equalsExpn) {
-        throw new RuntimeException("NYI");
+        visit(equalsExpn.getLeft());
+        visit(equalsExpn.getRight());
+
+        switch (equalsExpn.getOpSymbol()) {
+            case "=":
+                writeMemory(next_instruction_addr++, Machine.EQ);
+                break;
+            case "not =":
+                writeMemory(next_instruction_addr++, Machine.EQ);
+                writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
+                writeMemory(next_instruction_addr++, Machine.EQ);
+                break;
+            default:
+                throw new InvalidASTException("Invalid equality operation symbol: " + equalsExpn.getOpSymbol());
+        }
     }
 
     @Override
@@ -249,7 +255,10 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(NotExpn notExpn) {
-        throw new RuntimeException("NYI");
+        visit(notExpn.getOperand());
+
+        writeMemory(next_instruction_addr++, Machine.MACHINE_FALSE);
+        writeMemory(next_instruction_addr++, Machine.EQ);
     }
 
     @Override
@@ -259,7 +268,9 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(UnaryMinusExpn unaryMinusExpn) {
-        throw new RuntimeException("NYI");
+        visit(unaryMinusExpn.getOperand());
+
+        writeMemory(next_instruction_addr++, Machine.NEG);
     }
 
     /* ********** */
@@ -283,7 +294,27 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(IfStmt ifStmt) {
-        throw new RuntimeException("NYI");
+        visit(ifStmt.getCondition());
+
+        writeMemory(next_instruction_addr++, Machine.PUSH);
+        short patch_false_addr = next_instruction_addr;
+        writeMemory(next_instruction_addr++, Machine.UNDEFINED);
+        writeMemory(next_instruction_addr++, Machine.BF);
+
+        visit(ifStmt.getWhenTrue());
+
+        writeMemory(next_instruction_addr++, Machine.PUSH);
+        short patch_end_addr = next_instruction_addr;
+        writeMemory(next_instruction_addr++, Machine.UNDEFINED);
+        writeMemory(next_instruction_addr++, Machine.BR);
+
+        // Patch false address.
+        writeMemory(patch_false_addr, next_instruction_addr);
+
+        visit(ifStmt.getWhenFalse());
+
+        // Patch end address.
+        writeMemory(patch_end_addr, next_instruction_addr);
     }
 
     @Override
@@ -298,7 +329,15 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(RepeatUntilStmt repeatUntilStmt) {
-        throw new RuntimeException("NYI");
+        short start_addr = next_instruction_addr;
+
+        visit(repeatUntilStmt.getBody());
+
+        visit(repeatUntilStmt.getExpn());
+
+        writeMemory(next_instruction_addr++, Machine.PUSH);
+        writeMemory(next_instruction_addr++, start_addr);
+        writeMemory(next_instruction_addr++, Machine.BF);
     }
 
     @Override
@@ -308,7 +347,23 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(WhileDoStmt whileStmt) {
-        throw new RuntimeException("NYI");
+        short start_loop_addr = next_instruction_addr;
+
+        visit(whileStmt.getExpn());
+
+        writeMemory(next_instruction_addr++, Machine.PUSH);
+        short patch_end_loop = next_instruction_addr;
+        writeMemory(next_instruction_addr++, Machine.UNDEFINED);
+        writeMemory(next_instruction_addr++, Machine.BF);
+
+        visit(whileStmt.getBody());
+
+        writeMemory(next_instruction_addr++, Machine.PUSH);
+        writeMemory(next_instruction_addr++, start_loop_addr);
+        writeMemory(next_instruction_addr++, Machine.BR);
+
+        // Patch end loop address.
+        writeMemory(patch_end_loop, next_instruction_addr);
     }
 
     @Override
