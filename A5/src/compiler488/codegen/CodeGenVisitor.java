@@ -261,7 +261,11 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(IdentExpn identExpn) {
-        throw new RuntimeException("NYI");
+        VariableTable.Address variable = varTable.getAddress(identExpn.getIdent());
+        writeMemory(next_instruction_addr++, Machine.ADDR);
+        writeMemory(next_instruction_addr++, variable.lexicalLevel);
+        writeMemory(next_instruction_addr++, variable.offset);
+        writeMemory(next_instruction_addr++, Machine.LOAD);
     }
 
     @Override
@@ -286,7 +290,21 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(SubsExpn subsExpn) {
-        throw new RuntimeException("NYI");
+        VariableTable.Address array = varTable.getAddress(subsExpn.getVariable());
+
+        writeMemory(next_instruction_addr++, Machine.ADDR);
+        writeMemory(next_instruction_addr++, array.lexicalLevel);
+        writeMemory(next_instruction_addr++, array.offset);
+
+        visit(subsExpn.getOperand());
+
+        writeMemory(next_instruction_addr++, Machine.PUSH);
+        writeMemory(next_instruction_addr++, Machine.UNDEFINED); // TODO: push array's lower bound instead.
+        writeMemory(next_instruction_addr++, Machine.SUB);
+        writeMemory(next_instruction_addr++, Machine.ADD);
+        writeMemory(next_instruction_addr++, Machine.LOAD);
+
+        throw new RuntimeException("NYI"); // TODO: see above.
     }
 
     @Override
