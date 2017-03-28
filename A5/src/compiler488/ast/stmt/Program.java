@@ -8,6 +8,11 @@ import compiler488.visitor.StatementVisitor;
  */
 public class Program extends Scope {
 
+    public Program() {
+        super();
+        setIsMajor(true);
+    }
+
     @Override
     public void accept(StatementVisitor visitor) {
         visitor.visit(this);

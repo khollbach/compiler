@@ -37,6 +37,7 @@ public class RoutineBody extends Indentable {
 
     public void setBody(Scope body) {
         this.body = body;
+        body.setIsMajor(true);
     }
 
     public ASTList<ScalarDecl> getParameters() {

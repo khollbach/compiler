@@ -15,9 +15,12 @@ public class Scope extends Stmt {
 
     private ASTList<Stmt> statements; // The statements to execute.
 
+    private boolean isMajor;
+
     public Scope() {
         declarations = new ASTList<Declaration>();
         statements = new ASTList<Stmt>();
+        isMajor = false;
     }
 
     /**
@@ -62,4 +65,11 @@ public class Scope extends Stmt {
         visitor.visit(this);
     }
 
+    public boolean isMajor() {
+        return isMajor;
+    }
+
+    public void setIsMajor(boolean isMajor) {
+        this.isMajor = isMajor;
+    }
 }
