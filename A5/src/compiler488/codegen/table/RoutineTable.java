@@ -1,9 +1,6 @@
 package compiler488.codegen.table;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Symbol table to manage routine addressing during codegen.
@@ -34,7 +31,7 @@ public class RoutineTable implements AddressLookup<Short> {
     }
 
     public void openScope() {
-        scopeStack.push(new Stack<>());
+        scopeStack.push(new ArrayList<>());
     }
 
     public void closeScope() {
