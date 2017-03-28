@@ -2,6 +2,7 @@ package compiler488.codegen;
 
 import compiler488.ast.InvalidASTException;
 import compiler488.ast.Printable;
+import compiler488.ast.Readable;
 import compiler488.ast.decl.Declaration;
 import compiler488.ast.decl.MultiDeclarations;
 import compiler488.ast.decl.RoutineDecl;
@@ -283,7 +284,8 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         visit(subsExpn.getOperand());
 
         writeMemory(next_instruction_addr++, Machine.PUSH);
-        writeMemory(next_instruction_addr++, Machine.UNDEFINED); // TODO: push array's lower bound instead.
+        // TODO: push array's lower bound instead.
+        writeMemory(next_instruction_addr++, Machine.UNDEFINED);
         writeMemory(next_instruction_addr++, Machine.SUB);
         writeMemory(next_instruction_addr++, Machine.ADD);
         writeMemory(next_instruction_addr++, Machine.LOAD);
@@ -309,7 +311,40 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(AssignStmt assignStmt) {
-        throw new RuntimeException("NYI");
+        // Load address of LHS.
+        Expn lval = assignStmt.getLval();
+        if (lval instanceof IdentExpn) {
+            IdentExpn identExpn = (IdentExpn) lval;
+            VariableTable.Address variable = varTable.getAddress(identExpn.getIdent());
+
+            writeMemory(next_instruction_addr++, Machine.ADDR);
+            writeMemory(next_instruction_addr++, variable.lexicalLevel);
+            writeMemory(next_instruction_addr++, variable.offset);
+        } else if (lval instanceof SubsExpn) {
+            SubsExpn subsExpn = (SubsExpn) lval;
+            VariableTable.Address array = varTable.getAddress(subsExpn.getVariable());
+
+            writeMemory(next_instruction_addr++, Machine.ADDR);
+            writeMemory(next_instruction_addr++, array.lexicalLevel);
+            writeMemory(next_instruction_addr++, array.offset);
+
+            visit(subsExpn.getOperand());
+
+            writeMemory(next_instruction_addr++, Machine.PUSH);
+            // TODO: push array's lower bound instead.
+            writeMemory(next_instruction_addr++, Machine.UNDEFINED);
+            writeMemory(next_instruction_addr++, Machine.SUB);
+            writeMemory(next_instruction_addr++, Machine.ADD);
+        } else {
+            throw new InvalidASTException("Invalid LHS type in AssignStmt");
+        }
+
+        // Evaluate RHS
+        visit(assignStmt.getRval());
+
+        writeMemory(next_instruction_addr++, Machine.STORE);
+
+        throw new RuntimeException("NYI"); // TODO: see above.
     }
 
     @Override
@@ -349,7 +384,39 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(ReadStmt readStmt) {
-        throw new RuntimeException("NYI");
+        for (Readable input : readStmt.getInputs()) {
+            if (input instanceof IdentExpn) {
+                IdentExpn identExpn = (IdentExpn) input;
+                VariableTable.Address variable = varTable.getAddress(identExpn.getIdent());
+
+                writeMemory(next_instruction_addr++, Machine.ADDR);
+                writeMemory(next_instruction_addr++, variable.lexicalLevel);
+                writeMemory(next_instruction_addr++, variable.offset);
+                writeMemory(next_instruction_addr++, Machine.READI);
+                writeMemory(next_instruction_addr++, Machine.STORE);
+            } else if (input instanceof SubsExpn) {
+                SubsExpn subsExpn = (SubsExpn) input;
+                VariableTable.Address array = varTable.getAddress(subsExpn.getVariable());
+
+                writeMemory(next_instruction_addr++, Machine.ADDR);
+                writeMemory(next_instruction_addr++, array.lexicalLevel);
+                writeMemory(next_instruction_addr++, array.offset);
+
+                visit(subsExpn.getOperand());
+
+                writeMemory(next_instruction_addr++, Machine.PUSH);
+                // TODO: push array's lower bound instead.
+                writeMemory(next_instruction_addr++, Machine.UNDEFINED);
+                writeMemory(next_instruction_addr++, Machine.SUB);
+                writeMemory(next_instruction_addr++, Machine.ADD);
+                writeMemory(next_instruction_addr++, Machine.READI);
+                writeMemory(next_instruction_addr++, Machine.STORE);
+            } else {
+                throw new InvalidASTException("Invalid input type in ReadStmt");
+            }
+        }
+
+        throw new RuntimeException("NYI"); // TODO: see above.
     }
 
     @Override
