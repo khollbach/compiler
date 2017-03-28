@@ -84,12 +84,22 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(Program programScope) {
-        throw new RuntimeException("NYI");
+        // prologue
+        visit((Scope) programScope);
+        // epilogue
     }
 
     @Override
     public void visit(Scope scope) {
-        throw new RuntimeException("NYI");
+
+        // openScope(scope.isMajor)
+
+        for (Declaration d : scope.getDeclarations()) {
+            visit(d);
+        }
+        for(Stmt s : scope.getStatements()){
+            visit(s);
+        }
     }
 
     /* *********** */
