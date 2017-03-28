@@ -3,13 +3,16 @@ package compiler488.codegen;
 import compiler488.ast.InvalidASTException;
 import compiler488.ast.Printable;
 import compiler488.ast.decl.Declaration;
+import compiler488.ast.decl.DeclarationPart;
 import compiler488.ast.decl.MultiDeclarations;
 import compiler488.ast.decl.RoutineDecl;
+import compiler488.ast.decl.ScalarDecl;
 import compiler488.ast.expn.*;
 import compiler488.ast.stmt.*;
 import compiler488.codegen.table.VariableTable;
 import compiler488.runtime.Machine;
 import compiler488.runtime.MemoryAddressException;
+import compiler488.semantics.SemanticVisitor.OnVisitScopeListener;
 import compiler488.visitor.DeclarationVisitor;
 import compiler488.visitor.ExpressionVisitor;
 import compiler488.visitor.StatementVisitor;
@@ -37,6 +40,8 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
      * The location of the print-string procedure in machine memory.
      */
     private short print_string_procedure_addr;
+    
+    private OnVisitScopeListener visitScopeListener;
 
     private VariableTable varTable;
 
@@ -419,12 +424,41 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(MultiDeclarations multiDecl) {
-        throw new RuntimeException("NYI");
+    	for (DeclarationPart declPart: multiDecl.getElements()){
+    		varTable.createEntry(declPart);
+    	}
     }
 
     @Override
     public void visit(RoutineDecl routineDecl) {
-        throw new RuntimeException("NYI");
+    	
+    	setOnVisitScopeListener(() -> {
+    		for (ScalarDecl param: routineDecl.getRoutineBody().getParameters()){
+    			varTable.createEntry(param);
+    		}
+    	});
+    	routineDecl.getRoutineBody().getBody().accept(this);
+    }
+    
+    private void setOnVisitScopeListener(OnVisitScopeListener listener) {
+        this.visitScopeListener = listener;
+    }
+
+    private void consumeScopeVisitHook() {
+        // run hook once then clear the listener
+        if (visitScopeListener != null) {
+            visitScopeListener.onVisitScope();
+            visitScopeListener = null;
+        }
+    }
+
+    public interface OnVisitScopeListener {
+
+        /**
+         * Executed after a new scope has been opened in the symbol table, but
+         * before any of the scope body has been processed.
+         */
+        void onVisitScope();
     }
 
     /*
