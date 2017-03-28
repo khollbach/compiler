@@ -52,8 +52,14 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
      * Perform code generation.
      */
     public void doCodeGen(Program programAST) {
+        // Generate print-string procedure.
+        generatePrintStringProcedure();
+
         // Recursively perform code generation on the AST.
         programAST.accept(this);
+
+        // Add a HALT as the final instruction.
+        writeMemory(next_instruction_addr++, Machine.HALT);
 
         // Initialize machine program counter, stack pointer, "stack upper bound" (MLP) pointer.
         Machine.setPC((short) 0);
@@ -71,13 +77,7 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(Program programScope) {
-        // Generate print-string procedure.
-        generatePrintStringProcedure();
-
-        visit((Scope) programScope);
-
-        // Add a HALT as the final instruction.
-        writeMemory(next_instruction_addr++, Machine.HALT);
+        throw new RuntimeException("NYI");
     }
 
     @Override
@@ -434,6 +434,7 @@ public class CodegenVisitor implements DeclarationVisitor, ExpressionVisitor, St
                 throw new MemoryAddressException("OOM");
             }
 
+            // This can throw MemoryAddressException too, but our above check should catch any issues first.
             Machine.writeMemory(addr, val);
         } catch (MemoryAddressException e) {
             System.err.println("Generated code won't fit in machine memory. Exiting now.");
