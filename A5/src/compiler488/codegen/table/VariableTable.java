@@ -84,10 +84,10 @@ public class VariableTable implements AddressLookup<VariableTable.Address> {
     public void openScope(boolean isMajorScope) {
         if (isMajorScope) {
             lexicalLevel++;
-            scopeStack.push(new Scope(isMajorScope, (short) 0));
+            scopeStack.push(new Scope(true, (short) 0));
         } else {
             short offset = scopeStack.peek().getOffset();
-            scopeStack.push(new Scope(isMajorScope, offset));
+            scopeStack.push(new Scope(false, offset));
         }
     }
 
