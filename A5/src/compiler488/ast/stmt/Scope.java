@@ -17,6 +17,16 @@ public class Scope extends Stmt {
 
     private boolean isMajor;
 
+    private short allocationSize;
+
+    public short getAllocationSize() {
+        return allocationSize;
+    }
+
+    public void setAllocationSize(short allocationSize) {
+        this.allocationSize = allocationSize;
+    }
+
     public Scope() {
         declarations = new ASTList<Declaration>();
         statements = new ASTList<Stmt>();

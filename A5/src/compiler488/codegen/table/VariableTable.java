@@ -73,6 +73,10 @@ public class VariableTable implements AddressLookup<VariableTable.Address> {
         createEntry(id, allocationSize, (short) 0);
     }
 
+    public short getAllocationSize() {
+        return scopeStack.peek().getOffset();
+    }
+
 
     /**
      * An immutable pair of shorts representing a variable address.
