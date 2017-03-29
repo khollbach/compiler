@@ -35,6 +35,10 @@ public class CodeGenerator {
         writeWord(addr, word);
     }
 
+    public void patchCode(short addr) {
+        writeWord(addr, nextProgramAddr);
+    }
+
     public short getNextInstrAddr() {
         return nextProgramAddr;
     }
