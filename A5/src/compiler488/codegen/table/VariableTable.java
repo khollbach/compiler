@@ -77,25 +77,6 @@ public class VariableTable implements AddressLookup<VariableTable.Address> {
         return scopeStack.peek().getOffset();
     }
 
-
-    /**
-     * An immutable pair of shorts representing a variable address.
-     */
-    public static class Address {
-
-        public final short LL;
-
-        public final short ON;
-
-        public final short LOWER_BOUND;
-
-        Address(short lexicalLevel, short offset, short arrayLowerBound) {
-            this.LL = lexicalLevel;
-            this.ON = offset;
-            this.LOWER_BOUND = arrayLowerBound;
-        }
-    }
-
     public void openScope(boolean isMajorScope) {
         if (isMajorScope) {
             lexicalLevel++;
@@ -121,6 +102,29 @@ public class VariableTable implements AddressLookup<VariableTable.Address> {
         addressMap.get(id).pop();
         if (addressMap.get(id).isEmpty()) {
             addressMap.remove(id);
+        }
+    }
+
+    public short getLexicalLevel() {
+        return lexicalLevel;
+    }
+
+
+    /**
+     * An immutable pair of shorts representing a variable address.
+     */
+    public static class Address {
+
+        public final short LL;
+
+        public final short ON;
+
+        public final short LOWER_BOUND;
+
+        Address(short lexicalLevel, short offset, short arrayLowerBound) {
+            this.LL = lexicalLevel;
+            this.ON = offset;
+            this.LOWER_BOUND = arrayLowerBound;
         }
     }
 
