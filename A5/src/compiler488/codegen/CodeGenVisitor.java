@@ -91,12 +91,40 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         openScope(scope.isMajor());
 
         consumeScopeVisitHook();
+        short paramAllocationSize = 0;
+        short addrAllocationSize = 0;
+        if(scope.isMajor()){
+            paramAllocationSize = varTable.getAllocationSize();
+            addrAllocationSize = (short) (codeGen.getNextInstrAddr() + 3);
+            codeGen.genCode(
+                    PUSH, (short) 0,
+                    PUSH, UNDEFINED, // <-- addrAllocationSize points here, will be patched in
+                    DUPN
+            );
+        }
 
         for (Declaration d : scope.getDeclarations()) {
             visit(d);
         }
-        for(Stmt s : scope.getStatements()){
+        scope.setAllocationSize(varTable.getAllocationSize());
+        for(Stmt s : scope.getStatements()) {
             visit(s);
+            if (s instanceof Scope){
+                // keep updating allocation size of top level scope
+                scope.setAllocationSize((short) Math.max(scope.getAllocationSize(),
+                        ((Scope) s).getAllocationSize()));
+            }
+        }
+        if(scope.isMajor()){
+            // allocSize is (scope size) - (parameter size), i.e. number of variables on the stack
+            short allocSize  = (short) (scope.getAllocationSize() - paramAllocationSize);
+            // patching in the allocation size we need for variables in this scope
+            codeGen.patchCode(addrAllocationSize, allocSize);
+            // code to close the scope
+            codeGen.genCode(
+                    PUSH, allocSize, // push allocSize = number of variables to be removed
+                    POPN
+            );
         }
 
         closeScope();
