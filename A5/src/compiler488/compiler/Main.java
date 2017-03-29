@@ -10,6 +10,7 @@ import compiler488.semantics.SemanticError;
 import compiler488.semantics.SemanticVisitor;
 import compiler488.semantics.Semantics;
 import compiler488.symbol.SymbolTable;
+import compiler488.parser.*;
 
 import java.io.*;
 
