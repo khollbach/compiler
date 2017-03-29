@@ -105,11 +105,11 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         }
 
         for (Declaration d : scope.getDeclarations()) {
-            visit(d);
+            d.accept(this);
         }
         scope.setAllocationSize(varTable.getAllocationSize());
         for(Stmt s : scope.getStatements()) {
-            visit(s);
+            s.accept(this);
             if (s instanceof Scope){
                 // keep updating allocation size of top level scope
                 scope.setAllocationSize((short) Math.max(scope.getAllocationSize(),
