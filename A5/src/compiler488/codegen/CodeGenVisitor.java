@@ -539,7 +539,27 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(ReturnStmt returnStmt) {
-        throw new RuntimeException("NYI");
+        // TODO: need to know the address of the routine's cleanup code
+        short cleanupAddress = -1;
+        // TODO: need to know lexical level as well
+        short LL = -1;
+
+        if (returnStmt.getValue() == null) {
+            // Procedure return
+            codeGen.genCode(
+                    PUSH, cleanupAddress,
+                    BR
+            );
+        } else {
+            // Function return: "return with <expr>".
+            codeGen.genCode(
+                    ADDR, LL, (short) 0,
+                    PUSH, cleanupAddress,
+                    BR
+            );
+        }
+
+        throw new RuntimeException("NYI"); // TODO: see above.
     }
 
     @Override
