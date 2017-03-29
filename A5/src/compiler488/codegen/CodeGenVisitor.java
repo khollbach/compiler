@@ -105,11 +105,11 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         }
 
         for (Declaration d : scope.getDeclarations()) {
-            visit(d);
+            d.accept(this);
         }
         scope.setAllocationSize(varTable.getAllocationSize());
         for(Stmt s : scope.getStatements()) {
-            visit(s);
+            s.accept(this);
             if (s instanceof Scope){
                 // keep updating allocation size of top level scope
                 scope.setAllocationSize((short) Math.max(scope.getAllocationSize(),
@@ -542,7 +542,27 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(ReturnStmt returnStmt) {
-        throw new RuntimeException("NYI");
+        // TODO: need to know the address of the routine's cleanup code
+        short cleanupAddress = -1;
+        // TODO: need to know lexical level as well
+        short LL = -1;
+
+        if (returnStmt.getValue() == null) {
+            // Procedure return
+            codeGen.genCode(
+                    PUSH, cleanupAddress,
+                    BR
+            );
+        } else {
+            // Function return: "return with <expr>".
+            codeGen.genCode(
+                    ADDR, LL, (short) 0,
+                    PUSH, cleanupAddress,
+                    BR
+            );
+        }
+
+        throw new RuntimeException("NYI"); // TODO: see above.
     }
 
     @Override
