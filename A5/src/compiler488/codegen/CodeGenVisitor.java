@@ -91,13 +91,25 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         openScope(scope.isMajor());
 
         consumeScopeVisitHook();
-
+        short addrAllocationSize = (short) (codeGen.getNextInstrAddr() + 3);
+        codeGen.genCode(
+                PUSH, (short) 0,
+                PUSH, UNDEFINED, // <-- addrAllocationSize points here
+                DUPN
+        );
         for (Declaration d : scope.getDeclarations()) {
             visit(d);
         }
-        for(Stmt s : scope.getStatements()){
+        scope.setAllocationSize(varTable.getAllocationSize());
+        for(Stmt s : scope.getStatements()) {
             visit(s);
+            if (s instanceof Scope){
+                scope.setAllocationSize((short) Math.max(scope.getAllocationSize(),
+                        ((Scope) s).getAllocationSize()));
+            }
         }
+
+        codeGen.patchCode(addrAllocationSize, scope.getAllocationSize());
 
         closeScope();
     }
