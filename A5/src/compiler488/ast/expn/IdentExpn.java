@@ -9,6 +9,13 @@ import compiler488.visitor.ExpressionVisitor;
 public class IdentExpn extends Expn implements Readable {
     private String ident;    // name of the identifier
 
+    private boolean isFunction;
+
+    public IdentExpn(){
+        super();
+        isFunction = false;
+    }
+
     /**
      * Returns the name of the variable or function.
      */
@@ -23,6 +30,14 @@ public class IdentExpn extends Expn implements Readable {
 
     public void setIdent(String ident) {
         this.ident = ident;
+    }
+
+    public boolean isFunction() {
+        return isFunction;
+    }
+
+    public void setFunction(boolean function) {
+        isFunction = function;
     }
 
     public void accept(ExpressionVisitor expnVisitor) {

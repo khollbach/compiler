@@ -2,6 +2,7 @@ package compiler488.codegen;
 
 import static compiler488.runtime.Machine.*;
 
+import compiler488.ast.ASTList;
 import compiler488.ast.InvalidASTException;
 import compiler488.ast.Printable;
 import compiler488.ast.Readable;
@@ -307,11 +308,19 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(IdentExpn identExpn) {
-        VariableTable.Address var = varTable.getAddress(identExpn.getIdent());
-        codeGen.genCode(
-                ADDR, var.LL, var.ON,
-                LOAD
-        );
+        if (!identExpn.isFunction()) {
+            VariableTable.Address var = varTable.getAddress(identExpn.getIdent());
+            codeGen.genCode(
+                    ADDR, var.LL, var.ON,
+                    LOAD
+            );
+        } else {
+            // gen code for a function call
+            FunctionCallExpn fnExpn = new FunctionCallExpn();
+            fnExpn.setIdent(identExpn.getIdent());
+            fnExpn.setArguments(new ASTList<>());
+            visit(fnExpn);
+        }
     }
 
     @Override

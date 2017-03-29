@@ -191,7 +191,8 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
                     identExpn.setEvalType(ExpnEvalType.BOOLEAN);
                 }
 
-
+                // mark this IdentExpn as a function (information is used during codegen)
+                identExpn.setFunction(true);
             } else {
                 semanticErrors.add(new TypeError(identExpn));
                 identExpn.setEvalType(ExpnEvalType.UNDEFINED);
