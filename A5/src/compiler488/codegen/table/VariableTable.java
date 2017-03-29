@@ -45,16 +45,20 @@ public class VariableTable implements AddressLookup<VariableTable.Address> {
      */
     public void createEntry(DeclarationPart decl) {
         if (decl instanceof ArrayDeclPart) {
-            createEntry(decl.getName(), ((ArrayDeclPart) decl).getSize().shortValue());
+            createEntry(
+                    decl.getName(),
+                    ((ArrayDeclPart) decl).getSize().shortValue(),
+                    ((ArrayDeclPart) decl).getLowerBoundary().shortValue()
+            );
         } else {
             createEntry(decl.getName(), (short) 1);
         }
     }
 
-    private void createEntry(String id, short allocationSize) {
+    private void createEntry(String id, short allocationSize, short arrayLowerBound) {
         // Enter the symbol into the addressMap
         short offset = scopeStack.peek().getOffset();
-        Address entryAddress = new Address(lexicalLevel, offset);
+        Address entryAddress = new Address(lexicalLevel, offset, arrayLowerBound);
         if (!addressMap.containsKey(id)) {
             addressMap.put(id, new Stack<>());
         }
@@ -63,6 +67,10 @@ public class VariableTable implements AddressLookup<VariableTable.Address> {
         // Add this variable to the innermost open scope's declared variables
         //   and retrieve its offset.
         scopeStack.peek().addVariable(id, allocationSize);
+    }
+
+    private void createEntry(String id, short allocationSize) {
+        createEntry(id, allocationSize, (short) 0);
     }
 
 
@@ -75,9 +83,12 @@ public class VariableTable implements AddressLookup<VariableTable.Address> {
 
         public final short ON;
 
-        Address(short lexicalLevel, short offset) {
+        public final short LOWER_BOUND;
+
+        Address(short lexicalLevel, short offset, short arrayLowerBound) {
             this.LL = lexicalLevel;
             this.ON = offset;
+            this.LOWER_BOUND = arrayLowerBound;
         }
     }
 
@@ -137,7 +148,7 @@ public class VariableTable implements AddressLookup<VariableTable.Address> {
 
         /**
          * Returns a Collections of the ids of symbols declared in this scope.
-         * @return
+         * @return the ids of symbols declared in this scope
          */
         Collection<String> getIds() {
             return ids;

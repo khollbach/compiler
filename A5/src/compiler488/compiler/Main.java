@@ -565,7 +565,7 @@ public class Main {
 
         try {
             CodeGenVisitor codeGenVisitor = new CodeGenVisitor();
-            codeGenVisitor.doCodeGen(programAST);
+            programAST.accept(codeGenVisitor);
         } catch (Exception e) {
             System.err.println("Exception during Code Generation");
             System.err.println(e.getClass().getName() + ": " + e.getMessage());

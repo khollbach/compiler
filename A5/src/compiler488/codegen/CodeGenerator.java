@@ -35,16 +35,30 @@ public class CodeGenerator {
         writeWord(addr, word);
     }
 
-    public short getNextProgramAddr() {
+    public short getNextInstrAddr() {
         return nextProgramAddr;
     }
 
+    public short getNextConstPoolAddr() {
+        return nextConstPoolAddr;
+    }
+
+
     public short genText(String text) {
-        for (char c : text.toCharArray()) {
+
+        // add null terminator
+        if (nextConstPoolAddr < nextProgramAddr) {
+            errNoMemory();
+        } else {
+            writeWord(nextConstPoolAddr, (short) 0);
+            nextConstPoolAddr--;
+        }
+
+        for (int i = text.length() - 1; i >= 0; i--) {
             if (nextConstPoolAddr < nextProgramAddr) {
                 errNoMemory();
             } else {
-                writeWord(nextConstPoolAddr, (short) c);
+                writeWord(nextConstPoolAddr, (short) text.charAt(i));
                 nextConstPoolAddr--;
             }
         }
