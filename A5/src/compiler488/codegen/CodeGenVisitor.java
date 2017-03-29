@@ -302,8 +302,29 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
     }
 
     @Override
-    public void visit(FunctionCallExpn funcExpn) {
-        throw new RuntimeException("NYI");
+    public void visit(FunctionCallExpn funcCall) {
+        short functionAddress = routineTable.getAddress(funcCall.getIdent());
+        short functionLL = -1; // TODO: need to know function's LL
+
+        short patchReturnAddress = (short)(codeGen.getNextInstrAddr() + 3);
+        codeGen.genCode(
+                PUSH, (short) 0,
+                PUSH, UNDEFINED, // To be patched
+                ADDR, functionLL, (short) 0
+        );
+
+        for (Expn arg : funcCall.getArguments()) {
+            arg.accept(this);
+        }
+
+        codeGen.genCode(
+                PUSH, functionAddress,
+                BR
+        );
+
+        codeGen.patchCode(patchReturnAddress);
+
+        throw new RuntimeException("NYI"); // TODO: see above.
     }
 
     @Override
@@ -453,7 +474,27 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(ProcedureCallStmt procCall) {
-        throw new RuntimeException("NYI");
+        short procedureAddress = routineTable.getAddress(procCall.getName());
+        short procedureLL = -1; // TODO: need to know procedure's LL
+
+        short patchReturnAddress = (short)(codeGen.getNextInstrAddr() + 1);
+        codeGen.genCode(
+                PUSH, UNDEFINED, // To be patched
+                ADDR, procedureLL, (short) 0
+        );
+
+        for (Expn arg : procCall.getArguments()) {
+            arg.accept(this);
+        }
+
+        codeGen.genCode(
+                PUSH, procedureAddress,
+                BR
+        );
+
+        codeGen.patchCode(patchReturnAddress);
+
+        throw new RuntimeException("NYI"); // TODO: see above.
     }
 
     @Override
