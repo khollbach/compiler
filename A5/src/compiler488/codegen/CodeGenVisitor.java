@@ -591,7 +591,6 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         // main program's code
 
         // Remember the starting address.
-        // TODO: this should be stored in the function table
         routineTable.createEntry(PRINT_STRING_ID, codeGen.getNextInstrAddr());
 
         short addrBR = codeGen.getNextInstrAddr();
