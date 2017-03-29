@@ -599,7 +599,7 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
                 DUP,                    // <- addrBR points here
                 LOAD,                   // load next char
                 DUP,
-                PUSH, (short) 0,
+                PUSH, (short) '\0',
                 EQ,
                 PUSH, MACHINE_FALSE,
                 EQ,                     // check that next char is not null

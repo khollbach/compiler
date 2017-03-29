@@ -190,6 +190,8 @@ public class SemanticVisitor implements DeclarationVisitor, ExpressionVisitor, S
                 } else {
                     identExpn.setEvalType(ExpnEvalType.BOOLEAN);
                 }
+
+
             } else {
                 semanticErrors.add(new TypeError(identExpn));
                 identExpn.setEvalType(ExpnEvalType.UNDEFINED);
