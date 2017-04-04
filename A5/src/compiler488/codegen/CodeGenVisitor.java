@@ -13,12 +13,15 @@ import compiler488.ast.decl.RoutineDecl;
 import compiler488.ast.decl.ScalarDecl;
 import compiler488.ast.expn.*;
 import compiler488.ast.stmt.*;
+import compiler488.codegen.table.PatchTable;
 import compiler488.codegen.table.RoutineTable;
 import compiler488.codegen.table.VariableTable;
 import compiler488.runtime.Machine;
 import compiler488.visitor.DeclarationVisitor;
 import compiler488.visitor.ExpressionVisitor;
 import compiler488.visitor.StatementVisitor;
+
+import java.util.Collection;
 
 /**
  * Class to perform code generation on the AST after it passes semantic checks.
@@ -32,6 +35,10 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
     private VariableTable varTable;
 
     private RoutineTable routineTable;
+
+    private PatchTable returnTable;
+
+    private PatchTable exitTable;
 
     // id used for the print string routine in the routine table
     private static final String PRINT_STRING_ID = "__print_str__";
@@ -436,6 +443,8 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(ExitStmt exitStmt) {
+        // todo - use exit table
+
         throw new RuntimeException("NYI");
     }
 
@@ -471,6 +480,7 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(ProcedureCallStmt procCall) {
+
         RoutineTable.Address proc = routineTable.getAddress(procCall.getName());
 
         short patchReturnAddress = (short)(codeGen.getNextInstrAddr() + 1);
@@ -527,6 +537,8 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(RepeatUntilStmt repeatUntilStmt) {
+        // todo - use exit table
+
         // store the address to branch to if the loop termination
         // condition is not met
         short addrLoop = codeGen.getNextInstrAddr();
@@ -542,10 +554,12 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(ReturnStmt returnStmt) {
+        // todo - use returnTable
+
         // TODO: need to know the address of the routine's cleanup code
         short cleanupAddress = -1;
         // TODO: need to know lexical level as well
-        short LL = -1;
+        short LL = varTable.getLexicalLevel();
 
         if (returnStmt.getValue() == null) {
             // Procedure return
@@ -555,9 +569,12 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
             );
         } else {
             // Function return: "return with <expr>".
+            // evaluate expr & store in return value allocation on stack
+            returnStmt.getValue().accept(this);
             codeGen.genCode(
-                    ADDR, LL, (short) 0,
-                    PUSH, cleanupAddress,
+                    ADDR, LL, (short) -3,
+                    STORE,
+                    PUSH, UNDEFINED,
                     BR
             );
         }
@@ -567,6 +584,8 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(WhileDoStmt whileStmt) {
+        // todo - use exit table
+
         // store the address to branch to if the loop termination
         // condition is not met
         short addrLoop = codeGen.getNextInstrAddr();
@@ -644,13 +663,38 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(RoutineDecl routineDecl) {
-    	
+
+        // store the location for the address to branch around this routine
+        short patchAddrBrAround = (short) (codeGen.getNextInstrAddr() + 1);
+        codeGen.genCode(
+                BR, UNDEFINED
+        );
+
+        short lexicalLevel = varTable.getLexicalLevel();
+        routineTable.createEntry(routineDecl.getName(), codeGen.getNextInstrAddr(), lexicalLevel);
+        returnTable.pushLevel();
+
+        // body
     	setOnVisitScopeListener(() -> {
     		for (ScalarDecl param: routineDecl.getRoutineBody().getParameters()){
     			varTable.createEntry(param);
     		}
     	});
     	routineDecl.getRoutineBody().getBody().accept(this);
+
+    	// patch the BR addresses of return stmts to branch to cleanup
+    	short cleanupAddr = codeGen.getNextInstrAddr();
+        Collection<Short> addrsToPatch = returnTable.popLevel();
+        for (short addr : addrsToPatch) {
+            codeGen.patchCode(addr, cleanupAddr);
+        }
+
+        // cleanup
+        codeGen.genCode(
+                SETD, lexicalLevel,
+                BR
+        );
+        codeGen.patchCode(patchAddrBrAround);
     }
     
     private void setOnVisitScopeListener(OnVisitScopeListener listener) {
