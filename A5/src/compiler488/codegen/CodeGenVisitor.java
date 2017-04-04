@@ -51,6 +51,8 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         codeGen = new CodeGenerator();
         varTable = new VariableTable();
         routineTable = new RoutineTable();
+        returnTable = new PatchTable();
+        exitTable = new PatchTable();
     }
 
     /*
@@ -99,8 +101,10 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         openScope(scope.isMajor());
 
         consumeScopeVisitHook();
+
         short paramAllocationSize = 0;
         short addrAllocationSize = 0;
+
         if(scope.isMajor()){
             paramAllocationSize = varTable.getAllocationSize();
             addrAllocationSize = (short) (codeGen.getNextInstrAddr() + 3);
@@ -114,11 +118,13 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         for (Declaration d : scope.getDeclarations()) {
             d.accept(this);
         }
+
         scope.setAllocationSize(varTable.getAllocationSize());
         for(Stmt s : scope.getStatements()) {
             s.accept(this);
             if (s instanceof Scope){
                 // keep updating allocation size of top level scope
+                // allocation size propagates from the bottom up
                 scope.setAllocationSize((short) Math.max(scope.getAllocationSize(),
                         ((Scope) s).getAllocationSize()));
             }
@@ -443,9 +449,25 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(ExitStmt exitStmt) {
-        // todo - use exit table
+        short patchBrAddr;
 
-        throw new RuntimeException("NYI");
+        if (exitStmt.getExpn() != null) {
+            exitStmt.getExpn().accept(this);
+            patchBrAddr = (short) (codeGen.getNextInstrAddr() + 1);
+            codeGen.genCode(
+                    PUSH, UNDEFINED,
+                    BF
+            );
+        } else {
+            patchBrAddr = (short) (codeGen.getNextInstrAddr() + 1);
+            codeGen.genCode(
+                    PUSH, UNDEFINED,
+                    BR
+            );
+        }
+
+        // store patchBrAddr so that it gets patched to branch out of getLevel loops
+        exitTable.addPatch(patchBrAddr, exitStmt.getLevel());
     }
 
     @Override
@@ -462,7 +484,8 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
         ifStmt.getWhenTrue().accept(this);
 
-        // store the location for the address to branch to when true
+        // store the location for the address to branch to after executing
+        // the true branch
         short addrTrueBranch = (short) (codeGen.getNextInstrAddr() + 1);
         codeGen.genCode(
                 PUSH, UNDEFINED,
@@ -472,7 +495,9 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         // Patch false branch address.
         codeGen.patchCode(addrFalseBranch, codeGen.getNextInstrAddr());
 
-        ifStmt.getWhenFalse().accept(this);
+        if(ifStmt.getWhenFalse() != null) {
+            ifStmt.getWhenFalse().accept(this);
+        }
 
         // Patch true branch address
         codeGen.patchCode(addrTrueBranch, codeGen.getNextInstrAddr());
@@ -537,7 +562,7 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
     @Override
     public void visit(RepeatUntilStmt repeatUntilStmt) {
-        // todo - use exit table
+        exitTable.pushLevel();
 
         // store the address to branch to if the loop termination
         // condition is not met
@@ -550,27 +575,33 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
                 PUSH, addrLoop,
                 BF
         );
+
+        // patch the BR address for any exit statements
+        Collection<Short> addrsToPatch = exitTable.popLevel();
+        short patchAddr = codeGen.getNextInstrAddr();
+        for (short addr : addrsToPatch) {
+            codeGen.patchCode(addr, patchAddr);
+        }
     }
 
     @Override
     public void visit(ReturnStmt returnStmt) {
-        // todo - use returnTable
-
-        // TODO: need to know the address of the routine's cleanup code
-        short cleanupAddress = -1;
-        // TODO: need to know lexical level as well
+        // patchReturn is the location to patch with the address to branch to on return
+        short patchReturn;
         short LL = varTable.getLexicalLevel();
 
         if (returnStmt.getValue() == null) {
             // Procedure return
+            patchReturn = (short) (codeGen.getNextInstrAddr() + 1);
             codeGen.genCode(
-                    PUSH, cleanupAddress,
+                    PUSH, UNDEFINED,
                     BR
             );
         } else {
             // Function return: "return with <expr>".
             // evaluate expr & store in return value allocation on stack
             returnStmt.getValue().accept(this);
+            patchReturn = (short) (codeGen.getNextInstrAddr() + 5);
             codeGen.genCode(
                     ADDR, LL, (short) -3,
                     STORE,
@@ -579,12 +610,13 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
             );
         }
 
-        throw new RuntimeException("NYI"); // TODO: see above.
+        // store the location of the word to patch
+        returnTable.addPatch(patchReturn);
     }
 
     @Override
     public void visit(WhileDoStmt whileStmt) {
-        // todo - use exit table
+        exitTable.pushLevel();
 
         // store the address to branch to if the loop termination
         // condition is not met
@@ -608,6 +640,13 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
         // Patch the address to branch to when the loop terminates
         codeGen.patchCode(addrLoopTerm, codeGen.getNextInstrAddr());
+
+        // patch the BR address for any exit statements
+        Collection<Short> addrsToPatch = exitTable.popLevel();
+        short patchAddr = codeGen.getNextInstrAddr();
+        for (short addr : addrsToPatch) {
+            codeGen.patchCode(addr, patchAddr);
+        }
     }
 
     @Override

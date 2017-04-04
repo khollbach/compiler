@@ -8,6 +8,9 @@ import java.util.List;
 /**
  * A class used to store addresses to patch.
  *
+ * This class is used to track where in the program code to patch
+ * for exit statements and return statements.
+ *
  * Created by gg on 03/04/17.
  */
 public class PatchTable {
