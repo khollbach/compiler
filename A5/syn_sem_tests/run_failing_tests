@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Check syntax/semantics of failing (incorrect) programs.
+
+compiler=../dist/compiler488.jar
+test_dir=../tests/failing
+
+echo Syntax errors:
+echo
+for f in `ls $test_dir | grep 'syntax_error_*'`; do
+    echo "$f"
+    java -jar "$compiler" -X "$test_dir/$f"
+    echo
+done
+echo
+echo
+
+echo Semantic errors:
+for f in `ls $test_dir | grep 'semantic_error_*'`; do
+    echo "$f"
+    echo "$f"
+    java -jar "$compiler" -X "$test_dir/$f"
+    echo
+done

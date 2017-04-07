@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Delete test output directory.
+
+output_dir=tmp-test-output
+
+rm -rf "$output_dir"

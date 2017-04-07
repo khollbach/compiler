@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Run the programs in the "passing" test directory.
+# Save the output of each program to a file with the same name.
+
+compiler=../dist/compiler488.jar
+test_dir=../tests/passing
+
+output_dir=tmp-test-output
+
+# Clean output dir.
+rm -rf "$output_dir"
+mkdir -p "$output_dir"
+
+# Run tests.
+for f in `ls "$test_dir"`; do
+    echo "$f"
+
+    # Compile and run; send program output to a file.
+    java -jar "$compiler" -O "$output_dir/$f" "$test_dir/$f"
+
+    echo
+done

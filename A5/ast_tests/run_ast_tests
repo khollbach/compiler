@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Dump ASTs of passing tests, for diff'ing with the source files later.
+
+compiler=../dist/compiler488.jar
+test_dir=../tests/passing
+
+output_dir=tmp-test-output
+
+# Clean output dir.
+rm -rf "$output_dir"
+mkdir -p "$output_dir/expected" "$output_dir/actual"
+
+# Run tests.
+for f in `ls "$test_dir"`; do
+    echo "$f"
+
+    # Remove comments, trailing whitespace, and blank lines from source file
+    # and copy to expected dir.
+    cat "$test_dir/$f" | sed -e 's/%.*$//g' -e 's/\s*$//g' -e '/^$/d' \
+        > "$output_dir/expected/$f"
+
+    # Dump generated AST to actual dir.
+    java -jar "$compiler" -X -D a -U "$output_dir/actual/$f" "$test_dir/$f"
+
+    echo
+done

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# View diffs of expected and actual output.
+
+expected=../tests/expected_output
+actual=tmp-test-output
+
+for f in `ls "$expected"`; do
+    vimdiff "$expected/$f" "$actual/$f"
+done

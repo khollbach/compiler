@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Check syntax and semantics of "passing" (correct) programs.
+
+compiler=../dist/compiler488.jar
+test_dir=../tests/passing
+
+for f in `ls "$test_dir"`; do
+    echo "$f"
+    java -jar "$compiler" -X "$test_dir/$f"
+    echo
+done

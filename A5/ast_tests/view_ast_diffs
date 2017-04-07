@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# View diffs of the AST dumps of the passing tests.
+
+output_dir=tmp-test-output
+
+for f in `ls "$output_dir/expected"`; do
+    vimdiff "$output_dir/expected/$f" "$output_dir/actual/$f"
+done

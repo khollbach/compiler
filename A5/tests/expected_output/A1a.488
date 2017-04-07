@@ -1,0 +1,43 @@
+TESTING BOOLEAN OPERATORS:
+not: 
+PASS
+not: 
+PASS
+and: 
+PASS
+and: 
+PASS
+or: 
+PASS
+or: 
+PASS
+nested boolean expression: 
+PASS
+
+TESTING COMPARISON OPERATORS:
+equality: 
+PASS
+inequality: 
+PASS
+less than: 
+PASS
+less than or equal: 
+PASS
+greater than: 
+PASS
+greater than or equal: 
+PASS
+conditional: 
+PASS
+
+TESTING ARITHMETIC OPERATORS:
+unary minus: 
+PASS
+addition: 
+PASS
+subtraction: 
+PASS
+multiplication: 
+PASS
+division: 
+PASS
