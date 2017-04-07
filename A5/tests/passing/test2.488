@@ -1,0 +1,5 @@
+{
+    var i : Integer
+    i := 123
+    write i, newline
+}
