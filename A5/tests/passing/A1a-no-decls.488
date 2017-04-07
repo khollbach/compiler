@@ -1,8 +1,4 @@
 {
-    %write "Hello world.", newline
-    %write 1, 2, 3, newline, "a", "b", "c", newline
-    %write 5 + 6 * 7, newline
-
     write "TESTING BOOLEAN OPERATORS:", newline
 
     write "not: "
