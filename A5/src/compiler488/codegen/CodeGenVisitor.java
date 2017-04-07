@@ -78,8 +78,15 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         // add the print string routine to the main program scope
         setOnVisitScopeListener(() -> {
             genPrintStringProcedure();
+
             // set PC to the first instruction of the program scope
             Machine.setPC(codeGen.getNextInstrAddr());
+
+            // Set display.
+            codeGen.genCode(
+                    PUSHMT,
+                    SETD, (short) 0
+            );
         });
 
         // do codegen on the main program scope
@@ -735,7 +742,7 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         );
         codeGen.patchCode(patchAddrBrAround);
     }
-    
+
     private void setOnVisitScopeListener(OnVisitScopeListener listener) {
         this.visitScopeListener = listener;
     }

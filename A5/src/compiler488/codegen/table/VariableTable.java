@@ -21,7 +21,7 @@ public class VariableTable implements AddressLookup<VariableTable.Address> {
     public VariableTable() {
         addressMap = new HashMap<>();
         scopeStack = new Stack<>();
-        lexicalLevel = 0;
+        lexicalLevel = -1;
     }
 
     @Override
