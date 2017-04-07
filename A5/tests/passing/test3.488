@@ -1,0 +1,10 @@
+{
+    var i, j : Integer
+    i := 123
+    j := i * 2
+    write "123: ", i, newline
+    write "246: ", j, newline
+    j := j + i * 2
+    write "492: ", j, newline
+    write "984: ", j + i * 4, newline
+}
