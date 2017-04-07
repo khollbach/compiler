@@ -1,0 +1,68 @@
+{
+    %write "Hello world.", newline
+    %write 1, 2, 3, newline, "a", "b", "c", newline
+    %write 5 + 6 * 7, newline
+
+    write "TESTING BOOLEAN OPERATORS:", newline
+
+    write "not: "
+    write (not false ? 1 : 0), newline
+
+    write "not: "
+    write (not (not true) ? 1 : 0), newline
+
+    write "and: "
+    write (true and true ? 1 : 0), newline
+
+    write "and: "
+    write (not (false and true) ? 1 : 0), newline
+
+    write "or: "
+    write (false or true ? 1 : 0), newline
+
+    write "or: "
+    write (not (false or false) ? 1 : 0), newline
+
+    write "nested boolean expression: "
+    write ((false or true) and (not (false and false)) ? 1 : 0), newline
+
+    write newline, "TESTING COMPARISON OPERATORS:", newline
+
+    write "equality: "
+    write (1 = 1 ? 1 : 0), newline
+
+    write "inequality: "
+    write (1 not = 2 ? 1 : 0), newline
+
+    write "less than: "
+    write (1 < 2000 ? 1 : 0), newline
+
+    write "less than or equal: "
+    write ((1 < = 1) and (1 < = 32000) ? 1 : 0), newline
+
+    write "greater than: "
+    write (2 > 1 ? 1 : 0), newline
+
+    write "greater than or equal: "
+    write ((4 > = 4) and (4 > = 3) ? 1 : 0), newline
+
+    write "conditional: "
+    write ((true ? true : false) ? 1 : 0), newline
+
+    write newline, "TESTING ARITHMETIC OPERATORS:", newline
+
+    write "unary minus: "
+    write (-1 = (0 - 1) ? 1 : 0), newline
+
+    write "addition: "
+    write (-1 + 1 = 0 ? 1 : 0), newline
+
+    write "subtraction: "
+    write (5 - 4 = 1 ? 1 : 0), newline
+
+    write "multiplication: "
+    write ((5 * 4 = 20) and (-5 * -4 = 20) ? 1 : 0), newline
+
+    write "division: "
+    write ((20 / 2 = 10) and (-21 / 2 = -10) ? 1 : 0), newline
+}
