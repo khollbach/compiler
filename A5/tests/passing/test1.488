@@ -1,0 +1,7 @@
+{
+    write "Hello world.", newline
+    write 1, 2, 3, newline, "a", "b", "c", newline
+    write "47: ", 5 + 6 * 7, newline
+    write "147: ", ((5) + (5 / 5 + ((6 * 7))) - 1 - -100 + 1 - - - 1), newline
+    write newline
+}
