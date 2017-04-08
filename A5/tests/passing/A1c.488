@@ -9,11 +9,13 @@
 % integer specifying how many loops to exit (the default is 1).
 
 {
+    % Each 'write "testX"' is expected to run exactly one time.
+
     var i, j, k : Integer
     var count : Integer
 
     while true do {
-        write "test", newline
+        write "test1", newline
         exit
     }
 
@@ -27,11 +29,11 @@
     i := 1
     while i = 1 do {
         i := 2
-        write "test", newline
+        write "test2", newline
     }
 
     while true do {
-        write "test", newline
+        write "test3", newline
         exit when i = 2
     }
 
@@ -71,7 +73,7 @@
         if i = 2 then
             exit
         else {
-            write "test", newline
+            write "test4", newline
             i := 2
         }
     until false
@@ -101,7 +103,7 @@
             }
             i := i + 1
         } until i = 10
-        write "test", newline
+        write "test5", newline
         exit 1
     }
     write "Should be 2 3: ", i, " ", j, newline

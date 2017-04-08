@@ -1,8 +1,9 @@
-test
-test
+test1
+test2
+test3
 Should be 10: 10
 Should be 2 3 4: 2 3 4
-test
+test4
 Should be 50: 50
-test
+test5
 Should be 2 3: 2 3
