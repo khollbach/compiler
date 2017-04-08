@@ -309,6 +309,8 @@ return values).
     PUSH 0          // Allocate space for return value
     PUSH ret_addr   // Save return address.
     ADDR LL_f 0     // Save display
+    PUSHMT
+    SETD LL_f       // Set display
     ...eval args...
     PUSH start_f
     BR              // Go to function.
@@ -325,6 +327,8 @@ display.
 // Calling code
     PUSH ret_addr   // Save return address.
     ADDR LL_f 0     // Save display
+    PUSHMT
+    SETD LL_f       // Set display
     ...eval args...
     PUSH start_f
     BR              // Go to procedure.

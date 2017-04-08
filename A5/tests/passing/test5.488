@@ -1,0 +1,15 @@
+{
+    var i, j : Integer
+
+    procedure test(i : Integer, j : Integer)
+    {
+        write "i: ", i, newline
+        write "j: ", j, newline
+        return
+    }
+
+    i := 1
+    j := 2
+
+    test(i, j)
+}

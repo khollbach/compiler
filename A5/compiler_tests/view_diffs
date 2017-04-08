@@ -6,5 +6,8 @@ expected=../tests/expected_output
 actual=tmp-test-output
 
 for f in `ls "$expected"`; do
-    vimdiff "$expected/$f" "$actual/$f"
+    # If the files differ, show me.
+    if ! diff "$expected/$f" "$actual/$f" > /dev/null; then
+        vimdiff "$expected/$f" "$actual/$f"
+    fi
 done

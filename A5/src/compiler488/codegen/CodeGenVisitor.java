@@ -143,7 +143,7 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
             codeGen.patchCode(addrAllocationSize, allocSize);
             // code to close the scope
             codeGen.genCode(
-                    PUSH, allocSize, // push allocSize = number of variables to be removed
+                    PUSH, (short) (allocSize + paramAllocationSize),
                     POPN
             );
         }
@@ -329,7 +329,9 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         codeGen.genCode(
                 PUSH, (short) 0,
                 PUSH, UNDEFINED, // To be patched
-                ADDR, func.LL, (short) 0
+                ADDR, func.LL, (short) 0,
+                PUSHMT,
+                SETD, func.LL
         );
 
         for (Expn arg : funcCall.getArguments()) {
@@ -518,7 +520,9 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         short patchReturnAddress = (short)(codeGen.getNextInstrAddr() + 1);
         codeGen.genCode(
                 PUSH, UNDEFINED, // To be patched
-                ADDR, proc.LL, (short) 0
+                ADDR, proc.LL, (short) 0,
+                PUSHMT,
+                SETD, proc.LL
         );
 
         for (Expn arg : procCall.getArguments()) {
@@ -713,10 +717,11 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         // store the location for the address to branch around this routine
         short patchAddrBrAround = (short) (codeGen.getNextInstrAddr() + 1);
         codeGen.genCode(
-                BR, UNDEFINED
+                PUSH, UNDEFINED,
+                BR
         );
 
-        short lexicalLevel = varTable.getLexicalLevel();
+        short lexicalLevel = (short) (varTable.getLexicalLevel() + 1);
         routineTable.createEntry(routineDecl.getName(), codeGen.getNextInstrAddr(), lexicalLevel);
         returnTable.pushLevel();
 
@@ -729,7 +734,8 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
     	routineDecl.getRoutineBody().getBody().accept(this);
 
     	// patch the BR addresses of return stmts to branch to cleanup
-    	short cleanupAddr = codeGen.getNextInstrAddr();
+        // The off-by-three is to include the scope exit code in the cleanup (ie the "PUSH m", "POPN").
+    	short cleanupAddr = (short) (codeGen.getNextInstrAddr() - 3);
         Collection<Short> addrsToPatch = returnTable.popLevel();
         for (short addr : addrsToPatch) {
             codeGen.patchCode(addr, cleanupAddr);

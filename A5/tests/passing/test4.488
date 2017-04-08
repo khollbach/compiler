@@ -1,0 +1,22 @@
+{
+    procedure test
+    {
+        write "Hi from test.", newline
+    }
+
+    var i, j, k : Integer
+
+    write "Hi from main.", newline
+
+    test
+
+    write "Hi from main again.", newline
+
+    test
+
+    write "Hi from main (3).", newline
+
+    test
+    test
+    test
+}

@@ -19,5 +19,11 @@ for f in `ls "$test_dir"`; do
     # Compile and run; send program output to a file.
     java -jar "$compiler" -O "$output_dir/$f" "$test_dir/$f"
 
+    # Strip machine start/end messages from successful executions.
+    if grep -Eq 'End Execution.' "$output_dir/$f"; then
+        cat "$output_dir/$f" | tail -n +6 | head -n -6 > my-tmp-file
+        mv my-tmp-file "$output_dir/$f"
+    fi
+
     echo
 done
