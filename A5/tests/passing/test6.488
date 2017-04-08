@@ -1,0 +1,7 @@
+{
+    function f(n : Integer) : Integer {
+        return with n + 1
+    }
+
+    write "Should be 101: ", f(100), newline
+}
