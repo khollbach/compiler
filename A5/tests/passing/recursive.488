@@ -1,0 +1,8 @@
+{
+    function recursive(n : Integer) : Integer {
+        if n >= 10 then return with n
+        else return with recursive(n + 1)
+    }
+
+    write "Should be 10: ", recursive(0), newline
+}
