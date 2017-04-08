@@ -7,10 +7,15 @@
             return with x * factorial(x - 1)
         }
 
-        write "Factorial of ", n, " is ", factorial(n), ".", newline
         if n <= 1 then return with 1
         return with factorial(n) / factorial(n - 1) * sillyfact(n - 1)
     }
 
-    write "Should be 5040: ", sillyfact(7), newline
+    write "Should be 1: ", sillyfact(0), newline
+    write "Should be 1: ", sillyfact(1), newline
+    write "Should be 2: ", sillyfact(2), newline
+    write "Should be 6: ", sillyfact(3), newline
+    write "Should be 24: ", sillyfact(4), newline
+    write "Should be 120: ", sillyfact(5), newline
+    write "Should be 720: ", sillyfact(6), newline
 }

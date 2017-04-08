@@ -3,11 +3,11 @@
 
     function countdown : Integer
     {
-        if count <= 0 then return with count
         count := count - 1
+        if count <= 0 then return with count
         return with count + countdown
     }
 
-    count := 10
-    write "Should be 45: ", countdown, newline
+    count := 11
+    write "Should be 55: ", countdown, newline
 }
