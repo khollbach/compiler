@@ -36,7 +36,7 @@
         return
     }
 
-    function sillyfactorial(n : Integer) : Integer
+    function sillyfact(n : Integer) : Integer
     {
         function factorial(x : Integer) : Integer
         {
@@ -46,7 +46,7 @@
 
         write "Factorial of ", n, " is ", factorial(n), ".", newline
         if n <= 1 then return with 1
-        return with factorial(n) / factorial(n - 1) * sillyfactorial(n - 1)
+        return with factorial(n) / factorial(n - 1) * sillyfact(n - 1)
     }
 
     count := 10
@@ -62,5 +62,5 @@
     nested
     write "Should be 3: ", temp, newline
 
-    write "Should be 5040: ", sillyfactorial(7), newline
+    write "Should be 5040: ", sillyfact(7), newline
 }

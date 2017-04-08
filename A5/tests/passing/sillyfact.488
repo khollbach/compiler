@@ -1,0 +1,16 @@
+{
+    function sillyfact(n : Integer) : Integer
+    {
+        function factorial(x : Integer) : Integer
+        {
+            if x <= 1 then return with 1
+            return with x * factorial(x - 1)
+        }
+
+        write "Factorial of ", n, " is ", factorial(n), ".", newline
+        if n <= 1 then return with 1
+        return with factorial(n) / factorial(n - 1) * sillyfact(n - 1)
+    }
+
+    write "Should be 5040: ", sillyfact(7), newline
+}

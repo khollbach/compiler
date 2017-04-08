@@ -1,0 +1,19 @@
+{
+    var temp : Integer
+
+    procedure nested
+    {
+        function helper(n : Integer) : Integer
+        {
+            if n >= 3 then return with n
+            return with helper(n + 1)
+        }
+
+        temp := helper(temp)
+        return
+    }
+
+    temp := 0
+    nested
+    write "Should be 3: ", temp, newline
+}

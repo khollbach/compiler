@@ -1,0 +1,13 @@
+{
+    var count : Integer
+
+    function countdown : Integer
+    {
+        if count <= 0 then return with count
+        count := count - 1
+        return with count + countdown
+    }
+
+    count := 10
+    write "Should be 45: ", countdown, newline
+}

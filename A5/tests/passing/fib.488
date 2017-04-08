@@ -1,0 +1,10 @@
+{
+    function fib(n : Integer) : Integer
+    {
+        if n <= 1 then return with n
+        return with fib(n - 1) + fib(n - 2)
+    }
+
+
+    write "Should be 21: ", fib(6), newline
+}

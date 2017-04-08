@@ -1,0 +1,15 @@
+{
+    var tally : Integer
+
+    procedure tallyup
+    {
+        if tally >= 10 then return
+        tally := tally + 1
+        tallyup
+        return
+    }
+
+    tally := 0
+    tallyup
+    write "Should be 10: ", tally, newline
+}
