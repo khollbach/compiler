@@ -462,8 +462,10 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
 
         if (exitStmt.getExpn() != null) {
             exitStmt.getExpn().accept(this);
-            patchBrAddr = (short) (codeGen.getNextInstrAddr() + 1);
+            patchBrAddr = (short) (codeGen.getNextInstrAddr() + 4);
             codeGen.genCode(
+            		PUSH, MACHINE_FALSE,
+            		EQ,
                     PUSH, UNDEFINED,
                     BF
             );
