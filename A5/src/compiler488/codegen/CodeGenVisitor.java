@@ -329,9 +329,7 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         codeGen.genCode(
                 PUSH, (short) 0,
                 PUSH, UNDEFINED, // To be patched
-                ADDR, func.LL, (short) 0,
-                PUSHMT,
-                SETD, func.LL
+                ADDR, func.LL, (short) 0
         );
 
         for (Expn arg : funcCall.getArguments()) {
@@ -339,6 +337,10 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         }
 
         codeGen.genCode(
+                PUSHMT,
+                PUSH, (short) funcCall.getArguments().size(),
+                SUB,
+                SETD, func.LL,
                 PUSH, func.ENTRY_PT,
                 BR
         );
@@ -522,9 +524,7 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         short patchReturnAddress = (short)(codeGen.getNextInstrAddr() + 1);
         codeGen.genCode(
                 PUSH, UNDEFINED, // To be patched
-                ADDR, proc.LL, (short) 0,
-                PUSHMT,
-                SETD, proc.LL
+                ADDR, proc.LL, (short) 0
         );
 
         for (Expn arg : procCall.getArguments()) {
@@ -532,6 +532,10 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
         }
 
         codeGen.genCode(
+                PUSHMT,
+                PUSH, (short) procCall.getArguments().size(),
+                SUB,
+                SETD, proc.LL,
                 PUSH, proc.ENTRY_PT,
                 BR
         );
