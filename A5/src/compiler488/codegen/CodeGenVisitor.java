@@ -610,11 +610,15 @@ public class CodeGenVisitor implements DeclarationVisitor, ExpressionVisitor, St
             );
         } else {
             // Function return: "return with <expr>".
-            // evaluate expr & store in return value allocation on stack
-            returnStmt.getValue().accept(this);
-            patchReturn = (short) (codeGen.getNextInstrAddr() + 5);
+
             codeGen.genCode(
-                    ADDR, LL, (short) -3,
+                    ADDR, LL, (short) -3
+            );
+
+            returnStmt.getValue().accept(this);
+
+            patchReturn = (short) (codeGen.getNextInstrAddr() + 2);
+            codeGen.genCode(
                     STORE,
                     PUSH, UNDEFINED,
                     BR
